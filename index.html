@@ -1,0 +1,1511 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Six Floors</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+[hidden]{display:none!important}
+body{margin:0}
+/* Layout: the 3D model leads, the simulation console sits under it, then the data that drives it. */
+:root{
+  --bg:#eef0ec; --ink:#1d2421; --muted:#5f6a64; --line:#c9cfc9;
+  --plane:#9aa59d; --panel:#f7f8f5; --accent:#d4561f;
+  --lo:#c2462a; --mid:#c99a1e; --hi:#1f8a68; --nodata:#a3aaa6; --gone:#6e5a50;
+  --p-climber:#2856c9; --p-steady:#3b4440; --p-hopper:#8b3fd0; --p-changer:#d02f84; --p-case:#d8161f; --p-regular:#0d7f8c; --p-nepo:#b8860b; --p-nepoCase:#b8860b; --p-founderCase:#4f8f00; --p-beastCase:#1a78c2; --p-laid:#a9aeab;
+  --display:"Fraunces", Georgia, serif;
+  --body:"IBM Plex Sans", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141917; --ink:#e6ebe7; --muted:#97a39c; --line:#2d3531;
+  --plane:#6d7a72; --panel:#1b211e; --accent:#f07a42;
+  --lo:#e2603f; --mid:#e2b53a; --hi:#3fbf93; --nodata:#5d6662; --gone:#a08578;
+  --p-climber:#6f97ff; --p-steady:#d6ddd9; --p-hopper:#bf86ff; --p-changer:#ff6fb5; --p-case:#ff4d55; --p-regular:#3fc6d6; --p-nepo:#f2c14e; --p-nepoCase:#f2c14e; --p-founderCase:#93d34a; --p-beastCase:#5cb6ff; --p-laid:#59605c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141917; --ink:#e6ebe7; --muted:#97a39c; --line:#2d3531;
+  --plane:#6d7a72; --panel:#1b211e; --accent:#f07a42;
+  --lo:#e2603f; --mid:#e2b53a; --hi:#3fbf93; --nodata:#5d6662; --gone:#a08578;
+  --p-climber:#6f97ff; --p-steady:#d6ddd9; --p-hopper:#bf86ff; --p-changer:#ff6fb5; --p-case:#ff4d55; --p-regular:#3fc6d6; --p-nepo:#f2c14e; --p-nepoCase:#f2c14e; --p-founderCase:#93d34a; --p-beastCase:#5cb6ff; --p-laid:#59605c; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:grid;gap:14px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,3.4vw,2.3rem);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 .poc{display:inline-block;vertical-align:middle;margin-left:10px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:2px 7px;position:relative;top:-3px}
+.disclaimer.vibe{border-left-color:var(--muted);margin-top:6px}
+.disclaimer{margin:8px 0 0;max-width:70ch;font-size:13px;color:var(--muted);border-left:3px solid var(--accent);padding-left:10px}
+h2{font-family:var(--display);font-weight:500;font-size:1.35rem;margin:28px 0 4px;text-wrap:balance}
+.sub{color:var(--muted);max-width:70ch;margin:6px 0 0}
+.stage{position:relative;height:min(72vh,660px);min-height:400px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg);touch-action:none;cursor:grab}
+.stage:active{cursor:grabbing}
+canvas{display:block;width:100%;height:100%}
+.labels{position:absolute;inset:0;pointer-events:none}
+.lvl{position:absolute;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transform:translate(-100%,-50%);padding-right:10px;transition:opacity .3s}
+.lvl b{color:var(--ink);font-weight:500}
+.co{position:absolute;pointer-events:auto;font:500 11px var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:3px;padding:1px 6px;white-space:nowrap;transform:translate(-50%,-130%);cursor:pointer;transition:opacity .6s}
+.co[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.co:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.co.tr{border-style:dashed;border-left-style:solid}
+.co.tr::after{content:" · in transition";color:var(--muted);font-weight:400}
+.co.dbl{border-left-width:6px;border-left-style:double}
+.co.merged{display:none}
+.log .merge{color:var(--p-hopper)}
+.co.dead{text-decoration:line-through;color:var(--muted);opacity:.85}
+.co.dead::after{content:" · collapsed " attr(data-year);text-decoration:none;display:inline-block;margin-left:3px;font-weight:400}
+.co.tr[aria-pressed="true"]::after,.co.dead[aria-pressed="true"]{color:inherit}
+.year{position:absolute;left:12px;bottom:30px;font-family:var(--display);font-weight:700;font-size:clamp(2rem,6vw,3.4rem);line-height:1;color:var(--ink);opacity:.9;font-variant-numeric:tabular-nums;pointer-events:none}
+.legend{position:absolute;right:12px;top:12px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:12px;display:grid;gap:6px;width:210px}
+.cap{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ramp{height:8px;border-radius:2px;background:linear-gradient(90deg,var(--lo),var(--mid),var(--hi))}
+.ramp-l{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.nod{display:flex;align-items:center;gap:6px;color:var(--muted);line-height:1.3}
+.nod i{flex:0 0 14px;height:8px;border-radius:2px;background:var(--nodata)}
+.detail{position:absolute;left:12px;top:12px;width:min(300px,calc(100% - 24px));background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;font-size:13px;display:grid;gap:6px;cursor:auto;z-index:2}
+.detail h3{margin:0;font-family:var(--display);font-weight:500;font-size:1.15rem;padding-right:20px}
+.detail dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;font-variant-numeric:tabular-nums}
+.detail dt{color:var(--muted)}
+.detail dd{margin:0}
+.detail .close{position:absolute;right:6px;top:6px;padding:2px 8px}
+.trnote{border-left:2px dashed var(--muted);padding-left:8px;color:var(--muted);font-size:12px}
+.trtag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--muted);border-radius:3px;padding:0 5px;color:var(--muted);margin-left:6px;vertical-align:1px}
+.trtag.dead{border-style:solid;border-color:var(--gone);color:var(--gone)}
+.hint{position:absolute;left:12px;bottom:8px;font-size:12px;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.group{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.group .cap{margin-right:6px}
+button{font:500 13px var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:7px 12px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px}
+@media (max-width:760px){.sim{grid-template-columns:1fr}}
+.box{border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:12px 14px;min-width:0}
+.people{display:grid;gap:8px;margin-top:8px}
+.ptype{display:grid;grid-template-columns:18px 1fr auto;gap:2px 10px;align-items:start;font-size:13px}
+.ptype svg{margin-top:2px}
+.ptype p{margin:0;color:var(--muted);font-size:12px;grid-column:2/4}
+.ptype .n{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.levels{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:10px;font-variant-numeric:tabular-nums}
+.levels div{display:grid;gap:2px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.levels b{font-family:var(--body);font-size:16px;color:var(--ink);font-weight:600}
+.log{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;font-size:13px;max-height:260px;overflow-y:auto}
+.log li{display:grid;grid-template-columns:42px 1fr;gap:8px}
+.log time{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.log .bad{color:var(--lo)}
+.log .good{color:var(--hi)}
+.log .case{color:var(--p-case);font-weight:500}
+.ptype.seek svg circle.mark{fill:var(--accent)}
+.log .beast{color:var(--p-beastCase);font-weight:500}
+.ptype.beastCase b{color:var(--p-beastCase)}
+.log .founder{color:var(--p-founderCase);font-weight:500}
+.ptype.founderCase b{color:var(--p-founderCase)}
+.log .nepo{color:var(--p-nepo);font-weight:500}
+.ptype.nepoCase b{color:var(--p-nepo)}
+.ptype.case b{color:var(--p-case)}
+.tally{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.tally b{color:var(--ink);font-variant-numeric:tabular-nums}
+.follow{display:grid;gap:10px}
+.frow{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.frow label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.frow select{font:500 13px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;max-width:100%;min-width:0}
+.frow select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.jhead{font-family:var(--display);font-size:1.1rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.jhead i{width:12px;height:12px;border-radius:50%;background:var(--c)}
+.jlog{max-height:300px}
+.jlog .k{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--kc);vertical-align:0}
+.jsum{border-top:1px solid var(--line);padding-top:10px;font-size:14px;display:grid;gap:6px}
+.jsum b{font-family:var(--display);font-weight:500;font-size:1.05rem}
+.jsum dl{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:0;font-variant-numeric:tabular-nums}
+.jsum dt{color:var(--muted)}
+.jsum dd{margin:0}
+.crisis{position:absolute;left:50%;top:14px;transform:translate(-50%,-4px);background:var(--panel);color:var(--muted);border:1px solid var(--line);border-left:2px solid var(--lo);border-radius:3px;padding:5px 10px;font-size:11px;display:grid;gap:1px;text-align:left;pointer-events:none;max-width:min(380px,calc(100% - 24px));opacity:0;transition:opacity 1.2s ease,transform 1.2s ease}
+.crisis.show{opacity:.88;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){.crisis{transition:none}}
+.crisis b{font-family:var(--display);font-weight:500;font-size:12.5px;color:var(--ink)}
+@media (max-width:640px){.crisis{top:auto;bottom:150px}}
+.impact{min-width:620px;font-size:13px}
+.impact td.num{text-align:right}
+.impact .up{color:var(--lo)}
+.impact .down{color:var(--hi)}
+.impact .real{color:var(--muted);font-size:12px}
+.mix{display:grid;gap:5px;margin-top:8px;font-size:12px}
+.mix .r{display:grid;grid-template-columns:minmax(0,1.4fr) 1fr 74px;gap:8px;align-items:center}
+.mix .n{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mix .b{position:relative;height:10px;background:var(--line);border-radius:2px}
+.mix .b i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:2px}
+.mix .b u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.mix .v{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted);text-align:right}
+.mix .k{font-size:11px;color:var(--muted)}
+.fallen{padding-block:10px}
+.fl{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.fl li button{font:500 12px var(--body);padding:3px 8px;border-radius:3px;background:var(--bg);border:1px solid var(--line);color:var(--muted);display:inline-flex;gap:6px;align-items:baseline}
+.fl li button time{font-family:var(--mono);font-size:11px}
+.fl li.down button{color:var(--ink);border-left:3px solid var(--gone)}
+.fl li.down button span{text-decoration:line-through;text-decoration-color:var(--gone)}
+.fl li.up button{opacity:.55}
+.reveal{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%);width:min(420px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:6px;padding:18px 20px;display:grid;gap:8px;z-index:3;opacity:0;pointer-events:none;transition:opacity 1s ease,transform 1s ease;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.reveal.show{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+.reveal .cap{color:var(--accent)}
+.reveal h3{margin:0;font-family:var(--display);font-weight:700;font-size:1.5rem;text-wrap:balance}
+.reveal p{margin:0;color:var(--muted);font-size:14px}
+.reveal .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.jlog .hiddenstep{color:var(--muted);font-style:italic}
+@media (prefers-reduced-motion: reduce){.reveal{transition:none}}
+.ylegend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:6px 0}
+.ylegend span::before{content:"";display:inline-block;width:14px;height:3px;border-radius:2px;background:var(--c);margin-right:6px;vertical-align:3px}
+.realsim{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:6px}
+.rs{border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:12px 14px;min-width:0}
+.rs b{display:block;font-family:var(--display);font-weight:500;font-size:1.05rem;margin-bottom:4px}
+.rs p{margin:0;color:var(--muted);font-size:14px}
+.rel{display:grid;gap:10px;margin-top:6px}
+.relv{border-left:3px solid var(--line);padding:2px 0 2px 14px;max-width:80ch}
+.relv.cur{border-left-color:var(--accent)}
+.relv.lim{border-left-style:dashed}
+.relv h3{margin:0 0 4px;font-family:var(--display);font-weight:500;font-size:1.05rem;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.relv h3 span{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--muted);font-weight:400}
+.relv ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.relv li b{color:var(--ink);font-weight:500}
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:6px}
+.finding{border-top:2px solid var(--ink);padding-top:8px;min-width:0}
+.finding b{display:block;font-family:var(--display);font-weight:500;font-size:1.05rem;margin-bottom:2px}
+.finding p{margin:0;color:var(--muted);font-size:14px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:760px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--panel)}
+td.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+th.num{text-align:right}
+tr:last-child td{border-bottom:0}
+.score{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.score i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.band{font-family:var(--mono);font-size:12px}
+td a,.detail a{color:var(--ink)}
+.small{font-size:12px;color:var(--muted)}
+.notes{max-width:72ch;color:var(--muted);font-size:14px;display:grid;gap:8px}
+.notes p{margin:0}
+@media (max-width:640px){.legend{top:auto;bottom:34px;right:8px;width:170px}.lvl{font-size:9.5px}.detail{top:auto;bottom:34px}.year{bottom:auto;top:12px;left:auto;right:12px}}
+@media (prefers-reduced-motion: reduce){.co{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Six Floors <span class="poc">Proof of concept</span></h1>
+    <p class="disclaimer"><b>Proof of concept.</b> The companies, events and dates are real and sourced. The stick figures are fictional workers whose careers are simulated: they illustrate what typically happened to people like them, not what happened to any real person. Don't use it for real career or investment decisions.</p>
+    <p class="disclaimer vibe"><b>Vibe-coded.</b> Designed and directed by Zolyx, and built with Claude (Anthropic) in a single conversation, without writing code by hand. Sources are cited throughout, but the model hasn't been reviewed by a labour economist.</p>
+    <p class="sub">Each ladder is a real company, starting at the ground because every company hires at entry level. Height is how many levels the company is big enough to have; colour is how employees rate their career opportunities on Glassdoor. The stick figures are simulated workers who climb, switch companies on their own floor, start over, or lose their footing when a company collapses and its ladder vanishes.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="c"></canvas>
+    <div class="labels" id="labels"></div>
+    <div class="labels" id="tags"></div>
+    <div class="year" id="year">2000</div>
+    <div class="crisis" id="crisis" aria-live="polite"></div>
+    <div class="legend">
+      <div class="cap">Glassdoor career opportunities</div>
+      <div class="ramp"></div>
+      <div class="ramp-l"><span>2.5</span><span>3.5</span><span>4.5 / 5</span></div>
+      <div class="nod"><i></i>Not enough reviews</div>
+      <div class="nod"><i style="background:transparent;border:1px dashed var(--muted)"></i>Faded: in transition</div>
+      <div class="nod"><i style="background:var(--gone)"></i>Failed company: breaks apart the year it collapsed (listed below the model)</div>
+    </div>
+    <div class="detail" id="detail" hidden></div>
+    <div class="reveal" id="reveal" role="dialog" aria-live="polite" aria-label="Scenario revealed"></div>
+    <div class="hint">Drag to rotate · scroll or pinch to zoom · click a name for details</div>
+  </div>
+
+  <div class="fallen box">
+    <div class="cap">Companies that collapsed</div>
+    <ol class="fl" id="fallen"></ol>
+  </div>
+
+  <div class="controls">
+    <div class="group" role="group" aria-label="Simulation">
+      <span class="cap">Simulation</span>
+      <button id="play" aria-pressed="true">Pause</button>
+      <button id="restart">Restart from 2000</button>
+    </div>
+    <div class="group" role="group" aria-label="Speed">
+      <span class="cap">Speed</span>
+      <button id="s1" aria-pressed="true">1×</button>
+      <button id="s3" aria-pressed="false">3×</button>
+    </div>
+    <div class="group" role="group" aria-label="View">
+      <span class="cap">View</span>
+      <button id="vModel" aria-pressed="true">Model</button>
+      <button id="vSide" aria-pressed="false">Side</button>
+      <button id="vTop" aria-pressed="false">Top-down</button>
+    </div>
+    <button id="shuffle">Shuffle positions</button>
+  </div>
+
+  <div class="follow box" id="followBox">
+    <div class="cap">Follow one career</div>
+    <div class="frow">
+      <label for="ftype">Worker</label>
+      <select id="ftype">
+        <option value="regular">Regular employee</option>
+        <option value="climber">Climber</option>
+        <option value="steady">Settler</option>
+        <option value="hopper">Job hopper</option>
+        <option value="changer">Career changer</option>
+        <option value="nepo">Nepo hire</option>
+        <option value="case">Michael Fiddelke (real path)</option>
+        <option value="nepoCase">John Elkann (real path)</option>
+        <option value="founderCase">Jensen Huang (real path)</option>
+        <option value="beastCase">Jimmy Donaldson, MrBeast (real path)</option>
+      </select>
+      <label for="fscen">Scenario</label>
+      <select id="fscen">
+        <option value="random" selected>Surprise me: revealed at the end</option>
+        <option value="ordinary">Ordinary career: looking for a first job in 2000</option>
+        <option value="collapse">Their company collapses: Lehman Brothers, 2008</option>
+        <option value="merge">Their company merges: Fiat Chrysler into Stellantis, 2021</option>
+        <option value="attrition">High-attrition employer: starts at Infosys</option>
+        <option value="best">Best-rated employer: starts at Bain &amp; Company</option>
+      </select>
+      <button id="fstart">Follow from 2000</button>
+      <button id="fstop" hidden>Stop following</button>
+    </div>
+    <div id="journey" hidden>
+      <div class="jhead" id="jhead"></div>
+      <ol class="log jlog" id="jlog"></ol>
+      <div class="jsum" id="jsum" hidden></div>
+    </div>
+  </div>
+
+  <div class="sim">
+    <div class="box">
+      <div class="cap">Who is climbing</div>
+      <div class="people" id="people"></div>
+      <div class="cap" style="margin-top:12px">Where everyone is now</div>
+      <div class="levels" id="levels"></div>
+      <div class="tally" id="tally"></div>
+      <div class="cap" style="margin-top:14px">Industry mix: employed workers vs real US jobs</div>
+      <div class="mix" id="mix"></div>
+    </div>
+    <div class="box">
+      <div class="cap">What happened</div>
+      <ol class="log" id="log" aria-live="polite"></ol>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="cap">Year by year in this run, per 100 workers</div>
+    <div class="ylegend"><span style="--c:var(--hi)">Promotions</span><span style="--c:var(--accent)">Quits</span><span style="--c:var(--lo)">Layoffs</span></div>
+    <div style="overflow-x:auto"><svg id="yearly" viewBox="0 0 640 180" role="img" aria-label="Promotions, quits and layoffs per 100 simulated workers each year" style="width:100%;min-width:420px;height:auto;display:block"></svg></div>
+    <p class="small" style="margin:6px 0 0">Shaded bands mark 9/11, the 2008 crisis and COVID-19. Counts are for the simulated workers only, and leave out company-specific outlier events (collapses, bankruptcies, merger cuts, airline cuts after 9/11), which still happen in the model and appear in the log.</p>
+    <div class="cap" style="margin-top:18px">The real US economy over the same years</div>
+    <div class="ylegend"><span style="--c:var(--hi)">Hires</span><span style="--c:var(--accent)">Quits</span><span style="--c:var(--lo)">Layoffs</span></div>
+    <div style="overflow-x:auto"><svg id="realEcon" viewBox="0 0 640 220" role="img" aria-label="Real US hires, quits and layoffs per month, 2001 to 2026" style="width:100%;min-width:420px;height:auto;display:block"></svg></div>
+    <p class="small" style="margin:6px 0 0">Millions of people per month, all US employers. Source: <a href="https://fred.stlouisfed.org/data/JTSQUL" target="_blank" rel="noopener">BLS JOLTS via FRED</a> (<a href="https://fred.stlouisfed.org/data/JTSLDL" target="_blank" rel="noopener">layoffs</a>, <a href="https://fred.stlouisfed.org/data/JTSHIL" target="_blank" rel="noopener">hires</a>). Plotted for January and July of each year, and every month of 2020 so the COVID spike shows. No official source tracks promotions.</p>
+    <div class="cap" style="margin-top:18px">How each crisis shifted this run</div>
+    <p class="small" style="margin:4px 0 8px">Each event is compared with the years just before it, in this same simulation, next to the real US change for the same comparison. The workers are simulated, so exact numbers change on every restart; the direction of the shift is what to look at. Figures are per year, so periods of different length compare fairly. They fill in as the run reaches each period.</p>
+    <div class="tablewrap"><table class="impact" id="impact"></table></div>
+  </div>
+
+  <section>
+    <h2>What the data says</h2>
+    <div class="findings">
+      <div class="finding"><b>Tall ladders are not rated better</b><p>The companies that reach the top floor score between 3.1 (Target) and 4.2 (Google). Only Google is clearly green. The best scores in the model belong to consulting firms one floor lower.</p></div>
+      <div class="finding"><b>Nvidia is the outlier</b><p>Highest career score in the set at 4.4 from over 7,000 reviews, and a reported turnover of 3.7% in fiscal 2026. At about 42,000 staff it reaches Director, not the top floor.</p></div>
+      <div class="finding"><b>Intern to CEO, one ladder</b><p>Michael Fiddelke joined Target as a finance intern in 2003 and became CEO in February 2026, the red figure in the model. He arrived with an MBA from Kellogg and consulting experience at Deloitte.</p></div>
+      <div class="finding"><b>Three ways to the top</b><p>Fiddelke (red) climbed Target's ladder rung by rung for 23 years. Elkann (gold), grandson of Fiat's Gianni Agnelli, was lifted onto Fiat's board at 21. Huang (green) washed dishes at Denny's, then built his own ladder: Nvidia grew from 392 staff in 2000 to about 42,000.</p></div>
+      <div class="finding"><b>Size doesn't protect a ladder</b><p>Lehman Brothers had about 26,200 staff and Enron about 20,600 when they failed. Both were as tall as adidas or Nvidia are today.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The data behind each ladder</h2>
+    <p class="small">Headcounts are the latest figure found as of October 2026, or the last figure before collapse for failed companies. Career scores are Glassdoor's "career opportunities" sub-rating, read in October 2026. Figures marked "estimate" come from Revelio Labs, which counts public profiles, not company filings.</p>
+    <div class="tablewrap"><table id="table">
+      <thead><tr><th>Company</th><th class="num">Employees</th><th>Ladder reaches</th><th>Career score</th><th class="num">Reviews</th><th>Sources</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>What's real and what's simulated</h2>
+    <div class="realsim">
+      <div class="rs"><b>Real, the same every time</b><p>The companies, their sizes, career scores and founding years. Every event and its date: Lehman's collapse, Chrysler's bankruptcy, the Stellantis merger, 9/11 and the 2008 crisis. The careers of Michael Fiddelke, John Elkann, Jensen Huang and Jimmy Donaldson. The overall shifts the crises caused, such as US quits falling about 40% in 2008.</p></div>
+      <div class="rs"><b>Simulated, different on every restart</b><p>The 135 stick figures. No record exists of every employee's career, so the model creates fictional workers and gives them rules tuned to the real figures where data exists. Each simulated year it rolls the dice for each one: promoted or not, quit or not, laid off or not, which company hires them. This is an agent-based simulation.</p></div>
+      <div class="rs"><b>What that means</b><p>The model illustrates rather than predicts. It doesn't say "this person at Lehman lost their job". It says "a typical worker there in 2008 would have faced something like this". Pressing Restart replays the same history with a fresh roll of the dice, so individual stories change while the patterns stay. A single run can be skewed by luck; an effect that shows up on every restart is a real effect of the rules.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Which companies count in the economy graph</h2>
+    <p class="small" style="max-width:72ch">The economy chart and the crisis table only count workers at a reference sample: companies whose course through 9/11, the 2008 crisis and COVID-19 was close to the average experience of the economy. Companies that failed, boomed, or were hit far harder than average are left out, whatever their size or how well documented they are. Every company still appears in the 3D model and the log.</p>
+    <div class="realsim" id="sampleList"></div>
+  </section>
+
+  <section>
+    <h2>How to read it, and what it can't tell you</h2>
+    <div class="notes">
+      <p><b>Height is a size proxy.</b> Every ladder starts on the ground floor, L0 Entry level, where no experience is needed. Height is set by headcount band: under 100 staff reaches L1 Junior, 100 to 1,000 reaches L2 Senior, 1,000 to 10,000 reaches L3 Lead / Manager, 10,000 to 100,000 reaches L4 Director, and 100,000 or more reaches L5 Executive. Real companies use their own level structures, so this shows how much hierarchy a company of that size usually has, not its actual org chart.</p>
+      <p><b>Colour is perception.</b> Glassdoor reviewers choose to post, so scores lean towards people with strong feelings. Scores from a few dozen reviews can swing widely. Large companies mix very different jobs into one number.</p>
+      <p><b>The simulation is a set of rules, not data.</b> Each simulated year, a worker may be promoted. The base chance shrinks as the floors get higher (about 45% a year from Entry level, 35% from Junior, 22% from Senior, 12% from Lead, 5% from Director), and is scaled up or down by the company's career score and cut further if the company is in transition. Ladders appear in the year the company was founded and vanish in the year it collapsed. When a ladder vanishes, about half of its workers find a job on the same floor elsewhere; the rest drop a floor or back to entry level. These numbers are illustrative assumptions chosen to make the dynamics visible.</p>
+      <p><b>Mergers.</b> PSA Group (Peugeot, Citroën, Opel) and Fiat Chrysler merged into Stellantis on 16 January 2021. In the simulation their two ladders slide together and become one double ladder, two ladders glued along a shared middle rail. Workers move over with them: about 65% keep their floor, about 25% are moved down a floor because the merged company has duplicate roles, and about 10% are laid off to the ground. Those shares are illustrative assumptions. The predecessors take Stellantis's colour, since they no longer have reviews of their own.</p>
+      <p><b>The transition rule.</b> A company is marked "in transition" when it has announced major job cuts, a restructuring, a large merger still being integrated, or a review that could lead to selling or closing parts of the business, within the last 12 months. In the simulation, the ladder only fades and slows promotions from the month the transition began: February 2025 for Porsche, when its first job cuts were announced, and July 2026 for FDJ United, when it began reviewing its online business. Before that they behave like any other company.</p>
+      <p><b>Growing ladders.</b> Every company starts small, so ladders grow as companies do. Nvidia's ladder follows its real headcount history: 392 staff in January 2000, past 1,000 in 2002 and past 10,000 in 2017. Companies founded after 2000, such as Airbnb, Spotify, Zalando, Duolingo and MrBeast, appear as a one-floor ladder in their founding year and grow to today's height. Their timing is estimated, assuming fast early growth that slows later. Companies founded before 2000 are shown at today's height throughout, because their headcount history isn't in the model yet.</p>
+      <p><b>The three catastrophes.</b> The model shows 9/11, the 2008 financial crisis and the COVID-19 pandemic. Their effect on quits and layoffs is calibrated to the whole US economy, using the Bureau of Labor Statistics' JOLTS survey, and applied to every company alike, so the simulated workers behave like the average employee rather than the worst-hit ones. After 9/11, quits fell about 13% while layoffs economy-wide barely moved (−6%): the damage was concentrated in airlines and hotels. In the 2008 crisis, quits fell about 39% and layoffs rose about 20%. In March and April 2020, layoffs jumped about sixfold, with 13.0 million in March alone, and quits fell by a third. Because simulated workers reconsider their jobs only about once a year, this is modelled as one wave of layoffs at lockdown, sized to match. Then came the Great Resignation of 2021–22, when quits rose about 15% above pre-pandemic levels and layoffs fell about 21%. On top of the averages, company-specific shocks still happen as outlier events. Most companies survived all three crises, but some crashed: Sabena after 9/11; Lehman Brothers, Washington Mutual and Circuit City in 2008; Flybe and Arcadia Group during COVID-19, alongside Chrysler's bankruptcy and the airline cuts after 9/11. Their ladders break apart in the model, but everything that happens at failed companies (promotions, quits and the mass layoffs when they collapse) is kept out of the economy chart and the impact table, because extreme cases would distort the picture of the typical worker. The effect on promotions and job-search length is an assumption, because no official data tracks them.</p>
+      <p><b>Industry mix and hiring.</b> Simulated workers are hired so that each industry gets its real share of US jobs (Bureau of Labor Statistics, September 2026): education and health 18%, government 15%, leisure and hospitality 14%, professional and business services 14%, trade 14%, manufacturing 8%, finance 6%, construction 6%, transportation 5%, and information, where most tech companies sit, under 2%. Inside an industry, bigger companies hire proportionally more people, and a better career score makes a company somewhat more attractive. So a tech company can appear in the model as a ladder without taking a bigger share of the workforce than tech really has. Companies' sizes change over time where their growth is modelled.</p>
+      <p><b>Reference employers.</b> To keep the sample representative, the model includes large, typical employers from sectors that were missing: Walmart (retail), HCA Healthcare (health care), JPMorgan Chase (finance), Marriott and Starbucks (hospitality and food service), the US Postal Service (government) and VINCI (construction). Companies best known for one extreme event, such as General Motors' bankruptcy, Citigroup's 52,000 job cuts in 2008 or Boeing's 9/11 layoffs, were left out on purpose.</p>
+      <p><b>Retirement and a settled start.</b> About 2.5% of workers retire each year and are replaced by newcomers at entry level, as in a real workforce. Before the run starts in 2000, the statistical sample quietly lives through 20 years so it begins in a realistic, settled state.</p>
+      <p><b>Quitting and job hunting.</b> Each year a worker may quit and walk their floor looking for something better. The chance follows the company's published attrition rate where there is one: about 13 to 14% at TCS, Infosys, Wipro and Accenture, and 3.7% at Nvidia. Every other company uses its industry's real quit rate from the BLS JOLTS survey, from 0.8% a month in government to 3.4% a month in leisure and hospitality. Layoffs in normal years follow each industry's real layoff rate the same way, from 0.4% a month in government to 2.0% in professional and business services. Job hoppers quit more often, nepo hires rarely. After a search of roughly one to two years, about half of job seekers land a role one floor higher at another company, which is how many people get promoted in practice. The rest move sideways.</p>
+      <p><b>Why consulting scores so high.</b> Bain, BCG and McKinsey run an "up or out" model: consultants are promoted on a fixed schedule or expected to leave. That makes career progression fast and visible for those who stay, which shows in their scores, but it also means many people exit after a few years.</p>
+      <p><b>Why the shortest ladders are grey.</b> Companies with under 100 staff rarely have enough employee reviews for a reliable score. No well-known company that small, Telegram and Craigslist included, has a usable Glassdoor career rating, so their ladders stay grey rather than being given a guessed colour.</p>
+      <p><b>Missing:</b> the measures that would show stagnation directly, such as time spent at one level before promotion, the share of senior roles filled internally, and mid-level turnover. Most companies don't publish them.</p>
+    </div>
+  </section>
+  <section>
+    <h2>Release notes</h2>
+    <div class="rel">
+      <article class="relv cur">
+        <h3>Version 18 · Surprise scenarios <span>18 Oct 2026 · current</span></h3>
+        <ul><li><b>Reveal names the worker type.</b> The panel says which type of worker it was, describes their real start (including a nepo hire's family connections and where the first job was) and how that type behaves, and phrases the ending clearly.</li>
+          <li><b>Follow one career can keep the scenario secret.</b> "Surprise me" picks one of the five scenarios at random. During the run the journey log stays hidden; when the simulation reaches 2026, a panel reveals which scenario it was and how the career ended, and the full journey unlocks.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 17 · Real turnover by industry <span>18 Oct 2026</span></h3>
+        <ul>
+          <li><b>Quits and layoffs follow each industry's real rates.</b> The assumed 10% yearly quit chance and 4% layoff chance are replaced by the monthly rates the BLS JOLTS survey measures for each industry. A hotel or restaurant worker now changes jobs about four times as often as a government worker, as in reality. Companies with their own published attrition keep it.</li>
+          <li><b>Hiring replaces turnover.</b> Industries that lose people faster also hire more, so each keeps its real share of jobs.</li>
+          <li><b>Industry balance includes retirement.</b> Hiring now replaces everyone who leaves an industry, retirees included, which brought government back to its real share.</li>
+          <li><b>Balanced starting workforce.</b> In 2000 workers are placed by each industry's real share of jobs, and hiring gently favours any industry that drifts below its real share, as real labour markets rebalance. This fixed government, which had been running about 4 points short.</li>
+          <li><b>Retirement.</b> About 2.5% of workers retire each year (a roughly 40-year career) and a newcomer starts at entry level, so the workforce doesn't drift upward over 26 years.</li>
+          <li><b>Warm-up.</b> The statistical sample lives through 20 quiet years before 2000, so the run starts from a settled workforce instead of an artificial starting state.</li>
+          <li><b>COVID layoff wave.</b> The March–April 2020 layoffs are now applied as one wave at lockdown, sized to the real data, because workers only reconsider their jobs about once a year.</li>
+          <li>Recalibrated: every crisis now matches the direction of the real shift, and 2008 and COVID match its size closely. The crisis shifts still apply on top, and no other features changed.</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 16 · A realistic industry mix <span>18 Oct 2026</span></h3>
+        <ul>
+          <li><b>Hiring follows the real economy.</b> Each industry receives its real share of US jobs, and bigger companies hire proportionally more within their industry. Before, a 30-person company was about as likely to hire a worker as Walmart.</li>
+          <li><b>Fewer tech ladders.</b> Removed Mozilla, Personio and Celonis. Tech now gets under 2% of the simulated workforce, as in reality, however many tech ladders are shown.</li>
+          <li><b>Missing industries filled.</b> Added the US Postal Service (government), Starbucks (food service) and VINCI (construction).</li>
+          <li><b>A checked reference sample.</b> Every company was audited for how closely its course through the three crises followed the average. Companies that failed, boomed (Amazon, Nvidia, MrBeast) or were hit far harder than average (airlines, hotels, Airbnb, the Stellantis group) are left out of the economy chart and crisis table; they stay in the model. Rates are now per 100 workers in that sample. A new section lists which companies count and why the others don't.</li>
+          <li><b>Crisis casualties.</b> Added companies that crashed in each crisis: Sabena (9/11), Washington Mutual and Circuit City (2008), Flybe and Arcadia Group (COVID-19). Everything at failed companies is now excluded from the economy chart, not just their final layoffs.</li>
+          <li><b>Collapsed companies listed below the model.</b> Their labels no longer sit on the floors; a dated list under the model fills in as each one fails, and clicking a name shows its details.</li>
+          <li><b>Industry mix panel.</b> Shows the simulated workforce by industry against the real US share, live.</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 15 · A robust, representative sample <span>18 Oct 2026</span></h3>
+        <ul>
+          <li><b>Three catastrophes, calibrated to the whole economy.</b> 9/11, the 2008 financial crisis and the COVID-19 pandemic (plus the Great Resignation that followed) now shift quits and layoffs by the same percentages measured across all US employers in the BLS JOLTS survey. Every company follows the average change.</li>
+          <li><b>Reference employers instead of extreme cases.</b> Added Walmart, HCA Healthcare, JPMorgan Chase and Marriott to cover retail, health care, finance and hotels. Companies known mainly for one extreme event (General Motors, Citigroup, Boeing) were left out on purpose, so they don't skew the averages.</li>
+          <li><b>Outliers kept out of the economy chart.</b> Collapses, bankruptcies, merger cuts and airline cuts after 9/11 still happen in the model and the log, but the chart and impact table count only the economy-wide pattern.</li>
+          <li><b>A large invisible sample, because computers have limits.</b> Drawing more than about 135 animated figures would make the 3D model too slow on ordinary computers, but 135 is too few for reliable statistics. So 2,400 extra workers follow exactly the same rules without being drawn. The charts and the impact table use all of them; the 3D model shows only the 135. Results are given per 100 workers.</li>
+          <li><b>Real economy chart.</b> Official US hires, quits and layoffs from 2001 to 2026 sit next to the simulated results, and the impact table shows the real change beside each simulated one.</li>
+          <li><b>Baseline layoffs.</b> Workers now face a small, assumed 4% yearly chance of being laid off in normal years, so crisis changes can be measured against a normal level.</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 14 · One timeline <span>18 Oct 2026</span></h3>
+        <ul><li>Removed the on/off switches for the crises: the model always shows real history. Crisis effects are measured inside the same run by comparing each event with the years before it. Added the "What's real and what's simulated" explanation.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 13 · Crises, founders and growing ladders <span>18 Oct 2026</span></h3>
+        <ul><li>Added the 2008 financial crisis and 9/11, with United Airlines. Ladders now grow as companies grow: Nvidia from its real headcount history, younger companies with estimated timing. Added Jensen Huang and Jimmy Donaldson (MrBeast) as real founder paths.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 12 · Follow one career <span>18 Oct 2026</span></h3>
+        <ul><li>Pick a worker type and a scenario, watch them through a highlighted run with a footprint trail, a journey log and an end summary.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 11 · Job seekers <span>18 Oct 2026</span></h3>
+        <ul><li>Workers can quit and walk their floor looking for a better job, often landing one floor higher. Quit rates follow published attrition where available: TCS, Infosys, Wipro, Accenture and Nvidia.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Versions 9–10 · New figures and better data <span>18 Oct 2026</span></h3>
+        <ul><li>Added regular employees, nepo hires and laid-off workers, with John Elkann as a real nepotism case. Replaced companies with weak data, added well-rated employers (Bain, BCG, McKinsey, Google, Cisco), widened the floors and added the proof-of-concept disclaimer.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Versions 6–8 · The simulation <span>18 Oct 2026</span></h3>
+        <ul><li>Simulated workers from 2000 to 2026, failed companies whose ladders break apart, the transition rule, Target with Michael Fiddelke's real path, the Stellantis merger as a double ladder, and six floors with Entry level on the ground.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Versions 1–5 · The model <span>18 Oct 2026</span></h3>
+        <ul><li>Stacked floors and ladders; one ladder per real company, all starting at the ground; heights from sourced headcounts and colours from Glassdoor career scores; FDJ United and Dussmann screened and added.</li></ul>
+      </article>
+      <div class="relv lim">
+        <h3>Known limitations</h3>
+        <ul>
+          <li>No official data tracks promotions or job-search length economy-wide, so their crisis effects are assumptions.</li>
+          <li>The economy-wide data is for the United States; the model includes European and Asian companies.</li>
+          <li>Ladder growth for companies founded before 2000 isn't modelled; they appear at today's height.</li>
+          <li>Short events like the two-month COVID shock give noisier percentages than long ones, even with the large sample.</li>
+          <li>Company stability (credit ratings) is planned for a later version.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const LEVELS=["Junior","Senior","Lead / Manager","Director","Executive"]; // floors L1–L5
+const ENTRY="Entry level"; // the ground floor, L0: no experience needed
+const GD="Glassdoor";
+// [name, employees, note on figure, career score or null, reviews, sources, transition or null, founded, collapse or null]
+const DATA=[
+  ["Telegram",30,"2024, about 30 engineers per Pavel Durov",null,null,[["Dubawa fact check","https://dubawa.org/does-telegram-have-only-30-employees-as-claimed-by-x-user/"]],null,2013.6],
+  ["Craigslist",50,"2017",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Craigslist"]],null,1995],
+  ["Duolingo",900,"end 2025, 10-K: more than 900",3.7,172,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/1562088/000162828026012494/duol-20251231.htm"],[GD,"https://www.glassdoor.com.au/Overview/Working-at-EI_IE629348.htm"]],null,2011.5],
+  ["FDJ United",5755,"end 2025",3.1,94,[["Universal registration document 2025","https://www.sustainabilityreports.com/fdj-united/2025/universal-registration-document"],[GD,"https://static.glassdoor.fr/Reviews/FDJ-UNITED-Reviews-E804111_P2.htm"]],{from:2026.58,log:"it starts reviewing the online betting business it bought with Kindred",note:"Since July 2026, reviewing the online betting and gaming business it gained with Kindred (nearly 2,500 staff). Market exits or divestments are possible, and that unit has a new management team.",src:["Next.io, July 2026","https://next.io/?p=168800"]},1976],
+  ["Spotify",7323,"end 2025, derived",3.3,1798,[["Octagon (from Q1 2026 figures)","https://octagonai.co/markets/companies/kpis/spotify-headcount-in-2026/"],[GD,"https://www.glassdoor.ie/spotify"]],null,2006],
+  ["Airbnb",8200,"end 2025",3.5,2415,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/1559720/000155972026000004/abnb-20251231.htm"],[GD,"https://www.glassdoor.ca/Overview/Working-at-EI_IE391850.htm"]],null,2008],
+  ["Zalando",16582,"2025",3.3,3480,[["Wikipedia","https://en.wikipedia.org/wiki/Zalando"],[GD,"https://www.glassdoor.ie/Jobs/Zalando-Jobs-E613421.htm"]],null,2008],
+  ["Puma",18503,"2025 average",3.4,1894,[["Annual report 2025","https://annual-report.puma.com/2025/en/additional-information/puma-year-on-year-comparison/index.html"],[GD,"https://static-pc.glassdoor.de/Reviews/PUMA-Reviews-E10474_P125.htm"]],null,1948],
+  ["Porsche",41780,"2025",3.2,1662,[["People Matters","https://www.peoplematters.in/news/strategic-hr/porsche-eyes-5000-more-job-cuts-after-sales-drop-15percent-in-h1-2026-51028"],[GD,"https://www.glassdoor.com/Jobs/-Jobs-E10476.htm"]],{from:2025.12,log:"it announces its first job cuts as sales fall",note:"Announced its first job cuts in February 2025, since raised to 3,900, with about 5,000 more reportedly under consideration as of July 2026 after sales fell.",src:["People Matters, July 2026","https://www.peoplematters.in/news/strategic-hr/porsche-eyes-5000-more-job-cuts-after-sales-drop-15percent-in-h1-2026-51028"],src2:["electrive, Feb 2025","https://www.electrive.com/2025/02/14/porsche-plans-to-cut-1900-jobs/"]},1931],
+  ["Nvidia",42000,"Jan 2026, 10-K",4.4,7151,[["10-K FY2026","https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm"],[GD,"https://www.glassdoor.co.uk/Jobs/NVIDIA-Jobs-E7633.htm"]],null,1993,null,null,{rate:.037,label:"3.7% turnover, fiscal 2026 (10-K)"},{start:2,steps:[[2002.07,3,"passes 1,000 employees (1,123 in January 2002)"],[2017.08,4,"passes 10,000 employees (10,299 in January 2017)"]],pts:[[2000.08,392],[2002.07,1123],[2007.08,4083],[2012.08,7133],[2017.08,10299],[2021.08,18975],[2026.07,42000]],src:["Stock Analysis, Nvidia headcount history","https://www.stockanalysis.com/stocks/nvda/employees/"]}],
+  ["Dussmann",72000,"2025",null,19,[["Hogapage, May 2026","https://www.hogapage.de/nachrichten/wirtschaft/management/dussmann-group-erzielt-2025-rekordumsatz-auch-dank-food-services-bereich/"],[GD+" (2.8 from 19 reviews, too few to use)","https://www.glassdoor.co.in/Reviews/Dussmann-Group-Reviews-E934502.htm"],["Jobvoting (career 1/5, 40 reviews)","https://www.jobvoting.de/Dussmann+Service+Deutschland+GmbH/Arbeitgeber"]],null,1963],
+  ["adidas",64938,"end 2025",3.4,10328,[["Annual report 2025","https://report.adidas-group.com/2025/en/additional-information/ten-year-overview.html"],[GD,"https://www.glassdoor.sg/Jobs/adidas-Jobs-E10692.htm"]],null,1949],
+  ["Siemens",318000,"Sep 2025",3.8,27034,[["Siemens UK","https://news.siemens.co.uk/news/the-informed-executive"],[GD,"https://glassdoor.co.uk/Jobs/Siemens-Jobs-E3510.htm"]],null,1847],
+  ["Volkswagen",662942,"end 2025",3.5,1493,[["Annual report 2025","https://annualreport2025.volkswagen-group.com/group-management-report/business-development/total-workforce.html"],[GD,"https://static.glassdoor.ca/Reviews/Volkswagen-Group-Reviews-E3515.htm"]],null,1937],
+  ["Amazon",1576000,"end 2025, 10-K",3.6,254628,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/1018724/000101872426000004/amzn-20251231.htm"],[GD,"https://www.glassdoor.ie/Jobs/Amazon-Jobs-E6036.htm"]],null,1994],
+  ["Target",415000,"2025",3.1,95046,[["Target corporate overview","https://corporate.target.com/investors/corporate-overview"],[GD,"https://www.glassdoor.co.nz/Overview/Working-at-EI_IE194.htm"]],null,1902],
+  ["MrBeast",750,"2026, about 750 across Beast Industries (unattributed estimate)",4.1,41,[["Everything PR, 2026","https://everything-pr.com/mrbeast-built-a-holding-company-the-beast-industries-case-at-5-billion"],["Fortune, Mar 2025","https://fortune.com/2025/03/11/youtube-biggest-star-mrbeast-makes-more-money-chocolate-videos"],[GD+" (41 reviews, small sample)","https://www.glassdoor.co.nz/Reviews/MrBeast-Reviews-E6723666.htm"]],null,2012.05,null,null,null,null,{n0:1}],
+  ["United Airlines",113200,"end 2025, 10-K",3.8,7263,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/100517/000010051726000023/ual-20251231.htm"],[GD,"https://www.glassdoor.co.uk/Overview/Working-at-EI_IE683.htm"],["PBS NewsHour, Sep 2001 (about 20,000 cuts after 9/11)","https://www.pbs.org/newshour/economy/business-july-dec01-airlines_09-19"]],null,1926],
+  // reference employers: large, diversified S&P 500 companies with no extreme company-specific event, filling sectors the model lacked
+  ["Walmart",2100000,"Jan 2026, 10-K",3.3,155986,[["10-K FY2026","https://www.sec.gov/Archives/edgar/data/104169/000010416926000055/wmt-20260131.htm"],[GD,"https://www.glassdoor.ca/Jobs/-Jobs-E715.htm"]],null,1962],
+  ["HCA Healthcare",316000,"2024",3.3,9916,[["Macrotrends","https://www.macrotrends.net/stocks/charts/HCA/hca-healthcare/number-of-employees"],[GD,"https://www.glassdoor.co.nz/Overview/Working-at-EI_IE2062.htm"]],null,1968],
+  ["JPMorgan Chase",318512,"end 2025, 10-K",3.8,36388,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/19617/000162828026008131/jpm-20251231.htm"],[GD,"https://www.glassdoor.com.au/Overview/Working-at-EI_IE5224839.htm"]],null,1799],
+  ["Marriott",148000,"end 2025, 10-K (direct employees)",3.7,18971,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/1048286/000104828626000007/mar-20251231.htm"],[GD,"https://www.glassdoor.co.nz/Overview/Working-at-EI_IE7790.htm"]],null,1927],
+  ["US Postal Service",624492,"FY2025 (career and pre-career)",3.1,21049,[["USPS annual report FY2025","https://about.usps.com/what/financials/annual-reports/fy2025.pdf"],[GD,"https://www.glassdoor.com/Jobs/-Jobs-E3032.htm"]],null,1775],
+  ["Starbucks",381000,"Sep 2025, 10-K",3.3,86450,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/829224/000082922425000114/sbux-20250928.htm"],[GD,"https://www.glassdoor.co.in/Overview/Working-at-EI_IE2202.htm"]],null,1971],
+  ["VINCI",293786,"end 2025",3.7,1581,[["VINCI universal registration document 2025","https://www.vinci.com/publi/vinci/a11y/2025/vinci-urd/article/R5/"],[GD+" (review count shown inconsistently)","https://static.glassdoor.com.mx/Overview/Working-at-EI_IE10584.htm"]],null,1899],
+  // well-rated employers
+  ["Bain & Company",22033,"Mar 2026, estimate",4.5,8564,[["Revelio Labs","https://www.reveliolabs.com/companies/bain/employees/"],[GD,"https://www.glassdoor.ie/Overview/Working-at-EI_IE3752.htm"]],null,1973],
+  ["BCG",33500,"end 2025",4.4,13269,[["BCG press release, Apr 2026","https://www.bcg.com/press/23april2026-bcg-revenue-22nd-consecutive-year-growth"],[GD,"https://www.glassdoor.ca/Jobs/-Jobs-E3879.htm"]],null,1963],
+  ["McKinsey",38000,"2025",4.3,13239,[["Wikipedia","https://en.wikipedia.org/wiki/McKinsey_%26_Company"],[GD,"https://www.glassdoor.ie/Overview/Working-at-EI_IE2893.htm"]],null,1926],
+  ["Cisco",86200,"Jul 2025, 10-K",3.9,39832,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/858877/000085887725000111/csco-20250726.htm"],[GD,"https://www.glassdoor.ca/Jobs/Cisco-Systems-Jobs-E1425.htm"]],null,1984],
+  ["Google",190820,"end 2025, Alphabet 10-K",4.2,71506,[["Alphabet 10-K 2025","https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm"],[GD,"https://www.glassdoor.ie/Jobs/Google-Jobs-E9079.htm"]],null,1998.7],
+  // high-attrition employers: published yearly attrition drives how often their staff quit
+  ["TCS",598056,"Sep 2026",3.4,181596,[["Business Today, Oct 2026","https://www.businesstoday.in/markets/stocks/story/tcs-adds-4258-employees-in-q2-marks-third-quarter-of-headcount-addition-560460-2026-10-08"],[GD,"https://www.glassdoor.ie/Jobs/-Jobs-E13461.htm"]],null,1968,null,null,{rate:.133,label:"13.3% attrition, last 12 months to Sep 2026"}],
+  ["Infosys",328062,"Jun 2026",3.5,128709,[["HR Katha, Jul 2026","https://www.hrkatha.com/news/infosys-headcount-declines-by-532-in-q1-attrition-edges-up-to-13/"],[GD,"https://www.glassdoor.com/Jobs/Infosys-Jobs-E7927.htm"]],null,1981,null,null,{rate:.13,label:"13% annualised attrition, Jun 2026 quarter"}],
+  ["Wipro",236328,"Sep 2026",3.5,74658,[["People Matters, Oct 2026","https://www.peoplematters.in/news/business/wipro-workforce-declines-28percent-sequentially-to-236328-in-q2-fy27-52773"],[GD,"https://www.glassdoor.ca/Jobs/-Jobs-E9936.htm"]],null,1945,null,null,{rate:.138,label:"13.8% voluntary attrition, last 12 months to Sep 2026"}],
+  ["Accenture",779000,"Aug 2025, 10-K",3.6,225266,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/1467373/000146737325000217/acn-20250831.htm"],[GD,"https://www.glassdoor.ca/Jobs/Accenture-Jobs-E4138.htm"]],null,1989,null,null,{rate:.14,label:"14% attrition excluding involuntary exits, fiscal 2025 (10-K)"}],
+  // merger: PSA Group + Fiat Chrysler -> Stellantis (16 Jan 2021)
+  ["PSA Group",209000,"2019",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/PSA_Group"]],null,1976,null,{into:"Stellantis",at:2021.04}],
+  ["Fiat Chrysler",198545,"2018",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Fiat_Chrysler_Automobiles"]],null,1899,null,{into:"Stellantis",at:2021.04}],
+  ["Stellantis",258668,"end 2025",3.3,9156,[["ClubAlfa, Mar 2026","https://www.clubalfa.it/en/stellantis-adds-more-than-10000-jobs-in-2025-as-north-america-drives-the-rebound-35232"],["Wikipedia","https://en.wikipedia.org/wiki/Stellantis"],[GD,"https://static-pc.glassdoor.de/Jobs/Stellantis-Jobs-E4463465.htm"]],null,2021.04,null,{from:["PSA Group","Fiat Chrysler"]}],
+  // failed companies: collapse = {at: fractional year, label}
+  ["Enron",20600,"2000",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Enron"]],null,1985,{at:2001.92,label:"Filed for bankruptcy, 2 Dec 2001"}],
+  ["Lehman Brothers",26200,"2008",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Lehman_Brothers"]],null,1850,{at:2008.71,label:"Filed for Chapter 11 bankruptcy, 15 Sep 2008"}],
+  ["Schlecker",25000,"Sep 2008",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Schlecker"]],null,1975,{at:2012.06,label:"Filed for insolvency, 23 Jan 2012"}],
+  ["Air Berlin",8481,"end 2016",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Air_Berlin"]],null,1978,{at:2017.62,label:"Filed for insolvency, 15 Aug 2017"}],
+  ["Thomas Cook",21000,"2019",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Thomas_Cook_Group"]],null,1841,{at:2019.73,label:"Entered compulsory liquidation, 23 Sep 2019"}],
+  ["Wirecard",5300,"Jun 2019",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Wirecard"]],null,1999,{at:2020.48,label:"Filed for insolvency, 25 Jun 2020"}],
+  ["Sabena",12000,"2001, jobs lost at collapse",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Sabena"]],null,1923,{at:2001.85,label:"Liquidated 6 Nov 2001, after 9/11 hit transatlantic travel"}],
+  ["Washington Mutual",43198,"Jun 2008",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Washington_Mutual"]],null,1889,{at:2008.73,label:"Seized by regulators 25 Sep 2008, the largest US bank failure"}],
+  ["Circuit City",30000,"2008, jobs lost in liquidation",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Circuit_City"]],null,1949,{at:2008.86,label:"Filed for bankruptcy 10 Nov 2008; all stores closed Mar 2009"}],
+  ["Flybe",2000,"Mar 2020, jobs at risk",null,null,[["WION, Mar 2020","https://www.wionews.com/business-economy/uk-airline-flybe-dealt-final-blow-by-coronavirus-284507"]],null,1979,{at:2020.18,label:"Entered administration 5 Mar 2020; COVID-19 was the final blow"}],
+  ["Arcadia Group",13000,"2020",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/Arcadia_Group"]],null,1903,{at:2020.91,label:"Entered administration 30 Nov 2020 during the pandemic"}],
+  ["FTX",300,"2022",null,null,[["Wikipedia","https://en.wikipedia.org/wiki/FTX"]],null,2019.4,{at:2022.86,label:"Filed for Chapter 11 bankruptcy, 11 Nov 2022"}]
+];
+const levelFor=n=>n<100?1:n<1000?2:n<10000?3:n<100000?4:5;
+const fmt=n=>n.toLocaleString('en-US');
+const GAP=2.4, SIZE=34, LW=0.34, START=2000, END=2026.8;
+
+const stage=document.getElementById('stage'), canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+const cam=new THREE.OrthographicCamera(-1,1,1,-1,-100,200);
+scene.add(new THREE.AmbientLight(0xffffff,0.8));
+const dl=new THREE.DirectionalLight(0xffffff,0.55); dl.position.set(5,12,7); scene.add(dl);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const col=n=>new THREE.Color(css(n));
+const hex=c=>'#'+c.getHexString();
+function scoreColor(d){
+  if(d[8]) return col('--gone');
+  if(d[9]&&d[9].into){const m=DATA.find(x=>x[0]===d[9].into); if(m) return scoreColor(m)}
+  const s=d[3]; if(s==null) return col('--nodata');
+  const t=Math.min(1,Math.max(0,(s-2.5)/2));
+  return t<.5? col('--lo').lerp(col('--mid'),t*2) : col('--mid').lerp(col('--hi'),(t-.5)*2);
+}
+
+/* ground and planes */
+const groundMat=new THREE.MeshLambertMaterial();
+const ground=new THREE.Mesh(new THREE.BoxGeometry(SIZE,.12,SIZE),groundMat); ground.position.y=-.06; scene.add(ground);
+const planeMats=[], edgeMats=[];
+for(let i=0;i<5;i++){
+  const m=new THREE.MeshBasicMaterial({transparent:true,opacity:.11,depthWrite:false,side:THREE.DoubleSide});
+  const p=new THREE.Mesh(new THREE.PlaneGeometry(SIZE,SIZE),m); p.rotation.x=-Math.PI/2; p.position.y=(i+1)*GAP; scene.add(p); planeMats.push(m);
+  const em=new THREE.LineBasicMaterial({transparent:true,opacity:.7});
+  const e=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(SIZE,SIZE)),em); e.rotation.x=-Math.PI/2; e.position.y=(i+1)*GAP; scene.add(e); edgeMats.push(em);
+}
+
+/* ladders */
+const railGeo=new THREE.CylinderGeometry(.04,.04,1,6);
+const rungGeo=new THREE.CylinderGeometry(.025,.025,LW,5);
+const capGeo=new THREE.CylinderGeometry(.22,.22,.05,20);
+let ladderGroup=new THREE.Group(); scene.add(ladderGroup);
+const tagsEl=document.getElementById('tags');
+let seed=11, ladders=[], selected=null;
+function rnd(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}
+
+function ladderMeshes(g,mat,top,dbl){
+  g.clear();
+  const h=top*GAP+.35, n=Math.round(top*GAP/.3), m=new THREE.Matrix4(), q=new THREE.Quaternion(), e=new THREE.Euler(0,0,Math.PI/2);
+  // a double ladder is two ladders glued side by side: three rails, the middle one shared
+  const cols=dbl?[-LW/2-.02,LW/2+.02]:[0], rails=dbl?[-LW-.04,0,LW+.04]:[-LW/2,LW/2];
+  // rails and rungs are drawn as instanced meshes: one draw call each instead of one per rung
+  const R=new THREE.InstancedMesh(railGeo,mat,rails.length+(dbl?1:0));
+  rails.forEach((rx,i)=>{m.compose(new THREE.Vector3(rx,h/2,0),new THREE.Quaternion(),new THREE.Vector3(1,h,1));R.setMatrixAt(i,m)});
+  if(dbl){m.compose(new THREE.Vector3(0,h/2+.05,0),new THREE.Quaternion(),new THREE.Vector3(1.6,h+.1,1.6));R.setMatrixAt(rails.length,m)}
+  g.add(R);
+  const U=new THREE.InstancedMesh(rungGeo,mat,Math.max(1,n*cols.length)); q.setFromEuler(e); let k=0;
+  for(const cx of cols) for(let i=1;i<=n;i++){m.compose(new THREE.Vector3(cx,i*.3,0),q,new THREE.Vector3(1,1,1));U.setMatrixAt(k++,m)}
+  U.count=k; g.add(U);
+  const cap=new THREE.Mesh(capGeo,mat); cap.position.set(0,top*GAP+.38,0); if(dbl) cap.scale.set(1.6,1,1.1); g.add(cap);
+}
+function setTop(L,t){L.top=t;ladderMeshes(L.g,L.mat,t,L.dbl);L.growI=L.growth?L.growth.steps.filter(s=>s[1]<=t).length:0}
+// Ladders grow as companies grow. Nvidia uses its real headcount history. Companies founded after 2000 grow from a
+// small founding team to today's headcount, assuming fast early growth that slows later (an estimate, not data).
+const BAND=[0,100,1000,10000,100000];
+function growthFor(d,dbl){
+  if(d[11]) return d[11];
+  if(dbl||d[7]<=START) return null;
+  const N=d[1], n0=d[12]&&d[12].n0||10, f=d[7], T=d[8]?d[8].at:2025.9, final=levelFor(N);
+  if(final<2) return null;
+  const steps=[];
+  for(let lv=2;lv<=final;lv++){const frac=Math.pow(Math.log(BAND[lv-1]/n0)/Math.log(N/n0),2);steps.push([f+frac*(T-f),lv,`grows past ${fmt(BAND[lv-1])} employees (estimated timing)`])}
+  return {start:1,steps,est:true,n0,N,f,T};
+}
+function build(){
+  scene.remove(ladderGroup); ladderGroup=new THREE.Group(); scene.add(ladderGroup);
+  tagsEl.innerHTML=''; ladders=[]; const placed=[];
+  const far=(x,z,dmin,skip)=>!placed.some(p=>p!==skip&&Math.hypot(p[0]-x,p[1]-z)<dmin);
+  const lim=SIZE-2.5;
+  for(const d of DATA){
+    const mg=d[9]||null, dbl=!!(mg&&mg.from), growth=growthFor(d,dbl), top=growth?growth.start:levelFor(d[1]), tr=d[6];
+    let x,z,t=0;
+    if(dbl){ // the merged company stands exactly between the two companies it came from
+      const a=ladders.find(l=>l.d[0]===mg.from[0]), b=ladders.find(l=>l.d[0]===mg.from[1]);
+      x=(a.x+b.x)/2; z=(a.z+b.z)/2;
+    }else if(mg&&mg.into&&ladders.some(l=>l.d[9]&&l.d[9].into===mg.into)){ // second partner: 4-6 units from the first, with room in between
+      const a=ladders.find(l=>l.d[9]&&l.d[9].into===mg.into);
+      do{const ang=rnd()*Math.PI*2,r=4+rnd()*2;x=a.x+Math.cos(ang)*r;z=a.z+Math.sin(ang)*r;t++}
+      while(t<500&&(Math.abs(x)>lim/2||Math.abs(z)>lim/2||!far(x,z,4.4)||!far((a.x+x)/2,(a.z+z)/2,2.6,placed.find(p=>p[0]===a.x&&p[1]===a.z))));
+    }else{
+      do{x=(rnd()-.5)*lim;z=(rnd()-.5)*lim;t++} while(t<400&&!far(x,z,4.4));
+    }
+    placed.push([x,z]);
+    const mat=new THREE.MeshLambertMaterial({color:scoreColor(d),transparent:true,opacity:1});
+    const g=new THREE.Group(); g.position.set(x,0,z); const rot=rnd()*Math.PI; g.rotation.y=rot;
+    ladderMeshes(g,mat,top,dbl);
+    ladderGroup.add(g);
+    const el=document.createElement('button'); el.className='co'+(dbl?' dbl':''); el.textContent=d[0]; el.setAttribute('aria-pressed','false');
+    el.style.setProperty('--c',hex(scoreColor(d)));
+    el.addEventListener('pointerdown',e=>e.stopPropagation());
+    el.addEventListener('click',()=>select(d));
+    tagsEl.appendChild(el);
+    // front of the ladder, where workers step on
+    const fx=x+Math.sin(rot)*.32, fz=z+Math.cos(rot)*.32;
+    ladders.push({d,x,z,fx,fz,top,mat,el,g,vis:0,alive:false,failed:false,merged:false,slide:null,
+      growth,trFrom:tr?tr.from:null,trOn:false,founded:d[7],collapse:d[8]||null,mergeInto:mg&&mg.into||null,mergeAt:mg&&mg.at||null,dbl});
+  }
+}
+
+/* merger: the two ladders slide together and become one double ladder */
+function merge(name){
+  const parts=ladders.filter(l=>l.mergeInto===name&&!l.merged), M=ladders.find(l=>l.d[0]===name);
+  if(!M) return;
+  M.alive=true;
+  let keep=0,down=0,out=0,n=0;
+  for(const L of parts){
+    L.merged=true; L.alive=false; L.slide={t:0,fx:L.x,fz:L.z};
+    for(const p of people.filter(q=>q.comp===L&&q.shadow)) crowdMerge(p,M);
+    for(const p of people.filter(p=>p.comp===L&&!p.shadow)){
+      n++; p.q=[]; const lvl=Math.max(0,Math.round(p.y/GAP)); p.level=lvl; p.comp=M; p.next=year+.6+Math.random();
+      const r=Math.random();
+      if(lvl===0){keep++;note(p,`${L.d[0]} merges into ${name}. Keeps the job.`,'merge');continue}
+      if(r<.65){const s2=spot(p,M);walkTo(p,s2[0],s2[1]);keep++;note(p,`${L.d[0]} merges into ${name}. Keeps the ${lvName(lvl)} role.`,'merge')}
+      else if(r<.9&&lvl>1){walkTo(p,M.fx,M.fz);vert(p,(lvl-1)*GAP,'climb');const s2=spot(p,M);walkTo(p,s2[0],s2[1]);p.level=lvl-1;down++;note(p,`${L.d[0]} merges into ${name}. Two people for one role: moved down to ${lvName(lvl-1)}.`,'drop')}
+      else{walkTo(p,M.fx,M.fz);vert(p,0,'climb');walkTo(p,M.fx+(Math.random()-.5)*3,M.fz+(Math.random()-.5)*3);p.level=0;p.comp=null;setLaidOff(p,true);out++;bump('layoffs',true);note(p,`${L.d[0]} merges into ${name}. Laid off and back to entry level.`,'laid')}
+    }
+  }
+  tally.merged=(tally.merged||0)+n;
+  const parts2=[];if(keep)parts2.push(`${keep} kept their floor`);if(down)parts2.push(`${down} were moved down a floor as duplicate roles were cut`);if(out)parts2.push(`${out} were laid off`);
+  addLog(`${parts.map(l=>l.d[0]).join(' and ')} merged into ${name}. The two ladders are glued into one. ${n?n+' simulated worker'+(n>1?'s':'')+' moved over'+(parts2.length?': '+parts2.join(', '):'')+'.':''}`,'merge');
+}
+
+/* detail card */
+const detail=document.getElementById('detail');
+detail.addEventListener('pointerdown',e=>e.stopPropagation());
+const srcLinks=(src,sep)=>src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a>`).join(sep);
+function select(d,keep){
+  if(!keep && selected===d){selected=null;detail.hidden=true;ladders.forEach(L=>L.el.setAttribute('aria-pressed','false'));return}
+  selected=d;
+  ladders.forEach(L=>L.el.setAttribute('aria-pressed',String(L.d===d)));
+  const [name,emp,note,score,rev,src,tr,,cl]=d, lv=levelFor(emp);
+  const L=ladders.find(l=>l.d===d), here=L&&L.alive?people.filter(p=>p.comp===L&&!p.shadow).length:0;
+  detail.innerHTML=`<h3>${name}${tr?'<span class="trtag">In transition</span>':''}${cl?'<span class="trtag dead">Collapsed</span>':''}${d[9]&&d[9].into?'<span class="trtag">Merged 2021</span>':''}${d[9]&&d[9].from?'<span class="trtag">Merger</span>':''}</h3>
+    <dl><dt>Employees</dt><dd>${fmt(emp)} <span class="small">(${note}${cl?', before collapse':''})</span></dd>
+    <dt>Industry</dt><dd>${SECTORS[SECTOR_OF[name]||'prof'].name}</dd>
+    <dt>Turnover</dt><dd>${d[10]?'Own attrition data (see below)':`Industry rate: ${SECTORS[SECTOR_OF[name]||'prof'].q}% quit and ${SECTORS[SECTOR_OF[name]||'prof'].l}% laid off a month`}</dd>
+    ${(()=>{const st=sampleStatus(L);return `<dt>In economy graph</dt><dd>${st.ok?'Yes':'No'}: ${st.why.charAt(0).toLowerCase()+st.why.slice(1)}</dd>`})()}
+    <dt>Ladder reaches</dt><dd>L${lv} ${LEVELS[lv-1]}</dd>
+    ${d[9]&&d[9].into?`<dt>Status</dt><dd>Merged with ${DATA.filter(x=>x[9]&&x[9].into===d[9].into&&x!==d).map(x=>x[0]).join(', ')} into ${d[9].into}, 16 Jan 2021</dd>`:''}${d[9]&&d[9].from?`<dt>Formed</dt><dd>Merger of ${d[9].from.join(' and ')}, 16 Jan 2021</dd>`:''}${d[9]&&d[9].into?'':cl?`<dt>Status</dt><dd>${cl.label}</dd>`:`<dt>Career score</dt><dd>${score==null?'Not enough reviews':score.toFixed(1)+' / 5 from '+fmt(rev)+' reviews'}</dd>`}
+    ${L&&L.growth?`<dt>Ladder growth</dt><dd>${L.growth.est?'Grows from founding to today, timing estimated':'Grows with its real headcount history'}; now L${L.top}</dd>`:''}
+    ${d[10]?`<dt>Attrition</dt><dd>${d[10].label}</dd>`:''}
+    <dt>Simulated staff</dt><dd>${L&&L.alive?here+' now':L&&L.failed?'Ladder gone':L&&L.merged?'Moved to '+L.mergeInto:'Not founded yet in '+Math.floor(year)}</dd></dl>
+    ${name==='Target'?`<div class="trnote" style="border-left-color:var(--p-case)">The red figure is Michael Fiddelke, who joined as a finance intern in 2003 and became CEO in February 2026. <a href="https://mediabrief.com/michael-fiddelkes-22-year-journey-at-target/" target="_blank" rel="noopener">MediaBrief</a> · <a href="https://corporate.target.com/sustainability-governance/governance-and-reporting/corporate-governance/board-of-directors-and-management/michael-j-fiddelke" target="_blank" rel="noopener">Target</a></div>`:''}
+    ${tr?`<div class="trnote">${tr.note} These figures may not show where the company is heading. <a href="${tr.src[1]}" target="_blank" rel="noopener">${tr.src[0]}</a>${tr.src2?` · <a href="${tr.src2[1]}" target="_blank" rel="noopener">${tr.src2[0]}</a>`:''}</div>`:''}
+    <div class="small">${srcLinks(src,' · ')}</div>
+    <button class="close" aria-label="Close">×</button>`;
+  detail.querySelector('.close').onclick=()=>select(d);
+  detail.hidden=false;
+}
+
+/* table */
+function renderTable(){
+  document.querySelector('#table tbody').innerHTML=DATA.slice().sort((a,b)=>b[1]-a[1]).map(d=>{
+    const [name,emp,note,score,rev,src,tr,,cl]=d, lv=levelFor(emp), c=hex(scoreColor(d));
+    return `<tr><td><b>${name}</b>${tr?`<span class="trtag">In transition</span><div class="small">${tr.note} <a href="${tr.src[1]}" target="_blank" rel="noopener">${tr.src[0]}</a>${tr.src2?` · <a href="${tr.src2[1]}" target="_blank" rel="noopener">${tr.src2[0]}</a>`:''}</div>`:''}${cl?`<span class="trtag dead">Collapsed</span><div class="small">${cl.label}</div>`:''}${d[9]&&d[9].from?`<span class="trtag">Merger</span><div class="small">Formed by ${d[9].from.join(' and ')}, 16 Jan 2021</div>`:''}</td>
+    <td class="num">${fmt(emp)}<div class="small">${note}</div></td>
+    <td class="band">L${lv} ${LEVELS[lv-1]}${(()=>{const L=ladders.find(l=>l.d===d);const st=sampleStatus(L||{d,collapse:d[8]});return st.ok?'':`<div class="small" title="${st.why}">Not in economy graph</div>`})()}</td>
+    <td><span class="score" style="--c:${c}"><i></i>${d[9]&&d[9].into?'Merged into '+d[9].into+' (2021)':cl?'Company gone':score==null?'No usable score':score.toFixed(1)}</span></td>
+    <td class="num">${rev?fmt(rev):'–'}${d[10]?`<div class="small">Attrition ${(d[10].rate*100).toFixed(1)}%</div>`:''}</td>
+    <td class="small">${srcLinks(src,'<br>')}</td></tr>`}).join('');
+}
+
+/* ---------- simulation ---------- */
+const TYPES={
+  regular:{name:"Regular employee",desc:"Does the job and takes promotions when they come. Only moves company when their ladder runs out.",n:36},
+  climber:{name:"Climber",desc:"Wants the top floor. Switches company when a ladder runs out or stalls.",n:24},
+  steady:{name:"Settler",desc:"Happy once they reach a level that suits them, usually Senior or Lead.",n:24},
+  hopper:{name:"Job hopper",desc:"After each promotion, looks for a better company on the same floor.",n:21},
+  changer:{name:"Career changer",desc:"At some point leaves to start over at entry level in a new field.",n:15},
+  nepo:{name:"Nepo hire",desc:"Family connections. Skips entry level, rides straight up without using the rungs, and gets promoted far faster.",n:12}
+};
+const BASE=[.45,.35,.22,.12,.05]; // yearly promotion chance from L0 Entry, L1 Junior, L2 Senior, L3 Lead, L4 Director
+const NEPO_BOOST=2.6;
+// Real career paths, replayed step by step
+const CASES=[
+ {key:'case',name:"Michael Fiddelke",company:"Target",cls:'case',steps:[
+  {at:2003.45,lvl:0,text:"Michael Fiddelke joins Target at entry level as a finance intern, after an MBA at Kellogg and consulting at Deloitte."},
+  {at:2004.1,lvl:1,text:"Fiddelke: Analyst, Finance. His first step up, to Junior."},
+  {at:2005.6,lvl:3,text:"Fiddelke: promoted from analyst to Manager, Finance."},
+  {at:2007.2,lvl:4,text:"Fiddelke: Director, Finance."},
+  {at:2009.2,text:"Fiddelke: Director, Business Intelligence, Store Operations (sideways move on the same floor)."},
+  {at:2011.2,text:"Fiddelke: Senior Director, Strategic Pricing."},
+  {at:2013.2,lvl:5,text:"Fiddelke: Vice President, Pay and Benefits. He reaches the executive floor."},
+  {at:2015.6,text:"Fiddelke: SVP, Financial Planning and Analysis."},
+  {at:2017.2,text:"Fiddelke: SVP, Merchandising Capabilities."},
+  {at:2018.7,text:"Fiddelke: SVP, Operations."},
+  {at:2019.85,text:"Fiddelke: EVP and Chief Financial Officer."},
+  {at:2024.05,text:"Fiddelke: EVP and Chief Operating Officer."},
+  {at:2026.1,lvl:6,text:"Fiddelke becomes CEO of Target, 22 years and 10 months after joining as an intern."}
+ ]},
+ {key:'founderCase',name:"Jensen Huang",company:"Nvidia",cls:'founder',startTop:true,steps:[
+  {at:2000.05,text:"Jensen Huang co-founded Nvidia in April 1993, aged 30, and has been its CEO from day one. Before that he washed dishes, bussed tables and waited at Denny's from age 15 (1978–1983), then designed chips at AMD and became a director at LSI Logic. In 2000 Nvidia has 392 employees, so the ladder he built only reaches Senior."},
+  {at:2002.08,lift:'top',text:"Huang: Nvidia passes 1,000 employees. The ladder he built grows a floor, and he rises with it."},
+  {at:2017.09,lift:'top',text:"Huang: Nvidia passes 10,000 employees. Another floor appears beneath him."},
+  {at:2025.8,text:"Huang: Nvidia becomes the first public company worth more than $5 trillion."},
+  {at:2026.07,text:"Huang: Nvidia reaches about 42,000 employees, still run by its founder after 33 years."}
+ ]},
+ {key:'beastCase',name:"Jimmy Donaldson (MrBeast)",company:"MrBeast",cls:'beast',founder:true,steps:[
+  {at:2012.1,lift:'top',text:"Jimmy Donaldson, 13, starts the MrBeast YouTube channel in North Carolina. A company of one: the ladder he builds only reaches Junior."},
+  {at:2019.8,text:"Donaldson: launches #TeamTrees, a fundraiser to plant trees, with his team."},
+  {at:2021.8,text:"Donaldson: launches #TeamSeas, an ocean clean-up fundraiser."},
+  {at:2022.1,text:"Donaldson: co-founds Feastables, a chocolate brand. More than 100 people later work on it."},
+  {at:2023.5,text:"Donaldson: his businesses are grouped into a holding company, Beast Industries, and he co-founds Viewstats."},
+  {at:2024.7,text:"Donaldson: hires former Shutterfly CEO Jeff Housenbold to run Beast Industries; co-founds Lunchly."},
+  {at:2026.05,text:"Donaldson: Beast Industries employs around 750 people. Every one of them climbs a ladder that started with a teenager filming videos."}
+ ]},
+ {key:'nepoCase',name:"John Elkann",company:"Fiat Chrysler",cls:'nepo',steps:[
+  {at:2000.15,lift:5,text:"John Elkann, grandson of Fiat patriarch Gianni Agnelli, was chosen as family heir in 1997 and put on Fiat's board at 21. He skips every rung and rides straight to the executive floor."},
+  {at:2000.6,text:"Elkann: after graduating, he spends two years in General Electric's corporate audit programme, keeping his Fiat board seat."},
+  {at:2004.4,text:"Elkann: vice-chairman of Fiat at 28, after his great-uncle Umberto Agnelli dies. He helps bring in Sergio Marchionne as CEO."},
+  {at:2010.3,lift:6,text:"Elkann: chairman of Fiat at 34. He now stands on top of the ladder."},
+  {at:2021.06,company:"Stellantis",lift:6,text:"Elkann: chairman of Stellantis after Fiat Chrysler merges with PSA. He is carried across to the top of the new double ladder."},
+  {at:2024.92,text:"Elkann: CEO Carlos Tavares resigns; Elkann chairs the interim executive committee running Stellantis."},
+  {at:2025.47,text:"Elkann: Antonio Filosa becomes Stellantis CEO. Elkann stays chairman."}
+ ]}
+];
+let caseFigs=[];
+function stepCases(dt){
+  for(const c of caseFigs){
+    while(c.i<c.def.steps.length&&year>=c.def.steps[c.i].at){
+      const st=c.def.steps[c.i++];
+      if(st.company) c.company=st.company;
+      const L=ladders.find(l=>l.d[0]===c.company);
+      if(L&&st.lift==='top'){walkTo(c,L.x,L.z);vert(c,L.top*GAP+.4,'lift');c.level=L.top}
+      else if(L&&st.lift!==undefined){ // no rungs: rises straight up beside the ladder
+        if(st.lift===6){walkTo(c,L.x,L.z);vert(c,L.top*GAP+.4,'lift')}
+        else{const s=spot(c,L);walkTo(c,s[0],s[1]);vert(c,st.lift*GAP,'lift')}
+        c.level=Math.min(5,st.lift);
+      }else if(L&&st.lvl===0){const s=spot(c,L);walkTo(c,s[0],s[1])}
+      else if(L&&st.lvl){
+        walkTo(c,L.fx,L.fz);
+        if(st.lvl===6){vert(c,5*GAP+.4,'climb');walkTo(c,L.x,L.z)}
+        else{vert(c,st.lvl*GAP,'climb');const s=spot(c,L);walkTo(c,s[0],s[1])}
+        c.level=Math.min(5,st.lvl);
+      }
+      addLog(st.text,c.def.cls); if(c.tracked){if(c.comp===undefined)c.comp=null;note(c,st.text,'real')}
+    }
+    if(c.def.founder&&c.i>0&&!c.q.length){const L=ladders.find(l=>l.d[0]===c.company);if(L&&L.alive&&c.y<L.top*GAP+.39){walkTo(c,L.x,L.z);vert(c,L.top*GAP+.4,'lift');c.level=L.top}}
+    stepPerson(c,dt);
+  }
+}
+const YEAR_SEC=2.4, WALK=4.2, CLIMB=1.9;
+let people=[], year=START, playing=true, speed=1, logItems=[], tally={top:0,hit:0,dropped:0,restarts:0,hops:0};
+const figGroup=new THREE.Group(); scene.add(figGroup);
+const headGeo=new THREE.SphereGeometry(.085,10,8), limbGeo=new THREE.CylinderGeometry(.022,.022,1,5);
+const typeMats={beastCase:new THREE.MeshBasicMaterial(),founderCase:new THREE.MeshBasicMaterial(),seek:new THREE.MeshBasicMaterial(),case:new THREE.MeshBasicMaterial(),nepoCase:new THREE.MeshBasicMaterial(),laid:new THREE.MeshBasicMaterial()}; for(const k in TYPES) typeMats[k]=new THREE.MeshBasicMaterial();
+
+function makeFigure(type){
+  const m=typeMats[type], g=new THREE.Group();
+  const head=new THREE.Mesh(headGeo,m); head.position.y=.66; g.add(head);
+  const torso=new THREE.Mesh(limbGeo,m); torso.scale.y=.3; torso.position.y=.43; g.add(torso);
+  const arms=new THREE.Mesh(limbGeo,m); arms.scale.y=.3; arms.rotation.z=Math.PI/2; arms.position.y=.5; g.add(arms);
+  const legs=[];
+  for(const s of[-1,1]){const hip=new THREE.Group();hip.position.set(s*.05,.28,0);const leg=new THREE.Mesh(limbGeo,m);leg.scale.y=.28;leg.position.y=-.14;hip.add(leg);g.add(hip);legs.push(hip)}
+  g.scale.setScalar(1.25);
+  const meshes=[];g.traverse(o=>{if(o.isMesh)meshes.push(o)});
+  const mark=new THREE.Mesh(headGeo,typeMats.seek); mark.scale.setScalar(.55); mark.position.y=.9; mark.visible=false; g.add(mark);
+  figGroup.add(g); return {g,legs,meshes,head,mark};
+}
+const alive=()=>ladders.filter(L=>L.alive);
+const sf=L=>{const s=L.d[3]==null?3.3:L.d[3];return Math.max(.25,.4+(s-2.5)*.6)*(L.trOn?.6:1)};
+/* ---------- industry mix and hiring weights ----------
+   Real US jobs by industry (BLS Current Employment Statistics, Table B-1, September 2026, 159.0 million in total).
+   Simulated workers are hired so that each industry gets its real share of jobs; inside an industry, bigger
+   companies hire proportionally more, and a better career score makes a company somewhat more attractive. */
+// jobs: thousands, BLS Table B-1, Sep 2026. q / l: monthly quits and layoffs rates in percent, BLS JOLTS Tables 4 and 5,
+// average of Aug 2025 and May–Aug 2026; combined industries are weighted by jobs.
+const SECTORS={
+  edhealth:{name:"Education and health",jobs:28005,q:1.89,l:0.68},
+  gov:{name:"Government",jobs:23327,q:0.78,l:0.38},
+  leisure:{name:"Leisure, hospitality and other services",jobs:23008,q:3.35,l:1.45},
+  prof:{name:"Professional and business services",jobs:22482,q:2.14,l:2.04},
+  trade:{name:"Retail and wholesale trade",jobs:21558,q:2.44,l:0.95},
+  manuf:{name:"Manufacturing",jobs:12652,q:1.46,l:0.80},
+  fin:{name:"Financial activities",jobs:9082,q:1.14,l:0.56},
+  constr:{name:"Construction and mining",jobs:8971,q:1.76,l:1.80},
+  transport:{name:"Transportation, warehousing and utilities",jobs:7220,q:2.20,l:1.58},
+  info:{name:"Information (tech, media, telecoms)",jobs:2739,q:1.10,l:1.44}
+};
+const SECTOR_OF={"HCA Healthcare":"edhealth","US Postal Service":"gov",
+  "Marriott":"leisure","Starbucks":"leisure","FDJ United":"leisure","Thomas Cook":"leisure",
+  "Accenture":"prof","TCS":"prof","Infosys":"prof","Wipro":"prof","Bain & Company":"prof","BCG":"prof","McKinsey":"prof","Dussmann":"prof",
+  "Walmart":"trade","Target":"trade","Amazon":"trade","Zalando":"trade","Schlecker":"trade",
+  "Volkswagen":"manuf","Porsche":"manuf","PSA Group":"manuf","Fiat Chrysler":"manuf","Stellantis":"manuf","Siemens":"manuf","adidas":"manuf","Puma":"manuf","Nvidia":"manuf","Cisco":"manuf",
+  "JPMorgan Chase":"fin","Lehman Brothers":"fin","Wirecard":"fin","FTX":"fin",
+  "VINCI":"constr",
+  "United Airlines":"transport","Air Berlin":"transport","Enron":"transport","Sabena":"transport","Flybe":"transport","Washington Mutual":"fin","Circuit City":"trade","Arcadia Group":"trade",
+  "Google":"info","Spotify":"info","Telegram":"info","Craigslist":"info","Duolingo":"info","MrBeast":"info","Airbnb":"info"};
+// Which companies count in the economy graph. A company is left out if it failed, if it is in transition
+// (from the month the transition began), or if it is listed here with the reason.
+const NOT_SAMPLE={
+  // left out because their course through these events was far from the average, not because of how much data exists
+  "Amazon":"Far from average: it hired about 400,000 people in 2020 and grew about 50% in a year while most employers cut back",
+  "Nvidia":"Far from average: tenfold growth since 2000 and unusually low turnover (3.7%)",
+  "MrBeast":"Far from average: grew from one person to about 750 in a few years",
+  "Airbnb":"Far from average: laid off about 25% of its staff (1,900 people) in May 2020",
+  "United Airlines":"Far from average: airlines were among the hardest hit, with about 20,000 cuts after 9/11 and 16,370 furloughs in 2020",
+  "Marriott":"Far from average: hotels were among the hardest hit by COVID-19, with tens of thousands furloughed",
+  "PSA Group":"Far from average: merged into Stellantis in 2021",
+  "Fiat Chrysler":"Far from average: Chrysler went bankrupt in 2009, then the merger into Stellantis",
+  "Stellantis":"Far from average: formed by a merger, followed by plant closures"};
+function sampleStatus(L){
+  if(!L) return {ok:false,why:"No company"};
+  if(L.collapse) return {ok:false,why:"Extreme case: the company failed"};
+  if(NOT_SAMPLE[L.d[0]]) return {ok:false,why:NOT_SAMPLE[L.d[0]]};
+  if(L.trOn) return {ok:false,why:"In transition, so left out from the month it began"};
+  if(L.d[6]) return {ok:true,why:"Counts until its transition begins"};
+  return {ok:true,why:"Its course through these events was close to the average"};
+}
+const JOBS_TOTAL=Object.values(SECTORS).reduce((a,x)=>a+x.jobs,0);
+const sectorOf=L=>SECTOR_OF[L.d[0]]||'prof';
+// headcount at the current simulated year: real history for Nvidia, estimated growth for young companies, today's size otherwise
+function sizeNow(L){
+  const g=L.growth;
+  if(g&&g.pts){const pts=g.pts;if(year<=pts[0][0])return pts[0][1];for(let i=1;i<pts.length;i++)if(year<=pts[i][0]){const [a,na]=pts[i-1],[b,nb]=pts[i];return na*Math.pow(nb/na,(year-a)/(b-a))}return pts[pts.length-1][1]}
+  if(g&&g.est){const fr=Math.min(1,Math.max(0,(year-g.f)/(g.T-g.f)));return g.n0*Math.pow(g.N/g.n0,Math.sqrt(fr))}
+  return L.d[1];
+}
+// career score only matters within an industry, so it can't shift the overall industry mix
+// current share of employed workers by industry, refreshed during the run; hiring leans gently towards
+// industries below their real share, as real labour markets rebalance through wages and openings
+let mixNow=null;
+function updateMixNow(){const c={};let n=0;for(const p of people){if(p.comp){const k=sectorOf(p.comp);c[k]=(c[k]||0)+1;n++}}
+  mixNow={};for(const k in SECTORS)mixNow[k]=n?(c[k]||0)/n:0}
+function hireWeight(L,pool,stock){
+  const sec=sectorOf(L), mates=pool.filter(o=>sectorOf(o)===sec);
+  const inSec=mates.reduce((a,o)=>a+sizeNow(o),0)||1, meanSf=mates.reduce((a,o)=>a+sizeNow(o)*sf(o),0)/inSec||1;
+  // industries that lose people faster also hire more to replace them, so each keeps its real share of jobs
+  const out=mates.reduce((a,o)=>a+sizeNow(o)*(quitRate(o)+layoffRate(o)+RETIRE),0)/inSec||.2; // everyone who leaves: quits, layoffs and retirement
+  const share=SECTORS[sec].jobs/JOBS_TOTAL;
+  if(stock) return share*sizeNow(L)/inSec*sf(L)/meanSf; // placing the existing workforce: by real job shares
+  const corr=mixNow&&mixNow[sec]>0?Math.min(3,Math.max(.33,Math.pow(share/mixNow[sec],1.5))):1;
+  return share*out*corr*sizeNow(L)/inSec*sf(L)/meanSf;
+}
+function pick(opts,stock){
+  const pool=alive(); const w=opts.map(L=>hireWeight(L,pool,stock));
+  let r=Math.random()*w.reduce((a,b)=>a+b,0);for(let i=0;i<opts.length;i++){if((r-=w[i])<0)return opts[i]}return opts[0]}
+function spot(p,L){return [L.x+Math.cos(p.ang)*.75, L.z+Math.sin(p.ang)*.75]}
+let logQuiet=false;
+function addLog(text,cls){
+  if(logQuiet) return;
+  logItems.unshift({y:Math.floor(year),text,cls}); if(logItems.length>40) logItems.pop();
+  document.getElementById('log').innerHTML=logItems.map(i=>`<li><time>${i.y}</time><span class="${i.cls||''}">${i.text}</span></li>`).join('');
+}
+// queue helpers
+const walkTo=(p,x,z)=>p.q.push({t:'walk',x,z});
+const vert=(p,y,kind)=>p.q.push({t:kind,y});
+function join(p,L,lvl){ // p is on its current floor; go to L, climb to lvl, stand
+  const s=spot(p,L);
+  if(p.type==='nepo'&&lvl!==p.level){walkTo(p,s[0],s[1]);vert(p,lvl*GAP,'lift')}
+  else{walkTo(p,L.fx,L.fz); if(lvl!==p.level) vert(p,lvl*GAP,'climb'); walkTo(p,s[0],s[1])}
+  p.comp=L; p.level=lvl; setLaidOff(p,false); p.seeking=false; setSeeker(p,false);
+}
+function setSeeker(p,on){p.f.mark.visible=on&&!p.laidOff}
+// yearly quit chance: the company's own published attrition where it exists, otherwise its industry's real rate
+const quitRate=L=>(L.d[10]?L.d[10].rate:SECTORS[sectorOf(L)].q*12/100);
+const layoffRate=L=>SECTORS[sectorOf(L)].l*12/100;
+function startSearch(p){p.seeking=true;p.seekUntil=year+(.7+Math.random()*1.6)*cm('searchMult');setSeeker(p,true)}
+function wander(p){const lim=SIZE/2-1.5;for(let k=0;k<1+Math.floor(Math.random()*2);k++){const a=Math.random()*Math.PI*2,r=2+Math.random()*6;walkTo(p,Math.max(-lim,Math.min(lim,p.x+Math.cos(a)*r)),Math.max(-lim,Math.min(lim,p.z+Math.sin(a)*r)))}p.next=year+.35+Math.random()*.4}
+function setLaidOff(p,on){
+  if(p.laidOff===on) return; p.laidOff=on;
+  const m=on?(p.ownLaid||typeMats.laid):(p.ownMat||typeMats[p.type]); p.f.meshes.forEach(x=>x.material=m);
+  p.f.head.position.z=on?.06:0; p.f.head.position.y=on?.6:.66; // head drops forward
+}
+function transfer(p,N){const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;tally.hops++}
+
+/* ---------- economic shocks: 9/11 and the 2008 financial crisis ---------- */
+// Economy-wide shifts are calibrated to US JOLTS data (BLS, via FRED): every company follows the average change,
+// so the sample behaves like the economy. Company-specific shocks are kept as separate "outlier" events.
+const CRISES=[
+ {id:'sep11',name:"9/11 attacks",short:"9/11",from:2001.7,to:2002.7,quitMult:.88,layoffMult:.97,promoMult:.85,upMult:.85,searchMult:1.3,
+  outlier:{companies:["United Airlines","Air Berlin","Thomas Cook"],rate:.18,why:"Air travel collapses after 9/11"},
+  sub:"Quits −13% · layoffs flat economy-wide · airlines and travel hit hard",
+  startText:"Terrorist attacks on 11 September 2001. Air travel stops and tourism collapses; airlines and travel firms cut jobs fast. Across the whole economy, though, layoffs barely move: quits fall about 13% as people stay put.",
+  endText:"The 9/11 shock fades. Travel demand slowly recovers."},
+ {id:'gfc',name:"2008 financial crisis",short:"2008",from:2008.7,to:2010.25,quitMult:.62,layoffMult:1.25,promoMult:.5,upMult:.4,searchMult:2,
+  sub:"Quits −39% · layoffs +20% · fewer promotions · longer job searches",
+  startText:"The 2008 financial crisis hits. Economy-wide, quits fall about 39% and layoffs rise about 20%. Promotions slow and job searches take longer.",
+  endText:"The crisis eases. Quits slowly recover and layoffs return to normal.",
+  event:{at:2009.33,run(c){
+    const L=ladders.find(l=>l.d[0]==="Fiat Chrysler"&&l.alive); if(!L) return;
+    people.filter(p=>p.comp===L&&p.shadow&&Math.random()<.3).forEach(p=>quietly(()=>crisisLayoff(p,'',true)));
+    const hit=people.filter(p=>p.comp===L&&!p.def&&!p.shadow&&Math.random()<.3);hit.forEach(p=>crisisLayoff(p,`Chrysler files for bankruptcy and Fiat takes a stake. Laid off as ${lvName(p.level)}.`,true));
+    addLog(`Chrysler files for Chapter 11 bankruptcy; Fiat takes a 20% stake in the new company. ${hit.length?hit.length+' simulated worker'+(hit.length>1?'s':'')+' laid off.':''}`,'bad')}}},
+ {id:'covid',name:"COVID-19 pandemic",short:"COVID",from:2020.17,to:2020.34,quitMult:.68,layoffMult:1,
+  // In March–April 2020 US layoffs reached about six times their normal level (13.0 and 9.2 million). Workers in the model
+  // only reconsider their job about once a year, so the wave is applied once at lockdown, sized so the two months match.
+  event:{at:2020.19,run(c){
+    const emp=people.filter(p=>p.comp&&!p.def&&!p.tracked);let n=0;
+    for(const p of emp){if(Math.random()<.12){p.shadow?quietly(()=>crisisLayoff(p,'',false)):crisisLayoff(p,`Lockdown: ${p.comp.d[0]} lays off staff as the economy shuts down. Laid off as ${lvName(p.level)}.`);if(!p.shadow)n++}}
+    addLog(`Lockdowns begin. A wave of layoffs hits almost every industry at once${n?': '+n+' visible workers lose their jobs':''}.`,'bad')}},promoMult:.4,upMult:.3,searchMult:2,
+  sub:"March–April 2020: layoffs ×6 · quits −32% · hiring freezes",
+  startText:"COVID-19 is declared a pandemic on 11 March 2020 and lockdowns begin. US layoffs jump to 13.0 million in March alone, about six times normal, and quits fall by a third.",
+  endText:"The first lockdown shock passes. Hiring snaps back from May 2020."},
+ {id:'greatres',name:"Great Resignation",short:"QUITS BOOM",from:2021.25,to:2022.95,quitMult:1.12,layoffMult:.82,promoMult:1,upMult:1.3,searchMult:.8,mild:true,
+  sub:"After COVID: quits +15% · layoffs −21% · switching jobs pays",
+  startText:"After the pandemic, the Great Resignation: quits rise about 15% above pre-pandemic levels, layoffs fall to record lows, and workers who switch jobs often move up.",
+  endText:"The quitting wave cools down."}
+];
+CRISES.forEach(c=>c.on=true);
+const activeCrisis=()=>CRISES.find(c=>c.on&&year>=c.from&&year<c.to)||null;
+const inCrisis=()=>!!activeCrisis();
+const cm=k=>{const c=activeCrisis();return c?c[k]:1};
+let yearly={};
+let events={promos:[],quits:[],layoffs:[]}, sampleHist=[];
+const BK=.02, bk=t=>Math.floor((t-START)/BK);
+function sampleCount(){return people.filter(p=>p.comp&&sampleStatus(p.comp).ok||(!p.comp&&p.left&&sampleStatus(p.left).ok)).length}
+let curP=null; // worker whose decision is being made, so their company can be checked
+function bump(k,outlier){if(burning)return;const co=curP&&(curP.comp||curP.left);if(co&&!sampleStatus(co).ok)outlier=true;
+  if(outlier){tally.outlierLaid=(tally.outlierLaid||0)+1;return} // outlier events stay out of the economy chart
+  const y=Math.floor(year);(yearly[y]||(yearly[y]={promos:0,quits:0,layoffs:0}))[k]++;const i=bk(year);events[k][i]=(events[k][i]||0)+1}
+// windows: before / during / after each crisis, all inside this one run
+// before / during / after windows inside this one run, and the real US change for the same comparison (BLS JOLTS via FRED)
+const WIN={
+ sep11:{before:[2000,2001.7],after:[2002.7,2004.7],real:{quits:-13,layoffs:-6},realNote:"2002 vs 2001"},
+ gfc:{before:[2005.7,2008.7],after:[2010.25,2012.25],real:{quits:-39,layoffs:20},realNote:"2009–early 2010 vs 2006–07"},
+ covid:{before:[2017.2,2020.17],after:[2021.25,2022.95],real:{quits:-32,layoffs:508},realAfter:{quits:15,layoffs:-21},realNote:"Mar–Apr 2020 vs Jul 2019–Jan 2020; after = 2021–22"}};
+function countEv(k,a,b){let n=0;const arr=events[k];for(let i=Math.max(0,bk(a)),j=bk(b);i<j;i++)n+=arr[i]||0;return n}
+function sampleN(a,b){const h=sampleHist.filter(x=>x[0]>=a&&x[0]<b);return h.length?h.reduce((s,x)=>s+x[1],0)/h.length:people.length}
+function rate(k,a,b){const end=Math.min(b,year);if(end-a<Math.min(.25,(b-a)*.95))return null;return countEv(k,a,end)/(end-a)/sampleN(a,end)*100}
+function drawImpact(){
+  const t=document.getElementById('impact'); if(!t) return;
+  const f=v=>v==null?'–':v.toFixed(1);
+  const ch=(d,b)=>(d==null||b==null||b===0)?null:(d-b)/b*100;
+  const pc=(c,k)=>{if(c==null)return'';const bad=k==='promos'?c<0:c>0;return ` <span class="${Math.abs(c)<5?'':bad?'up':'down'}">(${c>0?'+':''}${c.toFixed(0)}%)</span>`};
+  const real=v=>v==null?'<span class="real">no official data</span>':`<b>${v>0?'+':''}${v}%</b>`;
+  let h='<thead><tr><th>Event</th><th>Per 100 workers a year</th><th class="num">Before</th><th class="num">During</th><th class="num">Real US, during</th><th class="num">After</th><th class="num">Real US, after</th></tr></thead><tbody>';
+  for(const c of CRISES){const w=WIN[c.id]; if(!w) continue;
+    ['promos','quits','layoffs'].forEach((k,i)=>{
+      const b=rate(k,...w.before), d=rate(k,c.from,c.to), a=rate(k,...w.after);
+      h+=`<tr>${i===0?`<td rowspan="4"><b>${c.name}</b><div class="small">${Math.floor(w.before[0])}–${Math.floor(w.after[1])}</div></td>`:''}<td>${{promos:'Promotions',quits:'Quits',layoffs:'Layoffs'}[k]}</td><td class="num">${f(b)}</td><td class="num">${f(d)}${pc(ch(d,b),k)}</td><td class="num">${real(k==='promos'?null:w.real[k])}</td><td class="num">${f(a)}${pc(ch(a,b),k)}</td><td class="num">${w.realAfter?real(k==='promos'?null:w.realAfter[k]):'<span class="real">–</span>'}</td></tr>`});
+    h+=`<tr><td colspan="6" class="real">Real-world comparison: ${w.realNote}</td></tr>`}
+  t.innerHTML=h+'</tbody>';
+}
+function crisisLayoff(p,why,outlier){
+  const L=p.comp, c=activeCrisis(); note(p,why||(c?`${L.d[0]} cuts jobs during the ${c.name}. Laid off as ${lvName(p.level)}.`:`Laid off by ${L.d[0]} as ${lvName(p.level)}.`),'laid');
+  p.left=L; p.comp=null; setLaidOff(p,true); startSearch(p); if(c) tally.crisisLaid=(tally.crisisLaid||0)+1; bump('layoffs',outlier);
+}
+function crisisTick(){
+  const banner=document.getElementById('crisis');
+  for(const c of CRISES){
+    if(!c.on) continue;
+    if(!c.state&&year>=c.from){c.state=1;addLog(c.startText,'bad')}
+    if(c.state===1&&c.event&&!c.eventDone&&year>=c.event.at){c.eventDone=true;c.event.run(c)}
+    if(c.state===1&&year>=c.to){c.state=2;addLog(c.endText,'good')}
+  }
+  const a=activeCrisis();
+  if(a){if(banner.dataset.id!==a.id){banner.dataset.id=a.id;banner.innerHTML=`<b>${a.name}</b><span>${a.sub}</span>`}banner.classList.add('show')}else banner.classList.remove('show');
+}
+function resetCrises(){CRISES.forEach(c=>{c.state=0;c.eventDone=false})}
+const JOLTS=[[2001,5722,3245,2220],[2001.5,5244,2947,2038],[2002,4855,2845,1907],[2002.5,4946,2561,2102],[2003,5058,2429,2109],[2003.5,4639,2271,2062],[2004,4900,2354,2037],[2004.5,4891,2609,1885],[2005,5201,2732,2008],[2005.5,5328,2735,1898],[2006,5271,2945,1784],[2006.5,5573,3047,1860],[2007,5426,2956,1922],[2007.5,5217,2951,1896],[2008,5071,2847,1989],[2008.5,4637,2489,2071],[2009,4095,1976,2581],[2009.5,3857,1685,2267],[2010,3904,1742,1880],[2010.5,4163,1785,2166],[2011,4000,1832,1827],[2011.5,4261,1986,1845],[2012,4457,2030,1797],[2012.5,4327,2072,1722],[2013,4487,2280,1678],[2013.5,4561,2363,1713],[2014,4626,2311,1806],[2014.5,5008,2633,1781],[2015,5061,2764,1789],[2015.5,5150,2764,1703],[2016,5220,2875,1805],[2016.5,5426,2967,1759],[2017,5499,3188,1745],[2017.5,5497,3097,1910],[2018,5512,3019,1932],[2018.5,5649,3426,1806],[2019,5786,3517,1705],[2019.5,5871,3654,1833],[2020.0,5981,3563,1808],[2020.083,5990,3497,1954],[2020.167,5171,2933,12985],[2020.25,4029,1991,9170],[2020.333,8133,2259,2139],[2020.417,7477,2594,2245],[2020.5,6320,3020,1827],[2020.583,6004,2931,1560],[2020.667,5966,3185,1567],[2020.75,6091,3311,1697],[2020.833,5894,3209,2097],[2020.917,5577,3369,1906],[2021,5598,3292,1567],[2021.5,6720,4059,1410],[2022,6431,4413,1423],[2022.5,6478,4031,1462],[2023,6370,3839,1767],[2023.5,5672,3552,1677],[2024,5591,3347,1641],[2024.5,5430,3359,1711],[2025,5238,3203,1738],[2025.5,5225,3132,1772],[2026,5347,3131,1660],[2026.5,5146,3089,1702]]; // [year, hires, quits, layoffs] in thousands; January and July each year, every month of 2020
+function drawReal(){
+  const svg=document.getElementById('realEcon'); if(!svg) return;
+  const W=640,H=220,P={l:34,r:10,t:14,b:22}, x0=2000, x1=2026.8, ymax=14000;
+  const X=y=>P.l+(y-x0)/(x1-x0)*(W-P.l-P.r), Y=v=>H-P.b-v/ymax*(H-P.t-P.b);
+  let g='';
+  for(const c of CRISES) if(!c.mild) g+=`<rect x="${X(c.from)}" y="${P.t}" width="${Math.max(3,X(c.to)-X(c.from))}" height="${H-P.t-P.b}" fill="var(--lo)" opacity=".1"/><text x="${X(c.from)+4}" y="${P.t+11}" font-size="10" fill="var(--lo)" font-family="var(--mono)">${c.short}</text>`;
+  for(let v=0;v<=ymax;v+=2000) g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${P.l-6}" y="${Y(v)+3}" font-size="10" text-anchor="end" fill="var(--muted)" font-family="var(--mono)">${v/1000}</text>`;
+  for(let y=2000;y<=2025;y+=5) g+=`<text x="${X(y)}" y="${H-6}" font-size="10" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">${y}</text>`;
+  [['var(--hi)',1],['var(--accent)',2],['var(--lo)',3]].forEach(([c,i])=>{g+=`<polyline points="${JOLTS.map(r=>X(r[0]).toFixed(1)+','+Y(r[i]).toFixed(1)).join(' ')}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`});
+  g+=`<text x="${X(2020.17)+6}" y="${Y(12985)+4}" font-size="10" fill="var(--lo)" font-family="var(--mono)">13.0M layoffs, March 2020</text>`;
+  svg.innerHTML=g;
+}
+function drawYearly(){
+  const svg=document.getElementById('yearly'); if(!svg) return;
+  const W=640,H=180,P={l:30,r:10,t:12,b:22};
+  const ys=[];for(let y=START;y<=Math.floor(END);y++)ys.push(y);
+  const ser=['promos','quits','layoffs'], col2={promos:'var(--hi)',quits:'var(--accent)',layoffs:'var(--lo)'};
+  const max=Math.max(2,...ys.map(y=>Math.max(...ser.map(k=>((yearly[y]||{})[k]||0)/sampleN(y,y+1)*100))));
+  const nice=Math.ceil(max/2)*2;
+  const X=y=>P.l+(y-START)/(ys.length-1)*(W-P.l-P.r), Y=v=>H-P.b-v/nice*(H-P.t-P.b);
+  let g='';
+  for(const c of CRISES) if(c.on&&!c.mild) g+=`<rect x="${X(c.from)}" y="${P.t}" width="${Math.max(3,X(c.to)-X(c.from))}" height="${H-P.t-P.b}" fill="var(--lo)" opacity=".1"/><text x="${X(c.from)+4}" y="${P.t+11}" font-size="10" fill="var(--lo)" font-family="var(--mono)">${c.short}</text>`;
+  for(let v=0;v<=nice;v+=nice/2){g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${P.l-6}" y="${Y(v)+3}" font-size="10" text-anchor="end" fill="var(--muted)" font-family="var(--mono)">${v}</text>`}
+  for(const y of ys) if(y%5===0) g+=`<text x="${X(y)}" y="${H-6}" font-size="10" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">${y}</text>`;
+  const now=Math.floor(year);
+  for(const k of ser){const pts=ys.filter(y=>y<=now).map(y=>`${X(y).toFixed(1)},${Y((((yearly[y]||{})[k]||0)/sampleN(y,y+1)*100)).toFixed(1)}`).join(' ');
+    if(pts) g+=`<polyline points="${pts}" fill="none" stroke="${col2[k]}" stroke-width="2" stroke-linejoin="round"/>`}
+  svg.innerHTML=g;
+}
+
+/* ---------- following one career ---------- */
+let follow=null, tracked=null, journey=[];
+const lvName=l=>l?LEVELS[l-1]:ENTRY;
+const KIND_COL={start:'--ink',hired:'--ink',promo:'--hi',quit:'--accent',move:'--p-hopper',laid:'--lo',drop:'--lo',merge:'--p-hopper',real:'--p-nepo',end:'--ink'};
+function note(p,text,kind){
+  if(!p||!p.tracked) return;
+  journey.push({y:Math.floor(year),text,kind});
+  const st=p.st; if(kind==='promo')st.promos++; if(kind==='quit')st.quits++; if(kind==='laid')st.laid++; if(kind==='drop')st.drops++;
+  if(p.comp) st.companies.add(p.comp.d[0]); else if(p.def&&p.company) st.companies.add(p.company);
+  if(p.comp&&!st.first) st.first={co:p.comp.d[0],lvl:p.level,y:Math.floor(year)};
+  p.markKind=kind; renderJourney();
+}
+function renderJourney(){
+  if(follow&&follow.mystery&&!revealed){const n=journey.filter(j=>j.kind!=='start').length;
+    document.getElementById('jlog').innerHTML=`<li><time>${Math.floor(year)}</time><span class="hiddenstep">The scenario is a surprise. ${n?n+' key moment'+(n>1?'s':'')+' so far, ':''}all revealed when the run ends in ${Math.floor(END)}.</span></li>`;return}
+  document.getElementById('jlog').innerHTML=journey.map(j=>`<li><time>${j.y}</time><span><span class="k" style="--kc:var(${KIND_COL[j.kind]||'--ink'})"></span>${j.text}</span></li>`).join('');
+  const el=document.getElementById('jlog'); el.scrollTop=el.scrollHeight;
+}
+const trailGroup=new THREE.Group(); scene.add(trailGroup);
+const TRAIL_MAX=60000;
+let trailGeo=null, trailN=0, lastPt=null, trailMat=null, trailLineMat=null;
+function resetTrail(){
+  trailGroup.clear(); trailN=0; lastPt=null;
+  trailGeo=new THREE.BufferGeometry(); trailGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(TRAIL_MAX*3),3)); trailGeo.setDrawRange(0,0);
+  trailMat=new THREE.PointsMaterial({size:4,sizeAttenuation:false}); trailLineMat=new THREE.LineBasicMaterial({transparent:true,opacity:.55});
+  trailGroup.add(new THREE.Points(trailGeo,trailMat)); trailGroup.add(new THREE.Line(trailGeo,trailLineMat));
+}
+function trailColor(){return tracked?col('--p-'+tracked.type):col('--ink')}
+function addTrailPoint(x,y,z){
+  if(trailN>=TRAIL_MAX) return;
+  const a=trailGeo.attributes.position; a.setXYZ(trailN,x,y+.05,z); trailN++; a.needsUpdate=true; trailGeo.setDrawRange(0,trailN);
+}
+function dropMarker(p,kind){
+  const m=new THREE.Mesh(headGeo,new THREE.MeshBasicMaterial({color:col(KIND_COL[kind]||'--ink')}));
+  m.scale.setScalar(1.9); m.position.set(p.x,p.y+.12,p.z); trailGroup.add(m);
+}
+function updateTrail(){
+  if(!tracked) return;
+  const x=tracked.x,y=tracked.y,z=tracked.z;
+  if(!lastPt||Math.hypot(x-lastPt[0],y-lastPt[1],z-lastPt[2])>.22){addTrailPoint(x,y,z);lastPt=[x,y,z]}
+  if(tracked.markKind&&!tracked.q.length){dropMarker(tracked,tracked.markKind);tracked.markKind=null}
+}
+function dimOthers(on){
+  for(const k in typeMats){const m=typeMats[k];m.transparent=on;m.opacity=on?.16:1;m.depthWrite=!on}
+}
+function ownMaterials(p){
+  p.ownMat=new THREE.MeshBasicMaterial({color:col('--p-'+p.type)}); p.ownLaid=new THREE.MeshBasicMaterial({color:col('--p-laid')});
+  p.f.meshes.forEach(x=>x.material=p.ownMat); p.f.mark.material=new THREE.MeshBasicMaterial({color:col('--accent')});
+  p.f.g.scale.setScalar(1.75);
+}
+// how each type of worker behaves, for the reveal
+const TYPE_REVEAL={
+  regular:p=>"As a regular employee, they took promotions when they came and only moved company when their ladder ran out.",
+  climber:p=>"As a climber, they aimed for the top floor and switched companies whenever a ladder ran out or stalled.",
+  steady:p=>`As a settler, they were happy once they reached ${lvName(p.target)} and stopped pushing for more.`,
+  hopper:p=>"As a job hopper, they looked for a better company on the same floor after every promotion.",
+  changer:p=>p.changed?"As a career changer, at one point they left everything behind and started over at entry level in a new field.":"As a career changer, they planned to start over in a new field, but the run ended before they did.",
+  nepo:p=>"As a nepo hire, family connections let them skip entry level, rise without using the rungs and get promoted about 2.6 times faster than everyone else."};
+const SCEN_REVEAL={
+  ordinary:"They started out on the ground in 2000, looking for a first job, with no company chosen in advance.",
+  collapse:"They started at Lehman Brothers, which collapsed in September 2008 in the largest bankruptcy in US history.",
+  merge:"They started at Fiat Chrysler, which merged with PSA Group into Stellantis in January 2021.",
+  attrition:"They started at Infosys, where about 13% of staff leave every year.",
+  best:"They started at Bain & Company, the best-rated employer in the model, with a 4.5 career score."};
+let revealed=false;
+const SCEN={
+  ordinary:{label:"Ordinary career",company:null},
+  collapse:{label:"Their company collapses",company:"Lehman Brothers",lvl:2,lock:2008.8},
+  merge:{label:"Their company merges",company:"Fiat Chrysler",lvl:2,lock:2021.2},
+  attrition:{label:"High-attrition employer",company:"Infosys",lvl:0},
+  best:{label:"Best-rated employer",company:"Bain & Company",lvl:0}
+};
+function setupTracked(){
+  revealed=false; {const rv=document.getElementById('reveal'); if(rv) rv.classList.remove('show');}
+  journey=[]; tracked=null; resetTrail();
+  const jb=document.getElementById('journey'); jb.hidden=!follow; document.getElementById('jsum').hidden=true;
+  document.getElementById('fstop').hidden=!follow;
+  dimOthers(!!follow);
+  if(!follow){renderJourney();return}
+  const real=['case','nepoCase','founderCase','beastCase'].includes(follow.type);
+  let p;
+  if(real){
+    p=caseFigs.find(c=>c.type===follow.type); p.tracked=true; p.st={promos:0,quits:0,laid:0,drops:0,companies:new Set([p.company])};
+    p.ownMat=new THREE.MeshBasicMaterial({color:col('--p-'+p.type)}); p.f.meshes.forEach(x=>x.material=p.ownMat); p.f.g.scale.setScalar(1.75);
+  }else{
+    const sc=SCEN[follow.scen], f=makeFigure(follow.type);
+    p={type:follow.type,f,q:[],level:0,comp:null,ang:Math.random()*Math.PI*2,next:START+.3,stuck:0,wantHop:false,laidOff:false,seeking:false,seekUntil:0,left:null,
+      target:2+(Math.random()<.45?1:0),changeYear:2006+Math.random()*12,changed:false,reachedTop:false,x:0,y:0,z:0,walkT:0,tracked:true,
+      lockUntil:sc.lock||0,st:{promos:0,quits:0,laid:0,drops:0,companies:new Set()}};
+    ownMaterials(p);
+    const L=sc.company&&ladders.find(l=>l.d[0]===sc.company&&l.alive);
+    if(L){const lvl=Math.min(L.top,follow.type==='nepo'?Math.max(2,sc.lvl):sc.lvl);p.comp=L;p.level=lvl;const s2=spot(p,L);p.x=s2[0];p.z=s2[1];p.y=lvl*GAP;p.st.companies.add(L.d[0])}
+    else{p.x=(Math.random()-.5)*8;p.z=(Math.random()-.5)*8}
+    f.g.position.set(p.x,p.y,p.z);
+    people.push(p);
+  }
+  tracked=p; trailMat.color=trailColor(); trailLineMat.color=trailColor();
+  const typeName=real?CASES.find(c=>c.key===follow.type).name:TYPES[follow.type].name;
+  document.getElementById('jhead').innerHTML=`<i style="--c:var(--p-${follow.type})"></i>Following: ${typeName}${real?' · real career':follow.mystery?' · scenario hidden until the end':' · '+SCEN[follow.scen].label}`;
+  if(!real) note(p,p.comp?`Starts as ${lvName(p.level)} at ${p.comp.d[0]}${follow.type==='nepo'&&p.level>=2?', placed there through family connections':''}.`:'Starts out on the ground, looking for a first job.','start');
+  else note(p,`Replaying ${typeName}'s real career, step by step.`,'start');
+}
+function finishJourney(){
+  if(!tracked||!follow) return;
+  const p=tracked, st=p.st, real=!!p.def;
+  note(p,`The run ends in ${Math.floor(END)} with them at ${lvName(p.level)}${p.comp?' at '+p.comp.d[0]:p.seeking?', still job hunting':''}.`,'end');
+  const sum=document.getElementById('jsum');
+  sum.innerHTML=`<b>Journey summary</b><dl>
+    <dt>Final floor</dt><dd>L${p.level} ${lvName(p.level)}</dd>
+    <dt>Promotions</dt><dd>${real?'see steps above':st.promos}</dd>
+    <dt>Companies</dt><dd>${[...st.companies].join(', ')||'none'}</dd>
+    ${real?'':`<dt>Times quit</dt><dd>${st.quits}</dd><dt>Laid off</dt><dd>${st.laid}</dd><dt>Dropped a floor</dt><dd>${st.drops}</dd>`}
+  </dl><span class="small">The trail in the model shows the full route. Big dots mark the key moments, coloured like the steps above.</span>`;
+  sum.hidden=false;
+  if(follow.mystery&&!revealed){
+    revealed=true; renderJourney();
+    document.getElementById('jhead').innerHTML=`<i style="--c:var(--p-${follow.type})"></i>Following: ${TYPES[follow.type].name} · ${SCEN[follow.scen].label}`;
+    const rv=document.getElementById('reveal');
+    const tn=TYPES[follow.type].name, an=/^[aeiou]/i.test(tn)?'An':'A';
+    let start=SCEN_REVEAL[follow.scen];
+    if(follow.scen==='ordinary'&&st.first) start=`They started out in 2000 with no company chosen in advance. Their first job was ${st.first.lvl?'as '+lvName(st.first.lvl):'at entry level'} at ${st.first.co}${follow.type==='nepo'&&st.first.lvl>=2?', through family connections':''}.`;
+    else if(follow.type==='nepo'&&follow.scen!=='ordinary') start=start.replace('They started at','Through family connections, they started above entry level at');
+    const end=p.comp?`working as <b>${p.level?lvName(p.level):'entry level'}</b> at ${p.comp.d[0]}`:p.laidOff?`at <b>${lvName(p.level)}</b> level, laid off and looking for work`:`at <b>${lvName(p.level)}</b> level, between jobs after quitting`;
+    const parts=[`${st.promos} promotion${st.promos===1?'':'s'}`,st.quits?`quit ${st.quits} time${st.quits===1?'':'s'}`:'never quit',st.laid?`laid off ${st.laid} time${st.laid===1?'':'s'}`:'never laid off'];
+    rv.innerHTML=`<div class="cap">${an} ${tn.toLowerCase()} · the scenario was</div><h3>${SCEN[follow.scen].label}</h3><p>${start}</p>
+      <p>${TYPE_REVEAL[follow.type](p)}</p>
+      <p>By 2026 they were ${end}: ${parts[0]}, ${parts[1]}, ${parts[2]}.</p>
+      <div class="row"><button id="revealJourney">See the full journey</button><button id="revealClose">Close</button></div>`;
+    rv.querySelector('#revealClose').onclick=()=>rv.classList.remove('show');
+    rv.querySelector('#revealJourney').onclick=()=>{rv.classList.remove('show');document.getElementById('followBox').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})};
+    rv.addEventListener('pointerdown',e=>e.stopPropagation());
+    requestAnimationFrame(()=>rv.classList.add('show'));
+  }
+}
+
+/* ---------- the statistical sample ----------
+   2,400 extra workers follow exactly the same rules as the visible figures but are never drawn,
+   so the charts rest on a large sample without slowing the 3D model down. */
+const CROWD_N=2400;
+const stubFig=()=>({g:{parent:true,position:{set(){}},scale:{setScalar(){}},rotation:{}},legs:[{rotation:{}},{rotation:{}}],meshes:[],head:{position:{}},mark:{}});
+let crowdTally={};
+function quietly(fn){const t=tally,l=logQuiet;tally=crowdTally;logQuiet=true;try{fn()}finally{tally=t;logQuiet=l}}
+function crowdCollapse(p,L){
+  const lvl=p.level; p.comp=null; p.left=L;
+  const open=alive().filter(o=>o.top>=lvl);
+  if(lvl>0&&Math.random()<.5&&open.length){p.comp=pick(open);return}
+  p.level=Math.max(0,lvl-1); p.y=p.level*GAP;
+  if(p.level===0){setLaidOff(p,true);bump('layoffs',true);startSearch(p)}
+  else{const o2=alive().filter(o=>o.top>=p.level);if(o2.length)p.comp=pick(o2)}
+}
+function crowdMerge(p,M){
+  const r=Math.random(); p.comp=M; if(p.level===0) return;
+  if(r<.65) return;
+  if(r<.9&&p.level>1){p.level--;p.y=p.level*GAP;return}
+  p.level=0;p.y=0;p.comp=null;setLaidOff(p,true);bump('layoffs',true);startSearch(p);
+}
+// warm-up: the statistical sample lives through 20 quiet years before 2000 so it starts in a realistic, settled state
+let burning=false;
+function burnIn(){
+  const real=year; burning=true;
+  const crowd=people.filter(p=>p.shadow);
+  for(let t=START-20;t<START;t+=.05){year=t;if(Math.round(t*20)%4===0)updateMixNow();for(const p of crowd){if(year>=p.next){quietly(()=>decide(p));p.q.length=0;p.y=p.level*GAP}}}
+  burning=false; year=real; // each worker keeps the decision timing they had at the end of the warm-up
+}
+function makeCrowd(){
+  const types=Object.keys(TYPES), total=types.reduce((a,k)=>a+TYPES[k].n,0), open=alive();
+  for(const type of types) for(let k=0;k<Math.round(CROWD_N*TYPES[type].n/total);k++){
+    const p={type,shadow:true,f:stubFig(),q:[],level:0,comp:null,ang:0,next:START-20+Math.random()*1.5,stuck:0,wantHop:false,laidOff:false,seeking:false,seekUntil:0,left:null,
+      target:2+(Math.random()<.45?1:0),changeYear:2004+Math.random()*18,changed:false,reachedTop:false,x:0,y:0,z:0,walkT:0};
+    if(Math.random()<.9){const L=pick(open,true);p.comp=L;p.level=Math.min(L.top,(type==='nepo'?2:0)+(Math.random()<.55?0:1)+(Math.random()<.3?1:0)+(Math.random()<.1?1:0))}
+    else p.next=START+Math.random()*4;
+    p.y=p.level*GAP; people.push(p);
+  }
+}
+function reset(){
+  figGroup.clear(); debrisGroup.clear(); debris=[]; people=[]; logItems=[]; tally={top:0,hit:0,dropped:0,restarts:0,hops:0};
+  document.getElementById('log').innerHTML='';
+  year=START;
+  ladders.forEach(L=>{L.alive=L.founded<=START&&!(L.collapse&&L.collapse.at<=START);L.failed=false;L.vis=L.alive?1:0;L.el.classList.remove('dead');L.trOn=false;L.el.classList.remove('tr');L.merged=false;L.slide=null;L.g.position.set(L.x,0,L.z);if(L.growth)setTop(L,L.growth.start)});
+  const open=alive();
+  let i=0;
+  for(const type in TYPES) for(let k=0;k<TYPES[type].n;k++,i++){
+    const f=makeFigure(type);
+    const p={type,f,q:[],level:0,comp:null,ang:Math.random()*Math.PI*2,next:START+Math.random()*1.5,stuck:0,wantHop:false,laidOff:false,seeking:false,seekUntil:0,left:null,
+      target:2+(Math.random()<.45?1:0),changeYear:2004+Math.random()*18,changed:false,reachedTop:false,x:0,y:0,z:0,walkT:0};
+    if(i%10<9){ // most start already employed in a company that exists in 2000
+      const L=pick(open,true);
+      const lvl=Math.min(L.top,(type==='nepo'?2:0)+(Math.random()<.55?0:1)+(Math.random()<.3?1:0)+(Math.random()<.1?1:0));
+      p.comp=L; p.level=lvl; const s=spot(p,L); p.x=s[0]; p.z=s[1]; p.y=lvl*GAP;
+    }else{ p.x=(Math.random()-.5)*(SIZE-3); p.z=(Math.random()-.5)*(SIZE-3); p.y=0; p.next=START+Math.random()*4; }
+    people.push(p);
+  }
+  mixNow=null; makeCrowd(); crowdTally={}; burnIn();
+  caseFigs=CASES.map(def=>{ const f=makeFigure(def.key); f.g.scale.setScalar(1.45);
+    const L=ladders.find(l=>l.d[0]===def.company);
+    const c={type:def.key,def,company:def.company,f,q:[],level:0,ang:-Math.PI/2,i:0,x:L?L.fx+2.2:0,y:0,z:L?L.fz+1.2:0,walkT:0};
+    if(def.startTop&&L){c.x=L.x;c.z=L.z;c.y=L.top*GAP+.4;c.level=L.top}
+    f.g.position.set(c.x,c.y,c.z); return c});
+  yearly={}; events={promos:[],quits:[],layoffs:[]}; sampleHist=[]; setTimeout(renderFallen,0); resetCrises(); {const c=document.getElementById('crisis');c.classList.remove('show');c.dataset.id='';}
+  setupTracked();
+  addLog(`The simulation starts. ${people.filter(p=>!p.shadow).length} visible workers (plus ${people.filter(p=>p.shadow).length} more in the statistical sample) with six kinds of ambition, two real careers, and every company that existed in 2000.`);
+  updateStats();
+}
+
+const RETIRE=.025; // about 2.5% of workers retire each year (a roughly 40-year career) and a newcomer starts at entry level
+function retire(p){
+  p.q.length=0; if(p.comp||p.left){} p.comp=null; p.left=null; p.level=0; p.y=0; p.seeking=false; p.laidOff=false; setSeeker(p,false);
+  p.reachedTop=false; p.changed=false; p.stuck=0; p.wantHop=false; p.changeYear=year+4+Math.random()*16; p.target=2+(Math.random()<.45?1:0);
+  if(!p.shadow){const m=p.ownMat||typeMats[p.type];p.f.meshes.forEach(x=>x.material=m);p.f.head.position.set(0,.66,0);
+    p.x=(Math.random()-.5)*(SIZE-3);p.z=(Math.random()-.5)*(SIZE-3);p.f.g.position.set(p.x,0,p.z)}
+  tally.retired=(tally.retired||0)+1;
+}
+function decide(p){
+  p.next=year+.6+Math.random()*.9;
+  if(!p.tracked&&Math.random()<RETIRE*1.35){retire(p);return}
+  const open=alive(), lock=p.lockUntil&&year<p.lockUntil;
+  if(!p.comp&&p.laidOff&&!p.seeking) startSearch(p);
+  if(p.seeking){
+    if(year<p.seekUntil){wander(p);return}
+    // search over: take an offer, often one floor higher than the job they left
+    const up=open.filter(L=>L!==p.left&&L.top>p.level), same=open.filter(L=>L!==p.left&&L.top>=p.level);
+    p.seeking=false; setSeeker(p,false);
+    if(!p.laidOff&&up.length&&Math.random()<.5*cm('upMult')){bump('promos');join(p,pick(up),p.level+1);tally.upSwitch=(tally.upSwitch||0)+1;note(p,`After job hunting, lands a role one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
+    if(p.laidOff&&p.level>0&&Math.random()<.4){const lower=open.filter(L=>L!==p.left&&L.top>=p.level-1);if(lower.length){const lv=p.level;join(p,pick(lower),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}.`,'drop');return}}
+    if(same.length){const wasLaid=p.laidOff;join(p,pick(same),p.level);note(p,wasLaid?`Hired again at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Takes a ${lvName(p.level)} role at ${p.comp.d[0]}, same floor as before.`,'hired');return}
+  }
+  if(p.comp&&!p.f.g.parent) return;
+  if(p.comp&&!p.def){const c=activeCrisis();
+    if(c&&c.outlier&&c.outlier.companies.includes(p.comp.d[0])&&Math.random()<c.outlier.rate*1.35){crisisLayoff(p,`${c.outlier.why}: ${p.comp.d[0]} cuts jobs. Laid off as ${lvName(p.level)}.`,true);return}
+    if(Math.random()<layoffRate(p.comp)*cm('layoffMult')*1.35*(p.comp.trOn?1.5:1)){crisisLayoff(p);return}}
+  if(!lock&&p.comp&&p.level<5&&Math.random()<cm('quitMult')*quitRate(p.comp)*1.35*(p.type==='hopper'?1.6:p.type==='nepo'?.3:p.type==='steady'&&p.level>=p.target?.4:1)){
+    note(p,`Quits ${p.comp.d[0]} as ${lvName(p.level)} to look for something better.`,'quit');
+    p.left=p.comp; p.comp=null; tally.quit=(tally.quit||0)+1; bump('quits');
+    walkTo(p,p.x+(Math.random()-.5)*2,p.z+(Math.random()-.5)*2); startSearch(p); return;
+  }
+  if(!p.comp){
+    if(p.type==='nepo'&&p.level===0){ // a family connection opens a door two floors up, at a tall company
+      const opts=open.filter(L=>L.top>=3); if(opts.length){const L=pick(opts);join(p,L,2);note(p,`Family connections: skips entry level and starts as Senior at ${L.d[0]}.`,'hired');addLog(`A nepo hire skips entry level and starts as a Senior at ${L.d[0]}.`,'nepo');return}
+    }
+    const opts=open.filter(L=>L.top>=p.level);
+    if(!opts.length) return;
+    join(p,pick(opts),p.level); note(p,`Hired at ${p.comp.d[0]} as ${lvName(p.level)}.`,'hired'); return;
+  }
+  const L=p.comp;
+  if(!lock&&p.type==='changer'&&!p.changed&&year>=p.changeYear&&p.level>=2){
+    p.changed=true; tally.restarts++; note(p,`Leaves ${L.d[0]} as ${lvName(p.level)} to start over at entry level in a new field.`,'drop');
+    walkTo(p,L.fx,L.fz); vert(p,0,'climb');
+    const s=[L.fx+(Math.random()-.5)*3,L.fz+(Math.random()-.5)*3]; walkTo(p,s[0],s[1]);
+    addLog(`A career changer left ${L.d[0]} at L${p.level} ${LEVELS[p.level-1]} to start over at entry level in a new field.`);
+    p.level=0; p.comp=null; p.next=year+.8; return;
+  }
+  if(!lock&&p.type==='hopper'&&p.wantHop){
+    const opts=open.filter(o=>o!==L&&o.top>p.level);
+    p.wantHop=false; if(opts.length){transfer(p,pick(opts));note(p,`Hops to ${p.comp.d[0]} at the same level, ${lvName(p.level)}, chasing a better ladder.`,'move');return}
+  }
+  if(p.type==='steady'&&p.level>=p.target) return;
+  if(L.top>p.level){
+    if(Math.random()<BASE[p.level]*sf(L)*(p.type==='nepo'?NEPO_BOOST:1)*cm('promoMult')){bump('promos');
+      const s=spot(p,L);
+      if(p.type==='nepo'){walkTo(p,s[0],s[1]);vert(p,(p.level+1)*GAP,'lift')}
+      else{walkTo(p,L.fx,L.fz); vert(p,(p.level+1)*GAP,'climb'); walkTo(p,s[0],s[1])}
+      p.level++; p.stuck=0; if(p.type==='hopper') p.wantHop=true; note(p,`Promoted to ${lvName(p.level)} at ${L.d[0]}.`,'promo');
+      if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive at ${L.d[0]}.`,'good')}
+    }else if(++p.stuck>=4&&!lock&&p.type!=='steady'&&p.type!=='regular'){
+      const opts=open.filter(o=>o!==L&&o.top>p.level&&sectorOf(o)===sectorOf(L)&&sf(o)>sf(L)).concat(open.filter(o=>o!==L&&o.top>p.level&&Math.random()<.3));
+      p.stuck=0; if(opts.length){transfer(p,pick(opts));note(p,`Passed over for promotion at ${L.d[0]}; moves to ${p.comp.d[0]}, which is rated better.`,'move')}
+    }
+  }else if(!lock&&p.type!=='steady'&&(p.type!=='regular'||Math.random()<.3)){
+    const opts=open.filter(o=>o.top>p.level);
+    if(opts.length){transfer(p,pick(opts));note(p,`${L.d[0]} has no higher floor. Moves to ${p.comp.d[0]}, which does.`,'move')}
+  }
+}
+
+/* a collapsing ladder breaks into pieces that fall, scatter on the ground and fade */
+const debrisGroup=new THREE.Group(); scene.add(debrisGroup);
+let debris=[];
+function shatter(L){
+  const mat=L.mat.clone(); mat.transparent=true; mat.opacity=1; mat.depthWrite=true;
+  const h=L.top*GAP+.35, pieces=[];
+  const add=(geo,sy,lx,ly,rx,rz)=>{const m=new THREE.Mesh(geo,mat);m.scale.y=sy;m.rotation.set(rx||0,0,rz||0);
+    const w=new THREE.Vector3(lx,ly,0);L.g.localToWorld(w);const g=new THREE.Group();g.position.copy(w);g.rotation.y=L.g.rotation.y;g.add(m);debrisGroup.add(g);pieces.push(g)};
+  for(const sgn of[-1,1]){const n=Math.ceil(h/1.1);for(let i=0;i<n;i++){const len=Math.min(1.1,h-i*1.1);add(railGeo,len,sgn*LW/2,i*1.1+len/2)}}
+  const rungs=Math.round(L.top*GAP/.3); for(let i=1;i<=rungs;i++) add(rungGeo,1,0,i*.3,0,Math.PI/2);
+  add(capGeo,1,0,L.top*GAP+.38);
+  for(const g of pieces){
+    const a=Math.random()*Math.PI*2, sp=.6+Math.random()*2.2;
+    g.userData={vx:Math.cos(a)*sp,vz:Math.sin(a)*sp,vy:Math.random()*1.5,
+      ax:(Math.random()-.5)*8,ay:(Math.random()-.5)*6,az:(Math.random()-.5)*8,rest:false};
+  }
+  debris.push({mat,pieces,t:0});
+}
+function updateDebris(dt){
+  for(const set of debris){
+    set.t+=dt;
+    for(const g of set.pieces){
+      const u=g.userData; if(u.rest) continue;
+      u.vy-=14*dt; g.position.x+=u.vx*dt; g.position.y+=u.vy*dt; g.position.z+=u.vz*dt;
+      g.rotation.x+=u.ax*dt; g.rotation.y+=u.ay*dt; g.rotation.z+=u.az*dt;
+      const lim=SIZE/2-.3; g.position.x=Math.max(-lim,Math.min(lim,g.position.x)); g.position.z=Math.max(-lim,Math.min(lim,g.position.z));
+      if(g.position.y<=.05){
+        g.position.y=.05;
+        if(Math.abs(u.vy)<1.2){u.rest=true; g.rotation.x=g.children[0].geometry===capGeo?0:Math.PI/2*(Math.random()<.5?1:-1); g.rotation.z=0; continue}
+        u.vy=-u.vy*.3; u.vx*=.55; u.vz*=.55; u.ax*=.5; u.ay*=.5; u.az*=.5;
+      }
+    }
+    if(set.t>3.2) set.mat.opacity=Math.max(0,1-(set.t-3.2)/1.6);
+    set.mat.depthWrite=set.mat.opacity>.99;
+  }
+  debris=debris.filter(set=>{if(set.t>4.9){set.pieces.forEach(g=>debrisGroup.remove(g));set.mat.dispose();return false}return true});
+}
+
+function renderFallen(){
+  const el=document.getElementById('fallen'); if(!el) return;
+  const fs=ladders.filter(L=>L.collapse).sort((a,b)=>a.collapse.at-b.collapse.at);
+  el.innerHTML=fs.map(L=>`<li class="${L.failed?'down':'up'}"><button data-n="${L.d[0]}" title="${L.collapse.label}"><time>${Math.floor(L.collapse.at)}</time><span>${L.d[0]}</span></button></li>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>select(DATA.find(d=>d[0]===b.dataset.n)));
+}
+function collapse(L){
+  shatter(L); L.vis=0; L.g.visible=false; setTimeout(renderFallen,0);
+  L.alive=false; L.failed=true; L.el.classList.add('dead'); L.el.dataset.year=Math.floor(L.collapse.at);
+  for(const p of people.filter(q=>q.comp===L&&q.shadow)) crowdCollapse(p,L);
+  const hit=people.filter(p=>p.comp===L&&!p.shadow);
+  let same=0,down=0,ground=0;
+  for(const p of hit){
+    p.q=[]; let lvl=Math.max(0,Math.round(p.y/GAP)); p.level=lvl; p.comp=null; p.next=year+.5+Math.random();
+    const open=alive().filter(o=>o.top>=lvl);
+    if(lvl>0&&Math.random()<.5&&open.length){const N=pick(open);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;same++;note(p,`${L.d[0]} collapses. Finds work at ${N.d[0]} on the same floor, ${lvName(lvl)}.`,'move');continue}
+    const nl=Math.max(0,lvl-1); if(nl<lvl) vert(p,nl*GAP,'fall'); p.level=nl;
+    if(nl===0){ground++;setLaidOff(p,true);bump('layoffs',true);note(p,`${L.d[0]} collapses. Laid off and back to entry level.`,'laid');continue}
+    const o2=alive().filter(o=>o.top>=nl);
+    if(o2.length){const N=pick(o2);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N}
+    down++; note(p,`${L.d[0]} collapses. Drops a floor to ${lvName(nl)}${p.comp?' at '+p.comp.d[0]:''}.`,'drop');
+  }
+  tally.hit+=hit.length; tally.dropped+=down+ground;
+  const parts=[]; if(same)parts.push(`${same} found work on the same floor`); if(down)parts.push(`${down} dropped a floor`); if(ground)parts.push(`${ground} fell back to entry level`);
+  addLog(`${L.d[0]} collapsed. ${hit.length?hit.length+' simulated worker'+(hit.length>1?'s':'')+' affected'+(parts.length?': '+parts.join(', '):'')+'.':'No simulated workers were there at the time.'}`,'bad');
+}
+
+function stepPerson(p,dt){
+  let moving=false;
+  while(p.q.length&&dt>0){
+    const a=p.q[0];
+    if(a.t==='walk'){
+      const dx=a.x-p.x,dz=a.z-p.z,dist=Math.hypot(dx,dz),stp=WALK*dt;
+      if(dist>1e-3) p.f.g.rotation.y=Math.atan2(dx,dz);
+      if(dist<=stp){p.x=a.x;p.z=a.z;dt-=dist/WALK;p.q.shift()}else{p.x+=dx/dist*stp;p.z+=dz/dist*stp;dt=0}
+      moving=true; p.walkT+=stp*6;
+    }else{
+      const sp=a.t==='fall'?CLIMB*2.5:CLIMB, d=a.y-p.y, stp=sp*dt;
+      if(Math.abs(d)<=stp){p.y=a.y;dt-=Math.abs(d)/sp;p.q.shift()}else{p.y+=Math.sign(d)*stp;dt=0}
+      p.walkT+=stp*8;
+    }
+  }
+  const sw=moving?Math.sin(p.walkT)*.6:0;
+  p.f.legs[0].rotation.x=sw; p.f.legs[1].rotation.x=-sw;
+  p.f.g.position.set(p.x,p.y,p.z);
+}
+
+function simulate(dt){
+  if(!playing||year>=END) return;
+  const sdt=dt*speed;
+  year=Math.min(END,year+sdt/YEAR_SEC);
+  for(const L of ladders){
+    if(L.growth&&L.alive){const gs=L.growth.steps[L.growI||0]; if(gs&&year>=gs[0]){setTop(L,gs[1]);addLog(`${L.d[0]} ${gs[2]}. Its ladder grows a floor: L${gs[1]} ${LEVELS[gs[1]-1]} now exists there.`,'good')}}
+    if(L.mergeAt&&!L.merged&&year>=L.mergeAt) merge(L.mergeInto);
+    if(!L.alive&&!L.failed&&!L.merged&&L.founded<=year&&!(L.collapse&&L.collapse.at<=year)&&!(L.mergeAt&&year>=L.mergeAt)){L.alive=true; if(L.founded>START&&!L.dbl) addLog(`${L.d[0]} was founded. A new ladder appears.`)}
+    if(L.alive&&L.collapse&&L.collapse.at<=year) collapse(L);
+    if(L.trFrom&&!L.trOn&&year>=L.trFrom){L.trOn=true;L.el.classList.add('tr');addLog(`${L.d[0]} enters a transition: ${L.d[6].log}. Its ladder fades and promotions there slow down.`,'bad')}
+  }
+  crisisTick();
+  if(!mixNow||year-(mixNow._t||0)>=.1){updateMixNow();mixNow._t=year}
+  if(!sampleHist.length||year-sampleHist[sampleHist.length-1][0]>=.05) sampleHist.push([year,sampleCount()]);
+  for(const p of people){
+    if(p.shadow){p.q.length=0;if(year>=p.next){curP=p;quietly(()=>decide(p));curP=null}p.q.length=0;p.y=p.level*GAP;continue}
+    if(!p.q.length&&year>=p.next){curP=p;decide(p);curP=null} stepPerson(p,sdt) }
+  stepCases(sdt);
+  if(year>=END){playing=false;setPlay();finishJourney();addLog(`The simulation reached ${Math.floor(END)}. ${tally.top} worker${tally.top===1?'':'s'} reached Executive; ${tally.hit} were hit by a collapse.`)}
+}
+
+/* stats */
+const peopleEl=document.getElementById('people');
+function stickSvg(type){return `<svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true" style="color:var(--p-${type})"><circle cx="7" cy="3.5" r="2.8" fill="currentColor"/><path d="M7 6.5v6.5M2.5 9h9M7 13l-3.5 6M7 13l3.5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>`}
+peopleEl.innerHTML=Object.entries(TYPES).map(([k,t])=>`<div class="ptype">${stickSvg(k)}<b>${t.name}</b><span class="n" id="n-${k}"></span><p>${t.desc}</p></div>`).join('');
+peopleEl.insertAdjacentHTML('beforeend',`<div class="ptype seek">${stickSvg('regular').replace('</svg>','<circle class="mark" cx="12" cy="2" r="1.8"/></svg>')}<b>Job seeker</b><span class="n" id="n-seek"></span><p>Quit to look for something better. Wanders across their floor, marked with an orange dot, until another company makes an offer, often one floor higher.</p></div>`);
+peopleEl.insertAdjacentHTML('beforeend',`<div class="ptype">${stickSvg('laid').replace('<circle cx="7" cy="3.5"','<circle cx="8.5" cy="4.5"')}<b>Laid off</b><span class="n" id="n-laid"></span><p>Anyone who loses their job in a collapse or merger turns grey, head down, until another company hires them at entry level.</p></div>
+<div class="ptype case">${stickSvg('case')}<b>Michael Fiddelke</b><span class="n">real path</span><p>Target's CEO, replayed from his actual job history: intern in 2003, Director in 2007, executive floor in 2013, CEO in 2026.</p></div>
+<div class="ptype founderCase">${stickSvg('founderCase')}<b>Jensen Huang</b><span class="n">real path</span><p>Started washing dishes at Denny's at 15, co-founded Nvidia at 30. Doesn't climb anyone's ladder: he stands on top of his own as it grows from Senior to Director height.</p></div>
+<div class="ptype beastCase">${stickSvg('beastCase')}<b>Jimmy Donaldson (MrBeast)</b><span class="n">real path</span><p>Started his YouTube channel at 13 in 2012. Stands on top of his own ladder, which grows as the team behind it does.</p></div>
+<div class="ptype nepoCase">${stickSvg('nepo')}<b>John Elkann</b><span class="n">real path</span><p>Agnelli heir, on Fiat's board at 21. Rides straight to the top without rungs; chairman of Fiat at 34, then of Stellantis.</p></div>`);
+let statT=0;
+function updateStats(){
+  const vis=people.filter(p=>!p.shadow);
+  const lv=[0,0,0,0,0,0]; vis.forEach(p=>lv[p.level]++);
+  document.getElementById('levels').innerHTML=['Entry',...LEVELS.map((l,i)=>'L'+(i+1))].map((l,i)=>`<div><b>${lv[i]}</b>${l}</div>`).join('');
+  {const el=document.getElementById('n-laid'); if(el) el.textContent=`${vis.filter(p=>p.laidOff).length} now`}
+  {const el=document.getElementById('n-seek'); if(el) el.textContent=`${vis.filter(p=>p.seeking&&!p.laidOff).length} now`}
+  for(const k in TYPES){const ps=vis.filter(p=>p.type===k);const avg=ps.reduce((a,p)=>a+p.level,0)/ps.length;document.getElementById('n-'+k).textContent=`${ps.length} · avg L${avg.toFixed(1)}`}
+  {const emp=people.filter(p=>p.comp);const cnt={};emp.forEach(p=>{const k=sectorOf(p.comp);cnt[k]=(cnt[k]||0)+1});
+   document.getElementById('mix').innerHTML=Object.entries(SECTORS).map(([k,x])=>{const sim=(cnt[k]||0)/Math.max(1,emp.length)*100, real=x.jobs/JOBS_TOTAL*100;
+     return `<div class="r"><span class="n" title="${x.name}">${x.name}</span><span class="b"><i style="width:${Math.min(100,sim*4)}%"></i><u style="left:${Math.min(100,real*4)}%"></u></span><span class="v">${sim.toFixed(0)}% / ${real.toFixed(0)}%</span></div>`}).join('')+`<div class="k">Bar: share of employed simulated workers (all ${people.length}). Line and second figure: real share of US jobs (BLS, Sep 2026).</div>`}
+  document.getElementById('tally').innerHTML=`<span>Reached Executive <b>${tally.top}</b></span><span>Company switches <b>${tally.hops}</b></span><span>Started over <b>${tally.restarts}</b></span><span>Hit by a collapse <b>${tally.hit}</b></span><span>Quit to look for better <b>${tally.quit||0}</b></span><span>Moved up by switching <b>${tally.upSwitch||0}</b></span><span>Laid off in a crisis <b>${tally.crisisLaid||0}</b></span><span>Moved by a merger <b>${tally.merged||0}</b></span>`;
+  document.getElementById('year').textContent=Math.floor(year);
+}
+
+function renderSampleList(){
+  const el=document.getElementById('sampleList'); if(!el) return;
+  const inc=[],exc=[],failed=[];
+  for(const d of DATA){const L=ladders.find(l=>l.d===d)||{d,collapse:d[8]};
+    if(d[8]){failed.push(d[0]);continue}
+    if(NOT_SAMPLE[d[0]]) exc.push(`<li><b>${d[0]}</b>: ${NOT_SAMPLE[d[0]].charAt(0).toLowerCase()+NOT_SAMPLE[d[0]].slice(1)}</li>`);
+    else inc.push(d[0]+(d[6]?' (until its transition begins)':''));}
+  el.innerHTML=`<div class="rs"><b>Included: ${inc.length} companies</b><p>${inc.join(', ')}.</p></div>
+    <div class="rs"><b>Left out: far from the average course</b><ul class="small" style="margin:0;padding-left:16px;display:grid;gap:3px">${exc.join('')}</ul></div>
+    <div class="rs"><b>Left out: failed companies (${failed.length})</b><p>${failed.join(', ')}. Extreme cases by definition: most companies survived these crises.</p></div>`;
+}
+function applyTheme(){
+  const pc=col('--plane'); planeMats.forEach(m=>m.color=pc); edgeMats.forEach(m=>m.color=pc);
+  groundMat.color=col('--line');
+  ladders.forEach(L=>{const c=scoreColor(L.d);L.mat.color=c;L.el.style.setProperty('--c',hex(c))});
+  for(const k in typeMats) if(k!=='seek') typeMats[k].color=col('--p-'+k);
+  typeMats.seek.color=col('--accent');
+  renderTable();
+}
+
+/* level labels */
+const labelsEl=document.getElementById('labels'); const labelEls=[];
+for(let i=0;i<6;i++){const d=document.createElement('div');d.className='lvl';d.innerHTML=`<b>L${i}</b> ${i?LEVELS[i-1]:ENTRY}`;labelsEl.appendChild(d);labelEls.push(d)}
+
+/* camera */
+const VIEWS={model:{az:.75,el:.5},side:{az:0,el:.02},top:{az:0,el:Math.PI/2-.0001}};
+let az=.75,el=.5,zoom=1,tgt=null;
+function setView(v){tgt=VIEWS[v];['Model','Side','Top'].forEach(n=>document.getElementById('v'+n).setAttribute('aria-pressed',String(n.toLowerCase()===v)))}
+function updCam(){
+  const w=stage.clientWidth,h=stage.clientHeight,a=w/h;
+  const span=(a<1?40/a*.62:33)/zoom;
+  cam.left=-span*a/2;cam.right=span*a/2;cam.top=span/2;cam.bottom=-span/2;cam.updateProjectionMatrix();
+  const c=new THREE.Vector3(0,2.7*GAP,0), r=40;
+  cam.position.set(r*Math.cos(el)*Math.sin(az),c.y+r*Math.sin(el),r*Math.cos(el)*Math.cos(az));
+  cam.up.set(0,1,0); if(el>1.5) cam.up.set(-Math.sin(az),0,-Math.cos(az));
+  cam.lookAt(c);
+}
+let drag=null; const pts=new Map();
+stage.addEventListener('pointerdown',e=>{stage.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);drag=[e.clientX,e.clientY];tgt=null});
+stage.addEventListener('pointermove',e=>{
+  if(!pts.has(e.pointerId))return;
+  if(pts.size===2){const [a,b]=[...pts.values()];const d0=Math.hypot(a[0]-b[0],a[1]-b[1]);pts.set(e.pointerId,[e.clientX,e.clientY]);const [c,d]=[...pts.values()];zoom=Math.min(4,Math.max(.5,zoom*Math.hypot(c[0]-d[0],c[1]-d[1])/d0));return}
+  pts.set(e.pointerId,[e.clientX,e.clientY]);
+  az-=(e.clientX-drag[0])*.008; el=Math.min(Math.PI/2-.0001,Math.max(0,el+(e.clientY-drag[1])*.008)); drag=[e.clientX,e.clientY];
+});
+const up=e=>{pts.delete(e.pointerId);drag=pts.size?[...pts.values()][0]:null};
+stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
+stage.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.min(4,Math.max(.5,zoom*Math.exp(-e.deltaY*.0012)))},{passive:false});
+
+function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight,false)}
+new ResizeObserver(resize).observe(stage);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const v=new THREE.Vector3();
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.1,(now-last)/1000); last=now;
+  simulate(dt);
+  updateDebris(reduce?5:dt);
+  updateTrail();
+  for(const L of ladders){
+    if(L.slide){
+      const M=ladders.find(m=>m.d[0]===L.mergeInto); L.slide.t=Math.min(1,L.slide.t+dt*(reduce?10:.8));
+      const e=L.slide.t<.5?2*L.slide.t*L.slide.t:1-Math.pow(-2*L.slide.t+2,2)/2;
+      L.g.position.set(L.slide.fx+(M.x-L.slide.fx)*e,0,L.slide.fz+(M.z-L.slide.fz)*e);
+      if(L.slide.t>=1){L.slide=null;L.vis=0}
+    }
+    const want=((L.alive&&!(L.dbl&&ladders.some(o=>o.slide)))||L.slide)?1:0;
+    L.vis+= (want-L.vis)*Math.min(1,dt*(reduce?60:2.2));
+    if(Math.abs(want-L.vis)<.01) L.vis=want;
+    const o=L.vis*(L.trOn?.35:1);
+    L.mat.opacity=o; L.mat.depthWrite=o>.99; L.g.visible=L.vis>.01;
+  }
+  if(tgt){const k=reduce?1:.08;az+=(tgt.az-az)*k;el+=(tgt.el-el)*k;if(Math.abs(tgt.az-az)+Math.abs(tgt.el-el)<.001){az=tgt.az;el=tgt.el;tgt=null}}
+  updCam();
+  renderer.render(scene,cam);
+  const w=stage.clientWidth,h=stage.clientHeight, hideLv=el>1.35;
+  for(let i=0;i<6;i++){
+    let best=null;
+    for(const [x,z] of [[-1,-1],[-1,1],[1,-1],[1,1]]){v.set(x*SIZE/2,i*GAP,z*SIZE/2).project(cam);if(!best||v.x<best.x)best=v.clone()}
+    labelEls[i].style.left=Math.max(150,(best.x+1)/2*w)+'px';labelEls[i].style.top=(1-best.y)/2*h+'px';labelEls[i].style.opacity=hideLv?0:1;
+  }
+  for(const L of ladders){
+    const shown=(L.alive&&(!L.dbl||L.vis>.5))||!!L.slide;
+    L.el.hidden=!shown;
+    if(!shown) continue;
+    v.set(L.g.position.x,(L.failed?.6:L.top*GAP+.5),L.g.position.z).project(cam);
+    L.el.style.left=(v.x+1)/2*w+'px';L.el.style.top=(1-v.y)/2*h+'px';
+  }
+  if((statT+=dt)>.25){statT=0;updateStats();drawYearly();drawImpact()}
+  requestAnimationFrame(frame);
+}
+
+function setPlay(){const b=document.getElementById('play');b.textContent=playing?'Pause':(year>=END?'Finished':'Play');b.setAttribute('aria-pressed',String(playing))}
+document.getElementById('play').onclick=()=>{if(year>=END)return;playing=!playing;setPlay()};
+const ftype=document.getElementById('ftype'), fscen=document.getElementById('fscen');
+ftype.onchange=()=>{fscen.disabled=['case','nepoCase','founderCase','beastCase'].includes(ftype.value)};
+document.getElementById('fstart').onclick=()=>{const keys=Object.keys(SCEN),myst=fscen.value==='random'&&!fscen.disabled;
+  follow={type:ftype.value,scen:myst?keys[Math.floor(Math.random()*keys.length)]:(fscen.value==='random'?'ordinary':fscen.value),mystery:myst};reset();playing=true;setPlay();document.getElementById('stage').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})};
+document.getElementById('fstop').onclick=()=>{follow=null;reset();playing=true;setPlay()};
+document.getElementById('restart').onclick=()=>{reset();playing=true;setPlay()};
+document.getElementById('s1').onclick=()=>{speed=1;s1.setAttribute('aria-pressed','true');s3.setAttribute('aria-pressed','false')};
+document.getElementById('s3').onclick=()=>{speed=3;s3.setAttribute('aria-pressed','true');s1.setAttribute('aria-pressed','false')};
+const s1=document.getElementById('s1'), s3=document.getElementById('s3');
+document.getElementById('vModel').onclick=()=>setView('model');
+document.getElementById('vSide').onclick=()=>setView('side');
+document.getElementById('vTop').onclick=()=>setView('top');
+document.getElementById('shuffle').onclick=()=>{seed=(Date.now()%100000)+1;build();applyTheme();reset();playing=true;setPlay()};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+build(); applyTheme(); drawReal(); renderSampleList(); reset(); resize(); requestAnimationFrame(frame);
+})();
+</script>
