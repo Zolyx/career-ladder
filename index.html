@@ -342,7 +342,8 @@ td a,.detail a{color:var(--ink)}
     <h2>How to read it, and what it can't tell you</h2>
     <div class="notes">
       <p><b>Height is how far you can progress.</b> Every ladder starts on the ground floor, L0 Entry level, where everyone starts. Each floor above is a career stage you can reach: you can become Junior, Senior, Lead / Manager, Director or Executive. A ladder's height shows the furthest stage that company offers. For now it's estimated from company size, since bigger companies have more stages: under 100 staff reaches Junior, 100 to 1,000 Senior, 1,000 to 10,000 Lead / Manager, 10,000 to 100,000 Director, and 100,000 or more Executive. A planned next step is to base it on each company's real mix of roles.</p>
-      <p><b>Every floor has a limited number of seats.</b> A company can only have so many directors and executives, so nobody, nepo hires included, can move onto a floor unless a seat there is free. Seats are shared out in the proportions of real US jobs from the BLS Occupational Employment and Wage Statistics (May 2025): top executives and general managers about 2.4% of all jobs, other managers 4.8%, supervisors and team leads about 5% (our estimate), professional roles 25.8%, and the rest split evenly between junior and entry-level work. Each company's seats scale with its simulated workforce, and shorter ladders spread the same proportions over fewer floors. A seat frees up when someone is promoted, leaves, retires or is laid off, or when the company grows. When a seat opens, insiders and job seekers compete for it: climbers push about 1.5 times as hard, and nepo hires 2.6 times as hard where their family controls the company (Walmart, by the Walton family; Volkswagen and Porsche, by the Porsche and Piëch families through Porsche SE; Fiat Chrysler and Stellantis, by the Agnelli family through Exor; Dussmann; and, before they collapsed, Schlecker and Arcadia Group) but only 1.4 times elsewhere. A job seeker who finds no free seat on their own floor keeps looking once, then takes a step down. Overall, this keeps about 2% of simulated workers at Executive and about 5% at Director, close to the real shares.</p>
+      <p><b>Every floor has a limited number of seats.</b> A company can only have so many directors and executives, so nobody, nepo hires included, can move onto a floor unless a seat there is free. Seats are shared out in the proportions of real US jobs from the BLS Occupational Employment and Wage Statistics (May 2025): top executives and general managers about 2.4% of all jobs, other managers 4.8%, supervisors and team leads about 5% (our estimate), professional roles 25.8%, and the rest split evenly between junior and entry-level work. Each company's seats scale with its simulated workforce, and shorter ladders spread the same proportions over fewer floors. A seat frees up when someone is promoted, leaves, retires or is laid off, or when the company grows. When a seat opens, insiders and job seekers compete for it: climbers push about 1.5 times as hard, and nepo hires 2.6 times as hard where their family controls the company (Walmart, by the Walton family; Volkswagen and Porsche, by the Porsche and Piëch families through Porsche SE; Fiat Chrysler and Stellantis, by the Agnelli family through Exor; Dussmann; and, before they collapsed, Schlecker and Arcadia Group) but only 1.4 times elsewhere. A job seeker who finds no free seat on their own floor keeps looking once, then takes a step down. Overall, this keeps about 2% of simulated workers at Executive and about 5% at Director, close to the real shares. A company's career score also shapes its seats: the better the score, the larger the share of its seats from Senior upwards, so the colour changes how far people can get there, not only how fast. That link is our assumption, since no public data gives each company's real mix of senior roles.</p>
+      <p><b>Staying in the same field.</b> About 37 to 39% of US job-to-job moves stay in the same industry sector (Census Bureau Job-to-Job Flows, as analysed by the Richmond Fed for 2019 to 2022). In the model about 40% of job moves stay in the worker's own industry. Some industries are represented by a single company (health care only by HCA Healthcare, government only by the US Postal Service), so that company stands for its whole industry: someone who leaves it can be hired by it again, in place of another employer in the same field. Staying in the field also follows the same rebalancing as hiring, so each industry keeps close to its real share of jobs. Workers passed over for promotion usually look for a better-rated company in their own industry. Career changers always start over in a different industry from the one they left.</p>
       <p><b>Colour is perception.</b> Glassdoor reviewers choose to post, so scores lean towards people with strong feelings. Scores from a few dozen reviews can swing widely. Large companies mix very different jobs into one number.</p>
       <p><b>The simulation is a set of rules, not data.</b> Each simulated year, a worker may be promoted. The base chance shrinks as the floors get higher (about 45% a year from Entry level, 35% from Junior, 22% from Senior, 12% from Lead, 5% from Director), and is scaled up or down by the company's career score and cut further if the company is in transition. Ladders appear in the year the company was founded and vanish in the year it collapsed. When a ladder vanishes, about half of its workers find a job on the same floor elsewhere; the rest drop a floor or back to entry level. These numbers are illustrative assumptions chosen to make the dynamics visible.</p>
       <p><b>Mergers.</b> PSA Group (Peugeot, Citroën, Opel) and Fiat Chrysler merged into Stellantis on 16 January 2021. In the simulation their two ladders slide together and become one double ladder, two ladders glued along a shared middle rail. Workers move over with them: about 65% keep their floor, about 25% are moved down a floor because the merged company has duplicate roles, and about 10% are laid off to the ground. Those shares are illustrative assumptions. The predecessors take Stellantis's colour, since they no longer have reviews of their own.</p>
@@ -362,7 +363,18 @@ td a,.detail a{color:var(--ink)}
     <h2>Release notes</h2>
     <div class="rel">
       <article class="relv cur">
-        <h3>Version 21 · Real job-search lengths <span>18 Oct 2026 · current</span></h3>
+        <h3>Version 23 · Same field, real ratings, career score that matters <span>18 Oct 2026 · current</span></h3>
+        <ul><li><b>Most careers stay closer to one field.</b> About 9 in 10 job moves used to change industry, about what random picks give. Now about 40% stay in the same industry, close to the 37 to 39% in Census job-to-job data.</li>
+          <li><b>The career score changes how far you can get.</b> Better-rated companies have a larger share of seats from Senior upwards, so their workers end up higher on average. The economy-wide pyramid stays the same.</li>
+          <li><b>Two fixes.</b> "Moves to X, which is rated better" now only appears when X really has a higher career score. Career changers now always start over in a different industry; one could restart at the company they had just left.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 22 · Scenarios always reach their event <span>18 Oct 2026</span></h3>
+        <ul><li><b>The followed worker lives through the collapse or merger.</b> In "Their company collapses" and "Their company merges", the worker you follow can no longer be laid off before the event, so they are always at Lehman Brothers in September 2008 or at Fiat Chrysler in January 2021. From the moment the event hits them, everything works as normal, and the outcome is where they are in 2026. The other scenarios (ordinary career, high-attrition employer, best-rated employer) have no single event to wait for, so nothing changes there.</li>
+          <li><b>Followed workers can be hit by the COVID layoff wave.</b> They used to be exempt from it; now they face the same chance as everyone else.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 21 · Real job-search lengths <span>18 Oct 2026</span></h3>
         <ul><li><b>Searches last as long as real ones.</b> Job hunts used to last one to two years, an illustrative guess that left far too many simulated workers out of work. They now follow BLS data on how long unemployment lasts: half end within about 11.5 weeks, the average is about 25 weeks. About 9 in 10 people who quit have the next job lined up and move on within weeks, as BLS figures suggest. Newcomers replacing retirees take a real-length search for their first job. Together this cuts the share of simulated workers out of work from about 40% to about 12%. Quit and layoff rates, seats and the reference sample are unchanged.</li></ul>
       </article>
       <article class="relv">
@@ -636,7 +648,7 @@ function merge(name){
     L.merged=true; L.alive=false; L.slide={t:0,fx:L.x,fz:L.z};
     for(const p of people.filter(q=>q.comp===L&&q.shadow)) crowdMerge(p,M);
     for(const p of people.filter(p=>p.comp===L&&!p.shadow)){
-      n++; p.q=[]; const lvl=Math.max(0,Math.round(p.y/GAP)); p.level=lvl; p.comp=M; p.next=year+.6+Math.random();
+      n++; p.q=[]; p.lockUntil=0; /* the scenario event has happened: normal life resumes */ const lvl=Math.max(0,Math.round(p.y/GAP)); p.level=lvl; p.comp=M; p.next=year+.6+Math.random();
       const r=Math.random();
       if(lvl===0){keep++;note(p,`${L.d[0]} merges into ${name}. Keeps the job.`,'merge');continue}
       if(r<.65){const s2=spot(p,M);walkTo(p,s2[0],s2[1]);keep++;note(p,`${L.d[0]} merges into ${name}. Keeps the ${lvName(lvl)} role.`,'merge')}
@@ -878,6 +890,7 @@ function join(p,L,lvl){ // p is on its current floor; go to L, climb to lvl, sta
   takeSeat(p,L,lvl); const s=spot(p,L);
   if(p.type==='nepo'&&lvl!==p.level){walkTo(p,s[0],s[1]);vert(p,lvl*GAP,'lift')}
   else{walkTo(p,L.fx,L.fz); if(lvl!==p.level) vert(p,lvl*GAP,'climb'); walkTo(p,s[0],s[1])}
+  if(p.avoid&&sectorOf(L)!==p.avoid) p.avoid=null; // the career changer has found work in a new field
   p.comp=L; p.level=lvl; setLaidOff(p,false); p.seeking=false; setSeeker(p,false);
 }
 function setSeeker(p,on){p.f.mark.visible=on&&!p.laidOff}
@@ -913,17 +926,41 @@ const CLIMB_EDGE=1.5, NEPO_EDGE=1.4; // promotion edge for climbers, and for nep
 // how hard a worker competes for a free seat at company L
 const edgeOf=(p,L)=>p.type==='nepo'?(isFamily(L)?NEPO_BOOST:NEPO_EDGE):p.type==='climber'?CLIMB_EDGE:1;
 let occ=new Map();
-function countSeats(){occ=new Map();for(const p of people){if(!p.comp)continue;const o=occOf(p.comp);o[p.level]++;o[6]++}}
+function countSeats(){occ=new Map();let a=0,n=0;for(const p of people){if(!p.comp)continue;const o=occOf(p.comp);o[p.level]++;o[6]++;a+=sf(p.comp);n++}if(n)SF_MEAN=a/n}
 function occOf(L){let o=occ.get(L);if(!o){o=[0,0,0,0,0,0,0];occ.set(L,o)}return o}
-function seatCap(L,lv,extra){let t=0;for(let i=0;i<=L.top;i++)t+=SEAT_SHARE[i];return Math.floor(SEAT_SHARE[lv]/t*(occOf(L)[6]+extra)+(L.dith?L.dith[lv]:.5))}
+/* a better career score means more of a company's seats sit on the upper floors (Senior and above), so it changes how far people
+   can get there, not only how fast. Seats from Senior up are scaled by the company's career score relative to the average job,
+   then each company's shares are rescaled to its own workforce. This is our assumption: Glassdoor scores reflect how employees
+   rate their prospects, and no public data gives each company's real mix of senior roles. */
+let SF_MEAN=1;
+function shares(L){const r=sf(L)/SF_MEAN,w=[];let t=0;for(let i=0;i<=L.top;i++){w[i]=SEAT_SHARE[i]*(i>=2?r:1);t+=w[i]}return w.map(x=>x/t)}
+function seatCap(L,lv,extra){return Math.floor(shares(L)[lv]*(occOf(L)[6]+extra)+(L.dith?L.dith[lv]:.5))}
 // is there a free seat on floor lv at L for worker p? (entry level is never full)
 function hasSeat(L,lv,p){if(lv<=0)return L.top>=0;if(lv>L.top)return false;return occOf(L)[lv]<seatCap(L,lv,p&&p.comp===L?0:1)}
 function takeSeat(p,L,lv){if(p.comp){const o=occOf(p.comp);o[p.level]--;o[6]--}const o=occOf(L);o[lv]++;o[6]++}
 // the best job a worker can land: their own floor if some company has a free seat there, otherwise the highest floor below it that does
-function landing(p,opts,lv){for(let l=lv;l>=0;l--){const o=opts.filter(L=>hasSeat(L,l,p));if(o.length)return [pick(o),l]}return null}
+function landing(p,opts,lv){for(let l=lv;l>=0;l--){const o=opts.filter(L=>hasSeat(L,l,p));if(o.length)return [fieldPick(p,o,null,l),l]}return null}
+/* staying in the same field: about 37–39% of US job-to-job moves stay in the same industry sector (Census Job-to-Job Flows,
+   via the Richmond Fed, 2019–2022). Some industries are represented by a single company here (health care by HCA Healthcare,
+   government by the US Postal Service), so many attempts to stay in the field find no other employer. Aiming 65% of moves at the
+   worker's own industry makes about 40% of all moves actually stay in it, close to the real figure. */
+const STAY_FIELD=.65;
+const backIn=p=>p.comp&&p.comp===p.left?' (it stands for its whole industry in the model)':'';
+const fieldOf=p=>p.comp?sectorOf(p.comp):p.left?sectorOf(p.left):null;
+function fieldPick(p,opts,sec,lv){
+  if(p.avoid){const o=opts.filter(L=>sectorOf(L)!==p.avoid);if(o.length)opts=o} // a career changer looks outside their old field
+  const f=sec||fieldOf(p);
+  // an industry that already has more than its real share of workers keeps fewer of its movers, one with less keeps more,
+  // the same rebalancing hiring uses, so the industry mix stays at its real shares
+  const corr=mixNow&&mixNow[f]>0?Math.min(3,Math.max(.33,Math.pow(SECTORS[f].jobs/JOBS_TOTAL/mixNow[f],1.5))):1;
+  if(f&&!p.avoid&&Math.random()<Math.min(.95,STAY_FIELD*corr)){const o=opts.filter(L=>sectorOf(L)===f);if(o.length)return pick(o)
+    // some industries have a single company in the model (health care: HCA Healthcare; government: the US Postal Service).
+    // That company stands for its whole industry, so staying in the field can mean being hired by it again.
+    const B=p.left;if(lv!=null&&!p.comp&&B&&B.alive&&sectorOf(B)===f&&!alive().some(L=>L!==B&&sectorOf(L)===f)&&hasSeat(B,lv,p))return B}
+  return pick(opts)}
 // starting floor for the workforce already in place in 2000, drawn from the same proportions
-function startLevel(L,type){const lo=type==='nepo'?Math.min(L.top,isFamily(L)?2:1):0;let t=0;for(let i=lo;i<=L.top;i++)t+=SEAT_SHARE[i];
-  let r=Math.random()*t;for(let i=lo;i<=L.top;i++){if((r-=SEAT_SHARE[i])<0)return i}return L.top}
+function startLevel(L,type){const lo=type==='nepo'?Math.min(L.top,isFamily(L)?2:1):0,sh=shares(L);let t=0;for(let i=lo;i<=L.top;i++)t+=sh[i];
+  let r=Math.random()*t;for(let i=lo;i<=L.top;i++){if((r-=sh[i])<0)return i}return L.top}
 function seatReport(){countSeats();const lv=[0,0,0,0,0,0];let n=0,over=0,cells=0;for(const[L,o]of occ){if(!L.alive)continue;for(let i=0;i<6;i++)lv[i]+=o[i];n+=o[6];
   for(let i=1;i<=L.top;i++){cells++;if(o[i]>seatCap(L,i,0))over++}}return {pct:lv.map(x=>+(100*x/n).toFixed(1)),overFull:over+'/'+cells}}
 
@@ -943,13 +980,13 @@ const CRISES=[
   event:{at:2009.33,run(c){
     const L=ladders.find(l=>l.d[0]==="Fiat Chrysler"&&l.alive); if(!L) return;
     people.filter(p=>p.comp===L&&p.shadow&&Math.random()<.3).forEach(p=>quietly(()=>crisisLayoff(p,'',true)));
-    const hit=people.filter(p=>p.comp===L&&!p.def&&!p.shadow&&Math.random()<.3);hit.forEach(p=>crisisLayoff(p,`Chrysler files for bankruptcy and Fiat takes a stake. Laid off as ${lvName(p.level)}.`,true));
+    const hit=people.filter(p=>p.comp===L&&!p.def&&!p.shadow&&!(p.lockUntil&&year<p.lockUntil)&&Math.random()<.3);hit.forEach(p=>crisisLayoff(p,`Chrysler files for bankruptcy and Fiat takes a stake. Laid off as ${lvName(p.level)}.`,true));
     addLog(`Chrysler files for Chapter 11 bankruptcy; Fiat takes a 20% stake in the new company. ${hit.length?hit.length+' simulated worker'+(hit.length>1?'s':'')+' laid off.':''}`,'bad')}}},
  {id:'covid',name:"COVID-19 pandemic",short:"COVID",from:2020.17,to:2020.34,quitMult:.68,layoffMult:1,
   // In March–April 2020 US layoffs reached about six times their normal level (13.0 and 9.2 million). Workers in the model
   // only reconsider their job about once a year, so the wave is applied once at lockdown, sized so the two months match.
   event:{at:2020.19,run(c){
-    const emp=people.filter(p=>p.comp&&!p.def&&!p.tracked);let n=0;
+    const emp=people.filter(p=>p.comp&&!p.def&&!(p.lockUntil&&year<p.lockUntil));let n=0;
     for(const p of emp){if(Math.random()<.12){p.shadow?quietly(()=>crisisLayoff(p,'',false)):crisisLayoff(p,`Lockdown: ${p.comp.d[0]} lays off staff as the economy shuts down. Laid off as ${lvName(p.level)}.`);if(!p.shadow)n++}}
     addLog(`Lockdowns begin. A wave of layoffs hits almost every industry at once${n?': '+n+' visible workers lose their jobs':''}.`,'bad')}},promoMult:.4,upMult:.3,searchMult:2,
   sub:"March–April 2020: layoffs ×6 · quits −32% · hiring freezes",
@@ -1187,10 +1224,10 @@ function quietly(fn){const t=tally,l=logQuiet;tally=crowdTally;logQuiet=true;try
 function crowdCollapse(p,L){
   const lvl=p.level; p.comp=null; p.left=L;
   const open=alive().filter(o=>hasSeat(o,lvl,p));
-  if(lvl>0&&Math.random()<.5&&open.length){const N=pick(open);takeSeat(p,N,lvl);p.comp=N;return}
+  if(lvl>0&&Math.random()<.5&&open.length){const N=fieldPick(p,open,sectorOf(L));takeSeat(p,N,lvl);p.comp=N;return}
   p.level=Math.max(0,lvl-1); p.y=p.level*GAP;
   if(p.level===0){setLaidOff(p,true);bump('layoffs',true);startSearch(p)}
-  else{const o2=alive().filter(o=>hasSeat(o,p.level,p));if(o2.length){const N=pick(o2);takeSeat(p,N,p.level);p.comp=N}}
+  else{const o2=alive().filter(o=>hasSeat(o,p.level,p));if(o2.length){const N=fieldPick(p,o2,sectorOf(L));takeSeat(p,N,p.level);p.comp=N}}
 }
 function crowdMerge(p,M){
   const r=Math.random(); p.comp=M; if(p.level===0) return;
@@ -1249,7 +1286,7 @@ function reset(){
 const RETIRE=.025; // about 2.5% of workers retire each year (a roughly 40-year career) and a newcomer starts at entry level
 function retire(p){
   p.q.length=0; if(p.comp||p.left){} p.comp=null; p.left=null; p.level=0; p.y=0; p.seeking=false; p.laidOff=false; setSeeker(p,false);
-  p.reachedTop=false; p.changed=false; p.stuck=0; p.wantHop=false; p.changeYear=year+4+Math.random()*16; p.target=2+(Math.random()<.45?1:0);
+  p.avoid=null; p.reachedTop=false; p.changed=false; p.stuck=0; p.wantHop=false; p.changeYear=year+4+Math.random()*16; p.target=2+(Math.random()<.45?1:0);
   if(!p.shadow){const m=p.ownMat||typeMats[p.type];p.f.meshes.forEach(x=>x.material=m);p.f.head.position.set(0,.66,0);
     p.x=(Math.random()-.5)*(SIZE-3);p.z=(Math.random()-.5)*(SIZE-3);p.f.g.position.set(p.x,0,p.z)}
   tally.retired=(tally.retired||0)+1;
@@ -1265,16 +1302,16 @@ function decide(p){
     // search over: take an offer, often one floor higher than the job they left
     const up=open.filter(L=>L!==p.left&&hasSeat(L,p.level+1,p)), same=open.filter(L=>L!==p.left&&L.top>=p.level);
     p.seeking=false; setSeeker(p,false);
-    const upTo=up.length&&pick(up);
-    if(!p.laidOff&&upTo&&Math.random()<Math.min(.9,.5*cm('upMult')*edgeOf(p,upTo))){bump('promos');join(p,upTo,p.level+1);tally.upSwitch=(tally.upSwitch||0)+1;note(p,`After job hunting, lands a role one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
-    if(p.laidOff&&p.level>0&&Math.random()<.4){const lower=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));if(lower.length){const lv=p.level;join(p,pick(lower),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}.`,'drop');return}}
+    const upTo=up.length&&fieldPick(p,up,null,p.level+1);
+    if(!p.laidOff&&upTo&&Math.random()<Math.min(.9,.5*cm('upMult')*edgeOf(p,upTo))){bump('promos');join(p,upTo,p.level+1);tally.upSwitch=(tally.upSwitch||0)+1;note(p,`After job hunting, lands a role one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
+    if(p.laidOff&&p.level>0&&Math.random()<.4){const lower=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));if(lower.length){const lv=p.level;join(p,fieldPick(p,lower,null,lv-1),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'drop');return}}
     const land=same.length&&landing(p,same,p.level);
     if(land&&land[1]<p.level&&!p.tries){p.tries=1;startSearch(p);note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');return}
     if(land){const wasLaid=p.laidOff,lv0=p.level;p.tries=0;join(p,land[0],land[1]);
-      note(p,p.level<lv0?`Still no ${lvName(lv0)} seat free anywhere; takes a step down to ${lvName(p.level)} at ${p.comp.d[0]}.`:wasLaid?`Hired again at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Takes a ${lvName(p.level)} role at ${p.comp.d[0]}, same floor as before.`,p.level<lv0?'drop':'hired');return}
+      note(p,p.level<lv0?`Still no ${lvName(lv0)} seat free anywhere; takes a step down to ${lvName(p.level)} at ${p.comp.d[0]}.`:wasLaid?`Hired again at ${p.comp.d[0]} as ${lvName(p.level)}${backIn(p)}.`:`Takes a role as ${lvName(p.level)} at ${p.comp.d[0]}, same floor as before${backIn(p)}.`,p.level<lv0?'drop':'hired');return}
   }
   if(p.comp&&!p.f.g.parent) return;
-  if(p.comp&&!p.def){const c=activeCrisis();
+  if(p.comp&&!p.def&&!lock){const c=activeCrisis(); // a followed worker in the collapse or merger scenario stays put until that event
     if(c&&c.outlier&&c.outlier.companies.includes(p.comp.d[0])&&Math.random()<c.outlier.rate*1.35){crisisLayoff(p,`${c.outlier.why}: ${p.comp.d[0]} cuts jobs. Laid off as ${lvName(p.level)}.`,true);return}
     if(Math.random()<layoffRate(p.comp)*cm('layoffMult')*1.35*(p.comp.trOn?1.5:1)){crisisLayoff(p);return}}
   if(!lock&&p.comp&&p.level<5&&Math.random()<cm('quitMult')*quitRate(p.comp)*1.35*(p.type==='hopper'?1.6:p.type==='nepo'?.3:p.type==='steady'&&p.level>=p.target?.4:1)){
@@ -1300,11 +1337,11 @@ function decide(p){
     walkTo(p,L.fx,L.fz); vert(p,0,'climb');
     const s=[L.fx+(Math.random()-.5)*3,L.fz+(Math.random()-.5)*3]; walkTo(p,s[0],s[1]);
     addLog(`A career changer left ${L.d[0]} at L${p.level} ${LEVELS[p.level-1]} to start over at entry level in a new field.`);
-    p.level=0; p.comp=null; p.next=year+.8; return;
+    p.avoid=sectorOf(L); p.left=null; p.level=0; p.comp=null; p.next=year+.8; return;
   }
   if(!lock&&p.type==='hopper'&&p.wantHop){
     const opts=open.filter(o=>o!==L&&o.top>p.level&&hasSeat(o,p.level,p));
-    p.wantHop=false; if(opts.length){transfer(p,pick(opts));note(p,`Hops to ${p.comp.d[0]} at the same level, ${lvName(p.level)}, chasing a better ladder.`,'move');return}
+    p.wantHop=false; if(opts.length){transfer(p,fieldPick(p,opts));note(p,`Hops to ${p.comp.d[0]} at the same level, ${lvName(p.level)}, chasing a better ladder.`,'move');return}
   }
   if(p.type==='steady'&&p.level>=p.target) return;
   if(L.top>p.level){
@@ -1316,12 +1353,15 @@ function decide(p){
       p.level++; p.stuck=0; if(p.type==='hopper') p.wantHop=true; note(p,`Promoted to ${lvName(p.level)} at ${L.d[0]}.`,'promo');
       if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive at ${L.d[0]}.`,'good')}
     }else if(++p.stuck>=4&&!lock&&p.type!=='steady'&&p.type!=='regular'){
-      const opts=open.filter(o=>o!==L&&o.top>p.level&&sectorOf(o)===sectorOf(L)&&sf(o)>sf(L)&&hasSeat(o,p.level,p)).concat(open.filter(o=>o!==L&&o.top>p.level&&Math.random()<.3&&hasSeat(o,p.level,p)));
-      p.stuck=0; if(opts.length){transfer(p,pick(opts));note(p,`Passed over for promotion at ${L.d[0]}; moves to ${p.comp.d[0]}, which is rated better.`,'move')}
+      // passed over: usually look for a better-rated company in the same industry, otherwise any company with a free seat
+      const cand=open.filter(o=>o!==L&&o.top>p.level&&hasSeat(o,p.level,p)), better=cand.filter(o=>sectorOf(o)===sectorOf(L)&&sf(o)>sf(L));
+      p.stuck=0; if(cand.length){const N=better.length&&Math.random()<.7?pick(better):fieldPick(p,cand);transfer(p,N);
+        const rated=N.d[3]!=null&&L.d[3]!=null&&N.d[3]>L.d[3];
+        note(p,`Passed over for promotion at ${L.d[0]}; moves to ${N.d[0]}${rated?', which is rated better':''}.`,'move')}
     }
   }else if(!lock&&p.type!=='steady'&&(p.type!=='regular'||Math.random()<.3)){
     const opts=open.filter(o=>o.top>p.level&&hasSeat(o,p.level,p));
-    if(opts.length){transfer(p,pick(opts));note(p,`${L.d[0]} has no higher floor. Moves to ${p.comp.d[0]}, which does.`,'move')}
+    if(opts.length){transfer(p,fieldPick(p,opts));note(p,`${L.d[0]} has no higher floor. Moves to ${p.comp.d[0]}, which does.`,'move')}
   }
 }
 
@@ -1376,13 +1416,13 @@ function collapse(L){
   const hit=people.filter(p=>p.comp===L&&!p.shadow);
   let same=0,down=0,ground=0;
   for(const p of hit){
-    p.q=[]; let lvl=Math.max(0,Math.round(p.y/GAP)); p.level=lvl; p.comp=null; p.next=year+.5+Math.random();
+    p.q=[]; p.lockUntil=0; let lvl=Math.max(0,Math.round(p.y/GAP)); p.level=lvl; p.comp=null; p.next=year+.5+Math.random();
     const open=alive().filter(o=>hasSeat(o,lvl,p));
-    if(lvl>0&&Math.random()<.5&&open.length){const N=pick(open);takeSeat(p,N,lvl);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;same++;note(p,`${L.d[0]} collapses. Finds work at ${N.d[0]} on the same floor, ${lvName(lvl)}.`,'move');continue}
+    if(lvl>0&&Math.random()<.5&&open.length){const N=fieldPick(p,open,sectorOf(L));takeSeat(p,N,lvl);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;same++;note(p,`${L.d[0]} collapses. Finds work at ${N.d[0]} on the same floor, ${lvName(lvl)}.`,'move');continue}
     const nl=Math.max(0,lvl-1); if(nl<lvl) vert(p,nl*GAP,'fall'); p.level=nl;
     if(nl===0){ground++;setLaidOff(p,true);bump('layoffs',true);note(p,`${L.d[0]} collapses. Laid off and back to entry level.`,'laid');continue}
     const o2=alive().filter(o=>hasSeat(o,nl,p));
-    if(o2.length){const N=pick(o2);takeSeat(p,N,nl);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N}
+    if(o2.length){const N=fieldPick(p,o2,sectorOf(L));takeSeat(p,N,nl);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N}
     down++; note(p,`${L.d[0]} collapses. Drops a floor to ${lvName(nl)}${p.comp?' at '+p.comp.d[0]:''}.`,'drop');
   }
   tally.hit+=hit.length; tally.dropped+=down+ground;
