@@ -39,7 +39,8 @@ h2{font-family:var(--display);font-weight:500;font-size:1.35rem;margin:28px 0 4p
 .stage:active{cursor:grabbing}
 canvas{display:block;width:100%;height:100%}
 .labels{position:absolute;inset:0;pointer-events:none}
-.lvl{position:absolute;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transform:translate(-100%,-50%);padding-right:10px;transition:opacity .3s}
+#labels{z-index:1}
+.lvl{position:absolute;font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transform:translate(-100%,-50%);margin-left:-6px;padding:2px 6px;border-radius:3px;background:color-mix(in srgb,var(--bg) 82%,transparent);transition:opacity .3s}
 .lvl b{color:var(--ink);font-weight:500}
 .co{position:absolute;pointer-events:auto;font:500 11px var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:3px;padding:1px 6px;white-space:nowrap;transform:translate(-50%,-130%);cursor:pointer;transition:opacity .6s}
 .co[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
@@ -181,7 +182,7 @@ td a,.detail a{color:var(--ink)}
 .small{font-size:12px;color:var(--muted)}
 .notes{max-width:72ch;color:var(--muted);font-size:14px;display:grid;gap:8px}
 .notes p{margin:0}
-@media (max-width:640px){.legend{top:auto;bottom:34px;right:8px;width:170px}.lvl{font-size:9.5px}.detail{top:auto;bottom:34px}.year{bottom:auto;top:12px;left:auto;right:12px}}
+@media (max-width:640px){.legend{top:auto;bottom:34px;right:8px;width:170px}.lvl{font-size:9px;letter-spacing:.02em}.detail{top:auto;bottom:34px}.year{bottom:auto;top:12px;left:auto;right:12px}}
 @media (prefers-reduced-motion: reduce){.co{transition:none}}
 </style>
 
@@ -190,7 +191,7 @@ td a,.detail a{color:var(--ink)}
     <h1>Six Floors <span class="poc">Proof of concept</span></h1>
     <p class="disclaimer"><b>Proof of concept.</b> The companies, events and dates are real and sourced. The stick figures are fictional workers whose careers are simulated: they illustrate what typically happened to people like them, not what happened to any real person. Don't use it for real career or investment decisions.</p>
     <p class="disclaimer vibe"><b>Vibe-coded.</b> Designed and directed by Zolyx, and built with Claude (Anthropic) in a single conversation, without writing code by hand. Sources are cited throughout, but the model hasn't been reviewed by a labour economist.</p>
-    <p class="sub">Each ladder is a real company, starting at the ground because every company hires at entry level. Height is how many levels the company is big enough to have; colour is how employees rate their career opportunities on Glassdoor. The stick figures are simulated workers who climb, switch companies on their own floor, start over, or lose their footing when a company collapses and its ladder vanishes.</p>
+    <p class="sub">Each ladder is a real company, starting at the ground because every company hires at entry level. Height is how far you can progress there: a ladder that reaches a floor means that at this company, you can become what that floor says. Colour is how employees rate their career opportunities on Glassdoor. The stick figures are simulated workers who climb, switch companies on their own floor, start over, or lose their footing when a company collapses and its ladder vanishes.</p>
   </header>
 
   <div class="stage" id="stage">
@@ -340,7 +341,8 @@ td a,.detail a{color:var(--ink)}
   <section>
     <h2>How to read it, and what it can't tell you</h2>
     <div class="notes">
-      <p><b>Height is a size proxy.</b> Every ladder starts on the ground floor, L0 Entry level, where no experience is needed. Height is set by headcount band: under 100 staff reaches L1 Junior, 100 to 1,000 reaches L2 Senior, 1,000 to 10,000 reaches L3 Lead / Manager, 10,000 to 100,000 reaches L4 Director, and 100,000 or more reaches L5 Executive. Real companies use their own level structures, so this shows how much hierarchy a company of that size usually has, not its actual org chart.</p>
+      <p><b>Height is how far you can progress.</b> Every ladder starts on the ground floor, L0 Entry level, where everyone starts. Each floor above is a career stage you can reach: you can become Junior, Senior, Lead / Manager, Director or Executive. A ladder's height shows the furthest stage that company offers. For now it's estimated from company size, since bigger companies have more stages: under 100 staff reaches Junior, 100 to 1,000 Senior, 1,000 to 10,000 Lead / Manager, 10,000 to 100,000 Director, and 100,000 or more Executive. A planned next step is to base it on each company's real mix of roles.</p>
+      <p><b>Every floor has a limited number of seats.</b> A company can only have so many directors and executives, so nobody, nepo hires included, can move onto a floor unless a seat there is free. Seats are shared out in the proportions of real US jobs from the BLS Occupational Employment and Wage Statistics (May 2025): top executives and general managers about 2.4% of all jobs, other managers 4.8%, supervisors and team leads about 5% (our estimate), professional roles 25.8%, and the rest split evenly between junior and entry-level work. Each company's seats scale with its simulated workforce, and shorter ladders spread the same proportions over fewer floors. A seat frees up when someone is promoted, leaves, retires or is laid off, or when the company grows. When a seat opens, insiders and job seekers compete for it: climbers push about 1.5 times as hard, and nepo hires 2.6 times as hard where their family controls the company (Walmart, by the Walton family; Volkswagen and Porsche, by the Porsche and Piëch families through Porsche SE; Fiat Chrysler and Stellantis, by the Agnelli family through Exor; Dussmann; and, before they collapsed, Schlecker and Arcadia Group) but only 1.4 times elsewhere. A job seeker who finds no free seat on their own floor keeps looking once, then takes a step down. Overall, this keeps about 2% of simulated workers at Executive and about 5% at Director, close to the real shares.</p>
       <p><b>Colour is perception.</b> Glassdoor reviewers choose to post, so scores lean towards people with strong feelings. Scores from a few dozen reviews can swing widely. Large companies mix very different jobs into one number.</p>
       <p><b>The simulation is a set of rules, not data.</b> Each simulated year, a worker may be promoted. The base chance shrinks as the floors get higher (about 45% a year from Entry level, 35% from Junior, 22% from Senior, 12% from Lead, 5% from Director), and is scaled up or down by the company's career score and cut further if the company is in transition. Ladders appear in the year the company was founded and vanish in the year it collapsed. When a ladder vanishes, about half of its workers find a job on the same floor elsewhere; the rest drop a floor or back to entry level. These numbers are illustrative assumptions chosen to make the dynamics visible.</p>
       <p><b>Mergers.</b> PSA Group (Peugeot, Citroën, Opel) and Fiat Chrysler merged into Stellantis on 16 January 2021. In the simulation their two ladders slide together and become one double ladder, two ladders glued along a shared middle rail. Workers move over with them: about 65% keep their floor, about 25% are moved down a floor because the merged company has duplicate roles, and about 10% are laid off to the ground. Those shares are illustrative assumptions. The predecessors take Stellantis's colour, since they no longer have reviews of their own.</p>
@@ -350,7 +352,7 @@ td a,.detail a{color:var(--ink)}
       <p><b>Industry mix and hiring.</b> Simulated workers are hired so that each industry gets its real share of US jobs (Bureau of Labor Statistics, September 2026): education and health 18%, government 15%, leisure and hospitality 14%, professional and business services 14%, trade 14%, manufacturing 8%, finance 6%, construction 6%, transportation 5%, and information, where most tech companies sit, under 2%. Inside an industry, bigger companies hire proportionally more people, and a better career score makes a company somewhat more attractive. So a tech company can appear in the model as a ladder without taking a bigger share of the workforce than tech really has. Companies' sizes change over time where their growth is modelled.</p>
       <p><b>Reference employers.</b> To keep the sample representative, the model includes large, typical employers from sectors that were missing: Walmart (retail), HCA Healthcare (health care), JPMorgan Chase (finance), Marriott and Starbucks (hospitality and food service), the US Postal Service (government) and VINCI (construction). Companies best known for one extreme event, such as General Motors' bankruptcy, Citigroup's 52,000 job cuts in 2008 or Boeing's 9/11 layoffs, were left out on purpose.</p>
       <p><b>Retirement and a settled start.</b> About 2.5% of workers retire each year and are replaced by newcomers at entry level, as in a real workforce. Before the run starts in 2000, the statistical sample quietly lives through 20 years so it begins in a realistic, settled state.</p>
-      <p><b>Quitting and job hunting.</b> Each year a worker may quit and walk their floor looking for something better. The chance follows the company's published attrition rate where there is one: about 13 to 14% at TCS, Infosys, Wipro and Accenture, and 3.7% at Nvidia. Every other company uses its industry's real quit rate from the BLS JOLTS survey, from 0.8% a month in government to 3.4% a month in leisure and hospitality. Layoffs in normal years follow each industry's real layoff rate the same way, from 0.4% a month in government to 2.0% in professional and business services. Job hoppers quit more often, nepo hires rarely. After a search of roughly one to two years, about half of job seekers land a role one floor higher at another company, which is how many people get promoted in practice. The rest move sideways.</p>
+      <p><b>Quitting and job hunting.</b> Each year a worker may quit and walk their floor looking for something better. The chance follows the company's published attrition rate where there is one: about 13 to 14% at TCS, Infosys, Wipro and Accenture, and 3.7% at Nvidia. Every other company uses its industry's real quit rate from the BLS JOLTS survey, from 0.8% a month in government to 3.4% a month in leisure and hospitality. Layoffs in normal years follow each industry's real layoff rate the same way, from 0.4% a month in government to 2.0% in professional and business services. Job hoppers quit more often, nepo hires rarely. Most people who quit already have their next job lined up: in September 2026 only 741,000 of the unemployed had quit their last job, against 3.1 million quits a month (BLS). So about 9 in 10 simulated quitters move on after a handover of two to six weeks (our estimate from those figures). Everyone else, including everyone laid off, searches for as long as real unemployment lasts (BLS Current Population Survey, September 2026): half find work within about 11.5 weeks, the average is about 25 weeks, and a few take a year or more. During the 2008 crisis and COVID they last about twice as long, as they did in reality. After the search, about half of job seekers land a role one floor higher at another company, which is how many people get promoted in practice. The rest move sideways.</p>
       <p><b>Why consulting scores so high.</b> Bain, BCG and McKinsey run an "up or out" model: consultants are promoted on a fixed schedule or expected to leave. That makes career progression fast and visible for those who stay, which shows in their scores, but it also means many people exit after a few years.</p>
       <p><b>Why the shortest ladders are grey.</b> Companies with under 100 staff rarely have enough employee reviews for a reliable score. No well-known company that small, Telegram and Craigslist included, has a usable Glassdoor career rating, so their ladders stay grey rather than being given a guessed colour.</p>
       <p><b>Missing:</b> the measures that would show stagnation directly, such as time spent at one level before promotion, the share of senior roles filled internally, and mid-level turnover. Most companies don't publish them.</p>
@@ -360,7 +362,21 @@ td a,.detail a{color:var(--ink)}
     <h2>Release notes</h2>
     <div class="rel">
       <article class="relv cur">
-        <h3>Version 18 · Surprise scenarios <span>18 Oct 2026 · current</span></h3>
+        <h3>Version 21 · Real job-search lengths <span>18 Oct 2026 · current</span></h3>
+        <ul><li><b>Searches last as long as real ones.</b> Job hunts used to last one to two years, an illustrative guess that left far too many simulated workers out of work. They now follow BLS data on how long unemployment lasts: half end within about 11.5 weeks, the average is about 25 weeks. About 9 in 10 people who quit have the next job lined up and move on within weeks, as BLS figures suggest. Newcomers replacing retirees take a real-length search for their first job. Together this cuts the share of simulated workers out of work from about 40% to about 12%. Quit and layoff rates, seats and the reference sample are unchanged.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 20 · Seats on every floor <span>18 Oct 2026</span></h3>
+        <ul><li><b>Nobody gets a seat that doesn't exist.</b> Each floor of each company now has a limited number of seats, in the proportions of real US jobs (BLS, May 2025), so only about 2% of workers can be Executive at once. Promotions, job switches and hires all need a free seat; job seekers who can't find one on their floor eventually step down.</li>
+          <li><b>Family connections need a family company.</b> Nepo hires start as Senior and climb fast only where their family controls the company, such as Walmart, Volkswagen, Porsche or Stellantis. Elsewhere they start as Junior with a small edge. Climbers now compete harder for open seats than regular employees.</li>
+          <li><b>The workforce starts as a pyramid.</b> Workers already in place in 2000 are spread over the floors in the same proportions, instead of crowding the upper floors.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 19 · Floors as career potential <span>18 Oct 2026</span></h3>
+        <ul><li><b>Floor names describe what you can reach.</b> The floors now read "You can become Junior" up to "You can become Executive", with "Entry level: everyone starts here" on the ground. A ladder's height shows how far you can progress at that company. It's still estimated from company size; basing it on each company's real role structure is the planned next step.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 18 · Surprise scenarios <span>18 Oct 2026</span></h3>
         <ul><li><b>Reveal names the worker type.</b> The panel says which type of worker it was, describes their real start (including a nepo hire's family connections and where the first job was) and how that type behaves, and phrases the ending clearly.</li>
           <li><b>Follow one career can keep the scenario secret.</b> "Surprise me" picks one of the five scenarios at random. During the run the journey log stays hidden; when the simulation reaches 2026, a panel reveals which scenario it was and how the career ended, and the full journey unlocks.</li></ul>
       </article>
@@ -680,7 +696,7 @@ const TYPES={
   steady:{name:"Settler",desc:"Happy once they reach a level that suits them, usually Senior or Lead.",n:24},
   hopper:{name:"Job hopper",desc:"After each promotion, looks for a better company on the same floor.",n:21},
   changer:{name:"Career changer",desc:"At some point leaves to start over at entry level in a new field.",n:15},
-  nepo:{name:"Nepo hire",desc:"Family connections. Skips entry level, rides straight up without using the rungs, and gets promoted far faster.",n:12}
+  nepo:{name:"Nepo hire",desc:"Family connections. Skips entry level and rides up without using the rungs. Gets promoted far faster where the family controls the company, a little faster elsewhere, but only into a free seat.",n:12}
 };
 const BASE=[.45,.35,.22,.12,.05]; // yearly promotion chance from L0 Entry, L1 Junior, L2 Senior, L3 Lead, L4 Director
 const NEPO_BOOST=2.6;
@@ -833,7 +849,7 @@ function sizeNow(L){
 // current share of employed workers by industry, refreshed during the run; hiring leans gently towards
 // industries below their real share, as real labour markets rebalance through wages and openings
 let mixNow=null;
-function updateMixNow(){const c={};let n=0;for(const p of people){if(p.comp){const k=sectorOf(p.comp);c[k]=(c[k]||0)+1;n++}}
+function updateMixNow(){countSeats();const c={};let n=0;for(const p of people){if(p.comp){const k=sectorOf(p.comp);c[k]=(c[k]||0)+1;n++}}
   mixNow={};for(const k in SECTORS)mixNow[k]=n?(c[k]||0)/n:0}
 function hireWeight(L,pool,stock){
   const sec=sectorOf(L), mates=pool.filter(o=>sectorOf(o)===sec);
@@ -859,7 +875,7 @@ function addLog(text,cls){
 const walkTo=(p,x,z)=>p.q.push({t:'walk',x,z});
 const vert=(p,y,kind)=>p.q.push({t:kind,y});
 function join(p,L,lvl){ // p is on its current floor; go to L, climb to lvl, stand
-  const s=spot(p,L);
+  takeSeat(p,L,lvl); const s=spot(p,L);
   if(p.type==='nepo'&&lvl!==p.level){walkTo(p,s[0],s[1]);vert(p,lvl*GAP,'lift')}
   else{walkTo(p,L.fx,L.fz); if(lvl!==p.level) vert(p,lvl*GAP,'climb'); walkTo(p,s[0],s[1])}
   p.comp=L; p.level=lvl; setLaidOff(p,false); p.seeking=false; setSeeker(p,false);
@@ -868,14 +884,48 @@ function setSeeker(p,on){p.f.mark.visible=on&&!p.laidOff}
 // yearly quit chance: the company's own published attrition where it exists, otherwise its industry's real rate
 const quitRate=L=>(L.d[10]?L.d[10].rate:SECTORS[sectorOf(L)].q*12/100);
 const layoffRate=L=>SECTORS[sectorOf(L)].l*12/100;
-function startSearch(p){p.seeking=true;p.seekUntil=year+(.7+Math.random()*1.6)*cm('searchMult');setSeeker(p,true)}
+// job search length follows the real spread of unemployment spells (BLS CPS, September 2026: median 11.5 weeks, mean 24.8 weeks):
+// most searches are short and a few last a year or more (a log-normal spread with that median and mean, capped at three years)
+function searchLength(){const z=Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());return Math.min(3,.22*Math.exp(1.25*z))}
+// most people who quit already have the next job lined up: in September 2026 only 741,000 of the unemployed were job leavers (BLS CPS),
+// against 3.1 million quits a month (JOLTS, August 2026). So about 9 in 10 quitters move on after a short handover of 2 to 6 weeks (our estimate).
+function startSearch(p,lined){p.seeking=true;p.seekUntil=year+(lined?.04+Math.random()*.08:searchLength()*cm('searchMult'));p.next=Math.min(p.next||Infinity,p.seekUntil);setSeeker(p,true)}
 function wander(p){const lim=SIZE/2-1.5;for(let k=0;k<1+Math.floor(Math.random()*2);k++){const a=Math.random()*Math.PI*2,r=2+Math.random()*6;walkTo(p,Math.max(-lim,Math.min(lim,p.x+Math.cos(a)*r)),Math.max(-lim,Math.min(lim,p.z+Math.sin(a)*r)))}p.next=year+.35+Math.random()*.4}
 function setLaidOff(p,on){
   if(p.laidOff===on) return; p.laidOff=on;
   const m=on?(p.ownLaid||typeMats.laid):(p.ownMat||typeMats[p.type]); p.f.meshes.forEach(x=>x.material=m);
   p.f.head.position.z=on?.06:0; p.f.head.position.y=on?.6:.66; // head drops forward
 }
-function transfer(p,N){const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;tally.hops++}
+function transfer(p,N){takeSeat(p,N,p.level);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;tally.hops++}
+
+/* ---------- seats: every floor has a limited number of jobs ----------
+   Share of jobs at each stage, from the BLS Occupational Employment and Wage Statistics (May 2025):
+   top executives and general managers about 2.4%, other managers 4.8%, supervisors about 5% (estimate),
+   professional roles 25.8%, and the rest split between junior and entry-level work.
+   A company gets seats in these proportions, scaled to its current workforce in the simulation; companies with
+   shorter ladders spread the same proportions over fewer floors. Nobody can move onto a floor without a free seat. */
+const SEAT_SHARE=[.31,.31,.258,.05,.048,.024];
+// companies controlled by a founding family, where family connections carry real weight
+const FAMILY={"Walmart":"the Walton family","Volkswagen":"the Porsche and Piëch families, through Porsche SE","Porsche":"the Porsche and Piëch families, through Porsche SE",
+  "Fiat Chrysler":"the Agnelli family, through Exor","Stellantis":"the Agnelli family, through Exor","Dussmann":"the Dussmann family","Schlecker":"the Schlecker family","Arcadia Group":"the Green family"};
+const isFamily=L=>!!FAMILY[L.d[0]];
+const CLIMB_EDGE=1.5, NEPO_EDGE=1.4; // promotion edge for climbers, and for nepo hires where their family has no say
+// how hard a worker competes for a free seat at company L
+const edgeOf=(p,L)=>p.type==='nepo'?(isFamily(L)?NEPO_BOOST:NEPO_EDGE):p.type==='climber'?CLIMB_EDGE:1;
+let occ=new Map();
+function countSeats(){occ=new Map();for(const p of people){if(!p.comp)continue;const o=occOf(p.comp);o[p.level]++;o[6]++}}
+function occOf(L){let o=occ.get(L);if(!o){o=[0,0,0,0,0,0,0];occ.set(L,o)}return o}
+function seatCap(L,lv,extra){let t=0;for(let i=0;i<=L.top;i++)t+=SEAT_SHARE[i];return Math.floor(SEAT_SHARE[lv]/t*(occOf(L)[6]+extra)+(L.dith?L.dith[lv]:.5))}
+// is there a free seat on floor lv at L for worker p? (entry level is never full)
+function hasSeat(L,lv,p){if(lv<=0)return L.top>=0;if(lv>L.top)return false;return occOf(L)[lv]<seatCap(L,lv,p&&p.comp===L?0:1)}
+function takeSeat(p,L,lv){if(p.comp){const o=occOf(p.comp);o[p.level]--;o[6]--}const o=occOf(L);o[lv]++;o[6]++}
+// the best job a worker can land: their own floor if some company has a free seat there, otherwise the highest floor below it that does
+function landing(p,opts,lv){for(let l=lv;l>=0;l--){const o=opts.filter(L=>hasSeat(L,l,p));if(o.length)return [pick(o),l]}return null}
+// starting floor for the workforce already in place in 2000, drawn from the same proportions
+function startLevel(L,type){const lo=type==='nepo'?Math.min(L.top,isFamily(L)?2:1):0;let t=0;for(let i=lo;i<=L.top;i++)t+=SEAT_SHARE[i];
+  let r=Math.random()*t;for(let i=lo;i<=L.top;i++){if((r-=SEAT_SHARE[i])<0)return i}return L.top}
+function seatReport(){countSeats();const lv=[0,0,0,0,0,0];let n=0,over=0,cells=0;for(const[L,o]of occ){if(!L.alive)continue;for(let i=0;i<6;i++)lv[i]+=o[i];n+=o[6];
+  for(let i=1;i<=L.top;i++){cells++;if(o[i]>seatCap(L,i,0))over++}}return {pct:lv.map(x=>+(100*x/n).toFixed(1)),overFull:over+'/'+cells}}
 
 /* ---------- economic shocks: 9/11 and the 2008 financial crisis ---------- */
 // Economy-wide shifts are calibrated to US JOLTS data (BLS, via FRED): every company follows the average change,
@@ -1049,7 +1099,7 @@ const TYPE_REVEAL={
   steady:p=>`As a settler, they were happy once they reached ${lvName(p.target)} and stopped pushing for more.`,
   hopper:p=>"As a job hopper, they looked for a better company on the same floor after every promotion.",
   changer:p=>p.changed?"As a career changer, at one point they left everything behind and started over at entry level in a new field.":"As a career changer, they planned to start over in a new field, but the run ended before they did.",
-  nepo:p=>"As a nepo hire, family connections let them skip entry level, rise without using the rungs and get promoted about 2.6 times faster than everyone else."};
+  nepo:p=>"As a nepo hire, family connections let them skip entry level and rise without using the rungs. Where their family controls the company they compete for promotions about 2.6 times as hard as everyone else; elsewhere only about 1.4 times. Like everyone, they can only move up when a seat on the next floor is free."};
 const SCEN_REVEAL={
   ordinary:"They started out on the ground in 2000, looking for a first job, with no company chosen in advance.",
   collapse:"They started at Lehman Brothers, which collapsed in September 2008 in the largest bankruptcy in US history.",
@@ -1083,7 +1133,7 @@ function setupTracked(){
       lockUntil:sc.lock||0,st:{promos:0,quits:0,laid:0,drops:0,companies:new Set()}};
     ownMaterials(p);
     const L=sc.company&&ladders.find(l=>l.d[0]===sc.company&&l.alive);
-    if(L){const lvl=Math.min(L.top,follow.type==='nepo'?Math.max(2,sc.lvl):sc.lvl);p.comp=L;p.level=lvl;const s2=spot(p,L);p.x=s2[0];p.z=s2[1];p.y=lvl*GAP;p.st.companies.add(L.d[0])}
+    if(L){const lvl=Math.min(L.top,follow.type==='nepo'?Math.max(isFamily(L)?2:1,sc.lvl):sc.lvl);p.comp=L;p.level=lvl;const s2=spot(p,L);p.x=s2[0];p.z=s2[1];p.y=lvl*GAP;p.st.companies.add(L.d[0])}
     else{p.x=(Math.random()-.5)*8;p.z=(Math.random()-.5)*8}
     f.g.position.set(p.x,p.y,p.z);
     people.push(p);
@@ -1091,7 +1141,7 @@ function setupTracked(){
   tracked=p; trailMat.color=trailColor(); trailLineMat.color=trailColor();
   const typeName=real?CASES.find(c=>c.key===follow.type).name:TYPES[follow.type].name;
   document.getElementById('jhead').innerHTML=`<i style="--c:var(--p-${follow.type})"></i>Following: ${typeName}${real?' · real career':follow.mystery?' · scenario hidden until the end':' · '+SCEN[follow.scen].label}`;
-  if(!real) note(p,p.comp?`Starts as ${lvName(p.level)} at ${p.comp.d[0]}${follow.type==='nepo'&&p.level>=2?', placed there through family connections':''}.`:'Starts out on the ground, looking for a first job.','start');
+  if(!real) note(p,p.comp?`Starts as ${lvName(p.level)} at ${p.comp.d[0]}${follow.type==='nepo'&&p.level>=1?(isFamily(p.comp)?', placed there by family connections: the company is controlled by '+FAMILY[p.comp.d[0]]:', helped by family connections'):''}.`:'Starts out on the ground, looking for a first job.','start');
   else note(p,`Replaying ${typeName}'s real career, step by step.`,'start');
 }
 function finishJourney(){
@@ -1112,7 +1162,7 @@ function finishJourney(){
     const rv=document.getElementById('reveal');
     const tn=TYPES[follow.type].name, an=/^[aeiou]/i.test(tn)?'An':'A';
     let start=SCEN_REVEAL[follow.scen];
-    if(follow.scen==='ordinary'&&st.first) start=`They started out in 2000 with no company chosen in advance. Their first job was ${st.first.lvl?'as '+lvName(st.first.lvl):'at entry level'} at ${st.first.co}${follow.type==='nepo'&&st.first.lvl>=2?', through family connections':''}.`;
+    if(follow.scen==='ordinary'&&st.first) start=`They started out in 2000 with no company chosen in advance. Their first job was ${st.first.lvl?'as '+lvName(st.first.lvl):'at entry level'} at ${st.first.co}${follow.type==='nepo'&&st.first.lvl>=1?(FAMILY[st.first.co]?', through family connections: the company is controlled by '+FAMILY[st.first.co]:', helped by family connections'):''}.`;
     else if(follow.type==='nepo'&&follow.scen!=='ordinary') start=start.replace('They started at','Through family connections, they started above entry level at');
     const end=p.comp?`working as <b>${p.level?lvName(p.level):'entry level'}</b> at ${p.comp.d[0]}`:p.laidOff?`at <b>${lvName(p.level)}</b> level, laid off and looking for work`:`at <b>${lvName(p.level)}</b> level, between jobs after quitting`;
     const parts=[`${st.promos} promotion${st.promos===1?'':'s'}`,st.quits?`quit ${st.quits} time${st.quits===1?'':'s'}`:'never quit',st.laid?`laid off ${st.laid} time${st.laid===1?'':'s'}`:'never laid off'];
@@ -1136,11 +1186,11 @@ let crowdTally={};
 function quietly(fn){const t=tally,l=logQuiet;tally=crowdTally;logQuiet=true;try{fn()}finally{tally=t;logQuiet=l}}
 function crowdCollapse(p,L){
   const lvl=p.level; p.comp=null; p.left=L;
-  const open=alive().filter(o=>o.top>=lvl);
-  if(lvl>0&&Math.random()<.5&&open.length){p.comp=pick(open);return}
+  const open=alive().filter(o=>hasSeat(o,lvl,p));
+  if(lvl>0&&Math.random()<.5&&open.length){const N=pick(open);takeSeat(p,N,lvl);p.comp=N;return}
   p.level=Math.max(0,lvl-1); p.y=p.level*GAP;
   if(p.level===0){setLaidOff(p,true);bump('layoffs',true);startSearch(p)}
-  else{const o2=alive().filter(o=>o.top>=p.level);if(o2.length)p.comp=pick(o2)}
+  else{const o2=alive().filter(o=>hasSeat(o,p.level,p));if(o2.length){const N=pick(o2);takeSeat(p,N,p.level);p.comp=N}}
 }
 function crowdMerge(p,M){
   const r=Math.random(); p.comp=M; if(p.level===0) return;
@@ -1153,7 +1203,7 @@ let burning=false;
 function burnIn(){
   const real=year; burning=true;
   const crowd=people.filter(p=>p.shadow);
-  for(let t=START-20;t<START;t+=.05){year=t;if(Math.round(t*20)%4===0)updateMixNow();for(const p of crowd){if(year>=p.next){quietly(()=>decide(p));p.q.length=0;p.y=p.level*GAP}}}
+  for(let t=START-20;t<START;t+=.05){year=t;if(Math.round(t*20)%4===0)updateMixNow();else countSeats();for(const p of crowd){if(year>=p.next){quietly(()=>decide(p));p.q.length=0;p.y=p.level*GAP}}}
   burning=false; year=real; // each worker keeps the decision timing they had at the end of the warm-up
 }
 function makeCrowd(){
@@ -1161,7 +1211,7 @@ function makeCrowd(){
   for(const type of types) for(let k=0;k<Math.round(CROWD_N*TYPES[type].n/total);k++){
     const p={type,shadow:true,f:stubFig(),q:[],level:0,comp:null,ang:0,next:START-20+Math.random()*1.5,stuck:0,wantHop:false,laidOff:false,seeking:false,seekUntil:0,left:null,
       target:2+(Math.random()<.45?1:0),changeYear:2004+Math.random()*18,changed:false,reachedTop:false,x:0,y:0,z:0,walkT:0};
-    if(Math.random()<.9){const L=pick(open,true);p.comp=L;p.level=Math.min(L.top,(type==='nepo'?2:0)+(Math.random()<.55?0:1)+(Math.random()<.3?1:0)+(Math.random()<.1?1:0))}
+    if(Math.random()<.9){const L=pick(open,true);p.comp=L;p.level=startLevel(L,type)}
     else p.next=START+Math.random()*4;
     p.y=p.level*GAP; people.push(p);
   }
@@ -1170,7 +1220,7 @@ function reset(){
   figGroup.clear(); debrisGroup.clear(); debris=[]; people=[]; logItems=[]; tally={top:0,hit:0,dropped:0,restarts:0,hops:0};
   document.getElementById('log').innerHTML='';
   year=START;
-  ladders.forEach(L=>{L.alive=L.founded<=START&&!(L.collapse&&L.collapse.at<=START);L.failed=false;L.vis=L.alive?1:0;L.el.classList.remove('dead');L.trOn=false;L.el.classList.remove('tr');L.merged=false;L.slide=null;L.g.position.set(L.x,0,L.z);if(L.growth)setTop(L,L.growth.start)});
+  ladders.forEach(L=>{L.alive=L.founded<=START&&!(L.collapse&&L.collapse.at<=START);L.failed=false;L.vis=L.alive?1:0;L.el.classList.remove('dead');L.trOn=false;L.el.classList.remove('tr');L.merged=false;L.slide=null;L.dith=[0,1,2,3,4,5].map(()=>Math.random());L.g.position.set(L.x,0,L.z);if(L.growth)setTop(L,L.growth.start)});
   const open=alive();
   let i=0;
   for(const type in TYPES) for(let k=0;k<TYPES[type].n;k++,i++){
@@ -1179,7 +1229,7 @@ function reset(){
       target:2+(Math.random()<.45?1:0),changeYear:2004+Math.random()*18,changed:false,reachedTop:false,x:0,y:0,z:0,walkT:0};
     if(i%10<9){ // most start already employed in a company that exists in 2000
       const L=pick(open,true);
-      const lvl=Math.min(L.top,(type==='nepo'?2:0)+(Math.random()<.55?0:1)+(Math.random()<.3?1:0)+(Math.random()<.1?1:0));
+      const lvl=startLevel(L,type);
       p.comp=L; p.level=lvl; const s=spot(p,L); p.x=s[0]; p.z=s[1]; p.y=lvl*GAP;
     }else{ p.x=(Math.random()-.5)*(SIZE-3); p.z=(Math.random()-.5)*(SIZE-3); p.y=0; p.next=START+Math.random()*4; }
     people.push(p);
@@ -1203,6 +1253,7 @@ function retire(p){
   if(!p.shadow){const m=p.ownMat||typeMats[p.type];p.f.meshes.forEach(x=>x.material=m);p.f.head.position.set(0,.66,0);
     p.x=(Math.random()-.5)*(SIZE-3);p.z=(Math.random()-.5)*(SIZE-3);p.f.g.position.set(p.x,0,p.z)}
   tally.retired=(tally.retired||0)+1;
+  p.next=year+searchLength(); // the newcomer who replaces them looks for a first job for as long as a real job search takes
 }
 function decide(p){
   p.next=year+.6+Math.random()*.9;
@@ -1210,13 +1261,17 @@ function decide(p){
   const open=alive(), lock=p.lockUntil&&year<p.lockUntil;
   if(!p.comp&&p.laidOff&&!p.seeking) startSearch(p);
   if(p.seeking){
-    if(year<p.seekUntil){wander(p);return}
+    if(year<p.seekUntil){wander(p);p.next=Math.min(p.next,p.seekUntil);return}
     // search over: take an offer, often one floor higher than the job they left
-    const up=open.filter(L=>L!==p.left&&L.top>p.level), same=open.filter(L=>L!==p.left&&L.top>=p.level);
+    const up=open.filter(L=>L!==p.left&&hasSeat(L,p.level+1,p)), same=open.filter(L=>L!==p.left&&L.top>=p.level);
     p.seeking=false; setSeeker(p,false);
-    if(!p.laidOff&&up.length&&Math.random()<.5*cm('upMult')){bump('promos');join(p,pick(up),p.level+1);tally.upSwitch=(tally.upSwitch||0)+1;note(p,`After job hunting, lands a role one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
-    if(p.laidOff&&p.level>0&&Math.random()<.4){const lower=open.filter(L=>L!==p.left&&L.top>=p.level-1);if(lower.length){const lv=p.level;join(p,pick(lower),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}.`,'drop');return}}
-    if(same.length){const wasLaid=p.laidOff;join(p,pick(same),p.level);note(p,wasLaid?`Hired again at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Takes a ${lvName(p.level)} role at ${p.comp.d[0]}, same floor as before.`,'hired');return}
+    const upTo=up.length&&pick(up);
+    if(!p.laidOff&&upTo&&Math.random()<Math.min(.9,.5*cm('upMult')*edgeOf(p,upTo))){bump('promos');join(p,upTo,p.level+1);tally.upSwitch=(tally.upSwitch||0)+1;note(p,`After job hunting, lands a role one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
+    if(p.laidOff&&p.level>0&&Math.random()<.4){const lower=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));if(lower.length){const lv=p.level;join(p,pick(lower),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}.`,'drop');return}}
+    const land=same.length&&landing(p,same,p.level);
+    if(land&&land[1]<p.level&&!p.tries){p.tries=1;startSearch(p);note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');return}
+    if(land){const wasLaid=p.laidOff,lv0=p.level;p.tries=0;join(p,land[0],land[1]);
+      note(p,p.level<lv0?`Still no ${lvName(lv0)} seat free anywhere; takes a step down to ${lvName(p.level)} at ${p.comp.d[0]}.`:wasLaid?`Hired again at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Takes a ${lvName(p.level)} role at ${p.comp.d[0]}, same floor as before.`,p.level<lv0?'drop':'hired');return}
   }
   if(p.comp&&!p.f.g.parent) return;
   if(p.comp&&!p.def){const c=activeCrisis();
@@ -1225,15 +1280,19 @@ function decide(p){
   if(!lock&&p.comp&&p.level<5&&Math.random()<cm('quitMult')*quitRate(p.comp)*1.35*(p.type==='hopper'?1.6:p.type==='nepo'?.3:p.type==='steady'&&p.level>=p.target?.4:1)){
     note(p,`Quits ${p.comp.d[0]} as ${lvName(p.level)} to look for something better.`,'quit');
     p.left=p.comp; p.comp=null; tally.quit=(tally.quit||0)+1; bump('quits');
-    walkTo(p,p.x+(Math.random()-.5)*2,p.z+(Math.random()-.5)*2); startSearch(p); return;
+    walkTo(p,p.x+(Math.random()-.5)*2,p.z+(Math.random()-.5)*2); startSearch(p,Math.random()<.9); return;
   }
   if(!p.comp){
-    if(p.type==='nepo'&&p.level===0){ // a family connection opens a door two floors up, at a tall company
-      const opts=open.filter(L=>L.top>=3); if(opts.length){const L=pick(opts);join(p,L,2);note(p,`Family connections: skips entry level and starts as Senior at ${L.d[0]}.`,'hired');addLog(`A nepo hire skips entry level and starts as a Senior at ${L.d[0]}.`,'nepo');return}
+    if(p.type==='nepo'&&p.level===0){ // family connections open a door above entry level: two floors up where the family controls the company, one elsewhere
+      const opts=open.filter(L=>hasSeat(L,isFamily(L)?2:1,p));
+      if(opts.length){const L=pick(opts),fam=isFamily(L);join(p,L,fam?2:1);
+        note(p,fam?`Family connections: skips entry level and starts as Senior at ${L.d[0]}, which is controlled by ${FAMILY[L.d[0]]}.`:`Connections help: skips entry level and starts as Junior at ${L.d[0]}.`,'hired');
+        if(fam) addLog(`A nepo hire skips entry level and starts as a Senior at ${L.d[0]}.`,'nepo');return}
     }
-    const opts=open.filter(L=>L.top>=p.level);
-    if(!opts.length) return;
-    join(p,pick(opts),p.level); note(p,`Hired at ${p.comp.d[0]} as ${lvName(p.level)}.`,'hired'); return;
+    const land=landing(p,open,p.level);
+    if(!land) return;
+    const lv0=p.level; join(p,land[0],land[1]);
+    note(p,p.level<lv0?`No ${lvName(lv0)} seat free; hired at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Hired at ${p.comp.d[0]} as ${lvName(p.level)}.`,p.level<lv0?'drop':'hired'); return;
   }
   const L=p.comp;
   if(!lock&&p.type==='changer'&&!p.changed&&year>=p.changeYear&&p.level>=2){
@@ -1244,23 +1303,24 @@ function decide(p){
     p.level=0; p.comp=null; p.next=year+.8; return;
   }
   if(!lock&&p.type==='hopper'&&p.wantHop){
-    const opts=open.filter(o=>o!==L&&o.top>p.level);
+    const opts=open.filter(o=>o!==L&&o.top>p.level&&hasSeat(o,p.level,p));
     p.wantHop=false; if(opts.length){transfer(p,pick(opts));note(p,`Hops to ${p.comp.d[0]} at the same level, ${lvName(p.level)}, chasing a better ladder.`,'move');return}
   }
   if(p.type==='steady'&&p.level>=p.target) return;
   if(L.top>p.level){
-    if(Math.random()<BASE[p.level]*sf(L)*(p.type==='nepo'?NEPO_BOOST:1)*cm('promoMult')){bump('promos');
+    const edge=edgeOf(p,L);
+    if(Math.random()<BASE[p.level]*sf(L)*edge*cm('promoMult')&&hasSeat(L,p.level+1,p)){bump('promos');takeSeat(p,L,p.level+1);
       const s=spot(p,L);
       if(p.type==='nepo'){walkTo(p,s[0],s[1]);vert(p,(p.level+1)*GAP,'lift')}
       else{walkTo(p,L.fx,L.fz); vert(p,(p.level+1)*GAP,'climb'); walkTo(p,s[0],s[1])}
       p.level++; p.stuck=0; if(p.type==='hopper') p.wantHop=true; note(p,`Promoted to ${lvName(p.level)} at ${L.d[0]}.`,'promo');
       if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive at ${L.d[0]}.`,'good')}
     }else if(++p.stuck>=4&&!lock&&p.type!=='steady'&&p.type!=='regular'){
-      const opts=open.filter(o=>o!==L&&o.top>p.level&&sectorOf(o)===sectorOf(L)&&sf(o)>sf(L)).concat(open.filter(o=>o!==L&&o.top>p.level&&Math.random()<.3));
+      const opts=open.filter(o=>o!==L&&o.top>p.level&&sectorOf(o)===sectorOf(L)&&sf(o)>sf(L)&&hasSeat(o,p.level,p)).concat(open.filter(o=>o!==L&&o.top>p.level&&Math.random()<.3&&hasSeat(o,p.level,p)));
       p.stuck=0; if(opts.length){transfer(p,pick(opts));note(p,`Passed over for promotion at ${L.d[0]}; moves to ${p.comp.d[0]}, which is rated better.`,'move')}
     }
   }else if(!lock&&p.type!=='steady'&&(p.type!=='regular'||Math.random()<.3)){
-    const opts=open.filter(o=>o.top>p.level);
+    const opts=open.filter(o=>o.top>p.level&&hasSeat(o,p.level,p));
     if(opts.length){transfer(p,pick(opts));note(p,`${L.d[0]} has no higher floor. Moves to ${p.comp.d[0]}, which does.`,'move')}
   }
 }
@@ -1317,12 +1377,12 @@ function collapse(L){
   let same=0,down=0,ground=0;
   for(const p of hit){
     p.q=[]; let lvl=Math.max(0,Math.round(p.y/GAP)); p.level=lvl; p.comp=null; p.next=year+.5+Math.random();
-    const open=alive().filter(o=>o.top>=lvl);
-    if(lvl>0&&Math.random()<.5&&open.length){const N=pick(open);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;same++;note(p,`${L.d[0]} collapses. Finds work at ${N.d[0]} on the same floor, ${lvName(lvl)}.`,'move');continue}
+    const open=alive().filter(o=>hasSeat(o,lvl,p));
+    if(lvl>0&&Math.random()<.5&&open.length){const N=pick(open);takeSeat(p,N,lvl);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;same++;note(p,`${L.d[0]} collapses. Finds work at ${N.d[0]} on the same floor, ${lvName(lvl)}.`,'move');continue}
     const nl=Math.max(0,lvl-1); if(nl<lvl) vert(p,nl*GAP,'fall'); p.level=nl;
     if(nl===0){ground++;setLaidOff(p,true);bump('layoffs',true);note(p,`${L.d[0]} collapses. Laid off and back to entry level.`,'laid');continue}
-    const o2=alive().filter(o=>o.top>=nl);
-    if(o2.length){const N=pick(o2);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N}
+    const o2=alive().filter(o=>hasSeat(o,nl,p));
+    if(o2.length){const N=pick(o2);takeSeat(p,N,nl);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N}
     down++; note(p,`${L.d[0]} collapses. Drops a floor to ${lvName(nl)}${p.comp?' at '+p.comp.d[0]:''}.`,'drop');
   }
   tally.hit+=hit.length; tally.dropped+=down+ground;
@@ -1418,7 +1478,7 @@ function applyTheme(){
 
 /* level labels */
 const labelsEl=document.getElementById('labels'); const labelEls=[];
-for(let i=0;i<6;i++){const d=document.createElement('div');d.className='lvl';d.innerHTML=`<b>L${i}</b> ${i?LEVELS[i-1]:ENTRY}`;labelsEl.appendChild(d);labelEls.push(d)}
+for(let i=0;i<6;i++){const d=document.createElement('div');d.className='lvl';d.innerHTML=i?`<b>L${i}</b> You can become ${LEVELS[i-1]}`:`<b>L0</b> Entry level: everyone starts here`;labelsEl.appendChild(d);labelEls.push(d)}
 
 /* camera */
 const VIEWS={model:{az:.75,el:.5},side:{az:0,el:.02},top:{az:0,el:Math.PI/2-.0001}};
@@ -1475,7 +1535,7 @@ function frame(now){
   for(let i=0;i<6;i++){
     let best=null;
     for(const [x,z] of [[-1,-1],[-1,1],[1,-1],[1,1]]){v.set(x*SIZE/2,i*GAP,z*SIZE/2).project(cam);if(!best||v.x<best.x)best=v.clone()}
-    labelEls[i].style.left=Math.max(150,(best.x+1)/2*w)+'px';labelEls[i].style.top=(1-best.y)/2*h+'px';labelEls[i].style.opacity=hideLv?0:1;
+    labelEls[i].style.left=Math.max(labelEls[i].offsetWidth+14,(best.x+1)/2*w)+'px';labelEls[i].style.top=(1-best.y)/2*h+'px';labelEls[i].style.opacity=hideLv?0:1;
   }
   for(const L of ladders){
     const shown=(L.alive&&(!L.dbl||L.vis>.5))||!!L.slide;
