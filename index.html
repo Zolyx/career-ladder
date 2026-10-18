@@ -256,8 +256,9 @@ td a,.detail a{color:var(--ink)}
       </select>
       <label for="fscen">Scenario</label>
       <select id="fscen">
-        <option value="random" selected>Surprise me: revealed at the end</option>
-        <option value="ordinary">Ordinary career: looking for a first job in 2000</option>
+        <option value="random" selected>Surprise me: usually a typical career, revealed at the end</option>
+        <option value="typical">Typical worker: picked at random from the 2000 workforce</option>
+        <option value="ordinary">First job: looking for a first job in 2000</option>
         <option value="collapse">Their company collapses: Lehman Brothers, 2008</option>
         <option value="merge">Their company merges: Fiat Chrysler into Stellantis, 2021</option>
         <option value="attrition">High-attrition employer: starts at Infosys</option>
@@ -363,7 +364,12 @@ td a,.detail a{color:var(--ink)}
     <h2>Release notes</h2>
     <div class="rel">
       <article class="relv cur">
-        <h3>Version 23 · Same field, real ratings, career score that matters <span>18 Oct 2026 · current</span></h3>
+        <h3>Version 24 · Typical careers first <span>19 Oct 2026 · current</span></h3>
+        <ul><li><b>A new "Typical worker" scenario.</b> The worker you follow is picked at random from the 2000 workforce, the same way as everyone else in the model: 9 in 10 already have a job, at a company and on a floor drawn in real proportions; the rest are looking for a first job. Nothing is scripted.</li>
+          <li><b>"Surprise me" is mostly typical.</b> It used to pick each of the five scenarios equally often, so 2 in 5 runs were a collapse or a merger. Now it follows a typical worker 80% of the time, a first job 10%, Infosys or Bain 4% each, and the Lehman collapse or the Fiat Chrysler merger only 1% each. These odds are our choice; collapses and mergers can still happen naturally to anyone.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 23 · Same field, real ratings, career score that matters <span>18 Oct 2026</span></h3>
         <ul><li><b>Most careers stay closer to one field.</b> About 9 in 10 job moves used to change industry, about what random picks give. Now about 40% stay in the same industry, close to the 37 to 39% in Census job-to-job data.</li>
           <li><b>The career score changes how far you can get.</b> Better-rated companies have a larger share of seats from Senior upwards, so their workers end up higher on average. The economy-wide pyramid stays the same.</li>
           <li><b>Two fixes.</b> "Moves to X, which is rated better" now only appears when X really has a higher career score. Career changers now always start over in a different industry; one could restart at the company they had just left.</li></ul>
@@ -945,7 +951,7 @@ function landing(p,opts,lv){for(let l=lv;l>=0;l--){const o=opts.filter(L=>hasSea
    government by the US Postal Service), so many attempts to stay in the field find no other employer. Aiming 65% of moves at the
    worker's own industry makes about 40% of all moves actually stay in it, close to the real figure. */
 const STAY_FIELD=.65;
-const backIn=p=>p.comp&&p.comp===p.left?' (it stands for its whole industry in the model)':'';
+const backIn=p=>{if(!(p.comp&&p.comp===p.left))return '';if(p._bi)return '';p._bi=true;return ' (it stands for its whole industry in the model)'};
 const fieldOf=p=>p.comp?sectorOf(p.comp):p.left?sectorOf(p.left):null;
 function fieldPick(p,opts,sec,lv){
   if(p.avoid){const o=opts.filter(L=>sectorOf(L)!==p.avoid);if(o.length)opts=o} // a career changer looks outside their old field
@@ -1133,11 +1139,12 @@ function ownMaterials(p){
 const TYPE_REVEAL={
   regular:p=>"As a regular employee, they took promotions when they came and only moved company when their ladder ran out.",
   climber:p=>"As a climber, they aimed for the top floor and switched companies whenever a ladder ran out or stalled.",
-  steady:p=>`As a settler, they were happy once they reached ${lvName(p.target)} and stopped pushing for more.`,
+  steady:p=>`As a settler, they only wanted to reach ${lvName(p.target)} and stop there${p.level>=p.target?', and that is where they settled':', but they ended the run below it'}.`,
   hopper:p=>"As a job hopper, they looked for a better company on the same floor after every promotion.",
   changer:p=>p.changed?"As a career changer, at one point they left everything behind and started over at entry level in a new field.":"As a career changer, they planned to start over in a new field, but the run ended before they did.",
   nepo:p=>"As a nepo hire, family connections let them skip entry level and rise without using the rungs. Where their family controls the company they compete for promotions about 2.6 times as hard as everyone else; elsewhere only about 1.4 times. Like everyone, they can only move up when a seat on the next floor is free."};
 const SCEN_REVEAL={
+  typical:"They were picked at random from the workforce of 2000, like any real worker.",
   ordinary:"They started out on the ground in 2000, looking for a first job, with no company chosen in advance.",
   collapse:"They started at Lehman Brothers, which collapsed in September 2008 in the largest bankruptcy in US history.",
   merge:"They started at Fiat Chrysler, which merged with PSA Group into Stellantis in January 2021.",
@@ -1145,12 +1152,16 @@ const SCEN_REVEAL={
   best:"They started at Bain & Company, the best-rated employer in the model, with a 4.5 career score."};
 let revealed=false;
 const SCEN={
-  ordinary:{label:"Ordinary career",company:null},
+  typical:{label:"Typical worker",company:null,typical:true},
+  ordinary:{label:"First job",company:null},
   collapse:{label:"Their company collapses",company:"Lehman Brothers",lvl:2,lock:2008.8},
   merge:{label:"Their company merges",company:"Fiat Chrysler",lvl:2,lock:2021.2},
   attrition:{label:"High-attrition employer",company:"Infosys",lvl:0},
   best:{label:"Best-rated employer",company:"Bain & Company",lvl:0}
 };
+/* "Surprise me" mostly follows a typical worker: dramatic scenarios are rare, as they are in real careers (our weights) */
+const SCEN_ODDS={typical:.8,ordinary:.1,attrition:.04,best:.04,collapse:.01,merge:.01};
+function surpriseScen(){let r=Math.random();for(const k in SCEN_ODDS){if((r-=SCEN_ODDS[k])<0)return k}return 'typical'}
 function setupTracked(){
   revealed=false; {const rv=document.getElementById('reveal'); if(rv) rv.classList.remove('show');}
   journey=[]; tracked=null; resetTrail();
@@ -1171,6 +1182,8 @@ function setupTracked(){
     ownMaterials(p);
     const L=sc.company&&ladders.find(l=>l.d[0]===sc.company&&l.alive);
     if(L){const lvl=Math.min(L.top,follow.type==='nepo'?Math.max(isFamily(L)?2:1,sc.lvl):sc.lvl);p.comp=L;p.level=lvl;const s2=spot(p,L);p.x=s2[0];p.z=s2[1];p.y=lvl*GAP;p.st.companies.add(L.d[0])}
+    else if(sc.typical&&Math.random()<.9){ // drawn like the rest of the workforce: 9 in 10 already have a job, on a floor in real proportions
+      const T=pick(alive(),true),lvl=startLevel(T,follow.type);p.comp=T;p.level=lvl;const s2=spot(p,T);p.x=s2[0];p.z=s2[1];p.y=lvl*GAP;p.st.companies.add(T.d[0])}
     else{p.x=(Math.random()-.5)*8;p.z=(Math.random()-.5)*8}
     f.g.position.set(p.x,p.y,p.z);
     people.push(p);
@@ -1199,8 +1212,9 @@ function finishJourney(){
     const rv=document.getElementById('reveal');
     const tn=TYPES[follow.type].name, an=/^[aeiou]/i.test(tn)?'An':'A';
     let start=SCEN_REVEAL[follow.scen];
-    if(follow.scen==='ordinary'&&st.first) start=`They started out in 2000 with no company chosen in advance. Their first job was ${st.first.lvl?'as '+lvName(st.first.lvl):'at entry level'} at ${st.first.co}${follow.type==='nepo'&&st.first.lvl>=1?(FAMILY[st.first.co]?', through family connections: the company is controlled by '+FAMILY[st.first.co]:', helped by family connections'):''}.`;
-    else if(follow.type==='nepo'&&follow.scen!=='ordinary') start=start.replace('They started at','Through family connections, they started above entry level at');
+    if(follow.scen==='typical') start+=st.first&&st.first.y<=START?` They were working ${st.first.lvl?'as '+lvName(st.first.lvl):'at entry level'} at ${st.first.co}.`:' They were looking for their first job.';
+    else if(follow.scen==='ordinary'&&st.first) start=`They started out in 2000 with no company chosen in advance. Their first job was ${st.first.lvl?'as '+lvName(st.first.lvl):'at entry level'} at ${st.first.co}${follow.type==='nepo'&&st.first.lvl>=1?(FAMILY[st.first.co]?', through family connections: the company is controlled by '+FAMILY[st.first.co]:', helped by family connections'):''}.`;
+    else if(follow.type==='nepo'&&follow.scen!=='ordinary'&&follow.scen!=='typical') start=start.replace('They started at','Through family connections, they started above entry level at');
     const end=p.comp?`working as <b>${p.level?lvName(p.level):'entry level'}</b> at ${p.comp.d[0]}`:p.laidOff?`at <b>${lvName(p.level)}</b> level, laid off and looking for work`:`at <b>${lvName(p.level)}</b> level, between jobs after quitting`;
     const parts=[`${st.promos} promotion${st.promos===1?'':'s'}`,st.quits?`quit ${st.quits} time${st.quits===1?'':'s'}`:'never quit',st.laid?`laid off ${st.laid} time${st.laid===1?'':'s'}`:'never laid off'];
     rv.innerHTML=`<div class="cap">${an} ${tn.toLowerCase()} · the scenario was</div><h3>${SCEN[follow.scen].label}</h3><p>${start}</p>
@@ -1593,7 +1607,7 @@ document.getElementById('play').onclick=()=>{if(year>=END)return;playing=!playin
 const ftype=document.getElementById('ftype'), fscen=document.getElementById('fscen');
 ftype.onchange=()=>{fscen.disabled=['case','nepoCase','founderCase','beastCase'].includes(ftype.value)};
 document.getElementById('fstart').onclick=()=>{const keys=Object.keys(SCEN),myst=fscen.value==='random'&&!fscen.disabled;
-  follow={type:ftype.value,scen:myst?keys[Math.floor(Math.random()*keys.length)]:(fscen.value==='random'?'ordinary':fscen.value),mystery:myst};reset();playing=true;setPlay();document.getElementById('stage').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})};
+  follow={type:ftype.value,scen:myst?surpriseScen():(fscen.value==='random'?'typical':fscen.value),mystery:myst};reset();playing=true;setPlay();document.getElementById('stage').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})};
 document.getElementById('fstop').onclick=()=>{follow=null;reset();playing=true;setPlay()};
 document.getElementById('restart').onclick=()=>{reset();playing=true;setPlay()};
 document.getElementById('s1').onclick=()=>{speed=1;s1.setAttribute('aria-pressed','true');s3.setAttribute('aria-pressed','false')};
