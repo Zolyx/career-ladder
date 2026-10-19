@@ -49,6 +49,8 @@ canvas{display:block;width:100%;height:100%}
 .co.tr::after{content:" · in transition";color:var(--muted);font-weight:400}
 .co.dbl{border-left-width:6px;border-left-style:double}
 .co.merged{display:none}
+.co.sm{font-size:9.5px;padding:0 4px;opacity:.78}
+.co.sm:hover,.co.sm:focus-visible,.co.sm[aria-pressed="true"]{opacity:1;z-index:2}
 .log .merge{color:var(--p-hopper)}
 .co.dead{text-decoration:line-through;color:var(--muted);opacity:.85}
 .co.dead::after{content:" · collapsed " attr(data-year);text-decoration:none;display:inline-block;margin-left:3px;font-weight:400}
@@ -191,7 +193,7 @@ td a,.detail a{color:var(--ink)}
     <h1>Six Floors <span class="poc">Proof of concept</span></h1>
     <p class="disclaimer"><b>Proof of concept.</b> The companies, events and dates are real and sourced. The stick figures are fictional workers whose careers are simulated: they illustrate what typically happened to people like them, not what happened to any real person. Don't use it for real career or investment decisions.</p>
     <p class="disclaimer vibe"><b>Vibe-coded.</b> Designed and directed by Zolyx, and built with Claude (Anthropic) in a single conversation, without writing code by hand. Sources are cited throughout, but the model hasn't been reviewed by a labour economist.</p>
-    <p class="sub">Each ladder is a real company, starting at the ground because every company hires at entry level. Height is how far you can progress there: a ladder that reaches a floor means that at this company, you can become what that floor says. Colour is how employees rate their career opportunities on Glassdoor. The stick figures are simulated workers who climb, switch companies on their own floor, start over, or lose their footing when a company collapses and its ladder vanishes.</p>
+    <p class="sub">Each ladder is a real company. Every company has all six career stages, from entry level to executive, but not the same number of seats on each: rung spacing shows how hard each step is there (dense rungs, many seats above; sparse rungs, few). Width is company size. Colour is how employees rate their career opportunities on Glassdoor. The companies are a sample chosen to match the real US economy by industry and company size. The stick figures are simulated workers who climb, switch companies, start over, or lose their footing when a company collapses and its ladder vanishes.</p>
   </header>
 
   <div class="stage" id="stage">
@@ -206,6 +208,7 @@ td a,.detail a{color:var(--ink)}
       <div class="ramp-l"><span>2.5</span><span>3.5</span><span>4.5 / 5</span></div>
       <div class="nod"><i></i>Not enough reviews</div>
       <div class="nod"><i style="background:transparent;border:1px dashed var(--muted)"></i>Faded: in transition</div>
+      <div class="nod"><i style="background:repeating-linear-gradient(90deg,var(--muted) 0 2px,transparent 2px 4px);height:8px"></i>Dense rungs: easier step up · wider ladder: bigger company</div>
       <div class="nod"><i style="background:var(--gone)"></i>Failed company: breaks apart the year it collapsed (listed below the model)</div>
     </div>
     <div class="detail" id="detail" hidden></div>
@@ -283,6 +286,8 @@ td a,.detail a{color:var(--ink)}
       <div class="tally" id="tally"></div>
       <div class="cap" style="margin-top:14px">Industry mix: employed workers vs real US jobs</div>
       <div class="mix" id="mix"></div>
+      <div class="cap" style="margin-top:14px">Company size (private sector): employed workers vs real US jobs</div>
+      <div class="mix" id="sizemix"></div>
     </div>
     <div class="box">
       <div class="cap">What happened</div>
@@ -307,11 +312,11 @@ td a,.detail a{color:var(--ink)}
   <section>
     <h2>What the data says</h2>
     <div class="findings">
-      <div class="finding"><b>Tall ladders are not rated better</b><p>The companies that reach the top floor score between 3.1 (Target) and 4.2 (Google). Only Google is clearly green. The best scores in the model belong to consulting firms one floor lower.</p></div>
-      <div class="finding"><b>Nvidia is the outlier</b><p>Highest career score in the set at 4.4 from over 7,000 reviews, and a reported turnover of 3.7% in fiscal 2026. At about 42,000 staff it reaches Director, not the top floor.</p></div>
+      <div class="finding"><b>Big companies are not rated better</b><p>The widest ladders, companies with 100,000 or more staff, score between 3.1 (Target) and 4.2 (Google). Only Google is clearly green. The best scores in the model belong to consulting firms with 20,000 to 40,000 staff.</p></div>
+      <div class="finding"><b>Nvidia is the outlier</b><p>Highest career score in the set at 4.4 from over 7,000 reviews, and a reported turnover of 3.7% in fiscal 2026. At about 42,000 staff it is still far smaller than Walmart or Amazon.</p></div>
       <div class="finding"><b>Intern to CEO, one ladder</b><p>Michael Fiddelke joined Target as a finance intern in 2003 and became CEO in February 2026, the red figure in the model. He arrived with an MBA from Kellogg and consulting experience at Deloitte.</p></div>
       <div class="finding"><b>Three ways to the top</b><p>Fiddelke (red) climbed Target's ladder rung by rung for 23 years. Elkann (gold), grandson of Fiat's Gianni Agnelli, was lifted onto Fiat's board at 21. Huang (green) washed dishes at Denny's, then built his own ladder: Nvidia grew from 392 staff in 2000 to about 42,000.</p></div>
-      <div class="finding"><b>Size doesn't protect a ladder</b><p>Lehman Brothers had about 26,200 staff and Enron about 20,600 when they failed. Both were as tall as adidas or Nvidia are today.</p></div>
+      <div class="finding"><b>Size doesn't protect a ladder</b><p>Lehman Brothers had about 26,200 staff and Enron about 20,600 when they failed. Both were about as large as adidas or Nvidia are today.</p></div>
     </div>
   </section>
 
@@ -319,7 +324,7 @@ td a,.detail a{color:var(--ink)}
     <h2>The data behind each ladder</h2>
     <p class="small">Headcounts are the latest figure found as of October 2026, or the last figure before collapse for failed companies. Career scores are Glassdoor's "career opportunities" sub-rating, read in October 2026. Figures marked "estimate" come from Revelio Labs, which counts public profiles, not company filings.</p>
     <div class="tablewrap"><table id="table">
-      <thead><tr><th>Company</th><th class="num">Employees</th><th>Ladder reaches</th><th>Career score</th><th class="num">Reviews</th><th>Sources</th></tr></thead>
+      <thead><tr><th>Company</th><th class="num">Employees</th><th>Size group</th><th>Career score</th><th class="num">Reviews</th><th>Sources</th></tr></thead>
       <tbody></tbody>
     </table></div>
   </section>
@@ -342,21 +347,27 @@ td a,.detail a{color:var(--ink)}
   <section>
     <h2>How to read it, and what it can't tell you</h2>
     <div class="notes">
-      <p><b>Height is how far you can progress.</b> Every ladder starts on the ground floor, L0 Entry level, where everyone starts. Each floor above is a career stage you can reach: you can become Junior, Senior, Lead / Manager, Director or Executive. A ladder's height shows the furthest stage that company offers. For now it's estimated from company size, since bigger companies have more stages: under 100 staff reaches Junior, 100 to 1,000 Senior, 1,000 to 10,000 Lead / Manager, 10,000 to 100,000 Director, and 100,000 or more Executive. A planned next step is to base it on each company's real mix of roles.</p>
-      <p><b>Every floor has a limited number of seats.</b> A company can only have so many directors and executives, so nobody, nepo hires included, can move onto a floor unless a seat there is free. Seats are shared out in the proportions of real US jobs from the BLS Occupational Employment and Wage Statistics (May 2025): top executives and general managers about 2.4% of all jobs, other managers 4.8%, supervisors and team leads about 5% (our estimate), professional roles 25.8%, and the rest split evenly between junior and entry-level work. Each company's seats scale with its simulated workforce, and shorter ladders spread the same proportions over fewer floors. A seat frees up when someone is promoted, leaves, retires or is laid off, or when the company grows. When a seat opens, insiders and job seekers compete for it: climbers push about 1.5 times as hard, and nepo hires 2.6 times as hard where their family controls the company (Walmart, by the Walton family; Volkswagen and Porsche, by the Porsche and Piëch families through Porsche SE; Fiat Chrysler and Stellantis, by the Agnelli family through Exor; Dussmann; and, before they collapsed, Schlecker and Arcadia Group) but only 1.4 times elsewhere. A job seeker who finds no free seat on their own floor keeps looking once, then takes a step down. Overall, this keeps about 2% of simulated workers at Executive and about 5% at Director, close to the real shares. A company's career score also shapes its seats: the better the score, the larger the share of its seats from Senior upwards, so the colour changes how far people can get there, not only how fast. That link is our assumption, since no public data gives each company's real mix of senior roles.</p>
-      <p><b>Staying in the same field.</b> About 37 to 39% of US job-to-job moves stay in the same industry sector (Census Bureau Job-to-Job Flows, as analysed by the Richmond Fed for 2019 to 2022). In the model about 40% of job moves stay in the worker's own industry. Some industries are represented by a single company (health care only by HCA Healthcare, government only by the US Postal Service), so that company stands for its whole industry: someone who leaves it can be hired by it again, in place of another employer in the same field. Staying in the field also follows the same rebalancing as hiring, so each industry keeps close to its real share of jobs. Workers passed over for promotion usually look for a better-rated company in their own industry. Career changers always start over in a different industry from the one they left.</p>
+      <p><b>Every company has every career stage.</b> Every ladder starts on the ground floor, L0 Entry level, and reaches L5 Executive, because every company, however small, has someone in charge: in a 40-person firm that is the owner or general manager, who the BLS counts as a top executive. What differs is how many seats each floor has, so the same step can be easy at one company and very hard at another. Rung spacing shows this: dense rungs below a floor mean many seats on it, sparse rungs mean few. A ladder's width shows the company's size. Until version 25, height showed company size and small companies stopped at Junior; once the sample matched real company sizes, that rule left only 0.2% of workers able to reach Executive, against 2.4% in reality.</p>
+      <p><b>Every floor has a limited number of seats.</b> A company can only have so many directors and executives, so nobody, nepo hires included, can move onto a floor unless a seat there is free. Across the whole economy, seats follow the proportions of real US jobs from the BLS Occupational Employment and Wage Statistics (May 2025): top executives and general managers about 2.4% of all jobs, other managers 4.8%, supervisors and team leads about 5% (our estimate), professional roles 25.8%, and the rest split evenly between junior and entry-level work. Each company's own mix differs in three ways. Industry: Senior seats follow the industry's share of professional and business specialist jobs (BLS Current Population Survey, September 2026), and the management floors its share of managers (BLS Occupational Employment and Wage Statistics, May 2023): 58% of jobs in education and health are professional, against 4% in construction, so becoming Senior is far easier in a hospital than on a building site; managers are 13.6% of jobs in finance but 3.9% in transportation. Size: bigger firms have more layers of management (French employer data, Caliendo, Monte and Rossi-Hansberg 2015), so a small firm has an owner but almost no directors, and a large one many directors; the exact factors are our assumption. Career score: the better the score, the larger the share of seats from Senior upwards (our assumption, since no public data gives each company's mix of senior roles). All companies are then calibrated together so the economy as a whole keeps the BLS proportions. When a seat opens, someone from the floor below usually fills it within about a year, as one departure sets off a chain of promotions; climbers push about 1.5 times as hard for it, and nepo hires 2.6 times as hard where their family controls the company (Walmart, by the Walton family; Volkswagen and Porsche, by the Porsche and Piëch families through Porsche SE; Fiat Chrysler and Stellantis, by the Agnelli family through Exor; Dussmann; and, before they collapsed, Schlecker and Arcadia Group) but only 1.4 times elsewhere. Overall, the simulated workforce stays close to the real pyramid: about 33% entry level, 30% junior, 25% senior, 5% leads, 4% directors and 2% executives, against 31, 31, 26, 5, 4.8 and 2.4%.</p>
+      <p><b>Staying in the same field.</b> About 37 to 39% of US job-to-job moves stay in the same industry sector (Census Bureau Job-to-Job Flows, as analysed by the Richmond Fed for 2019 to 2022), and the model keeps a similar share. Every industry is now represented by several companies of different sizes, so a worker can stay in their field without returning to the employer they left. Staying in the field also follows the same rebalancing as hiring, so each industry keeps close to its real share of jobs. Workers passed over for promotion usually look for a better-rated company in their own industry. Career changers always start over in a different industry from the one they left.</p>
       <p><b>Colour is perception.</b> Glassdoor reviewers choose to post, so scores lean towards people with strong feelings. Scores from a few dozen reviews can swing widely. Large companies mix very different jobs into one number.</p>
-      <p><b>The simulation is a set of rules, not data.</b> Each simulated year, a worker may be promoted. The base chance shrinks as the floors get higher (about 45% a year from Entry level, 35% from Junior, 22% from Senior, 12% from Lead, 5% from Director), and is scaled up or down by the company's career score and cut further if the company is in transition. Ladders appear in the year the company was founded and vanish in the year it collapsed. When a ladder vanishes, about half of its workers find a job on the same floor elsewhere; the rest drop a floor or back to entry level. These numbers are illustrative assumptions chosen to make the dynamics visible.</p>
+      <p><b>The simulation is a set of rules, not data.</b> Each simulated year, a worker may be promoted if a seat on the floor above is free at their company; the chance is scaled by the company's career score and cut if the company is in transition. Ladders appear in the year the company was founded and vanish in the year it collapsed. When a ladder vanishes, about half of its workers find a job on the same floor elsewhere; the rest drop a floor or back to entry level. Where these numbers are not calibrated to data, they are illustrative assumptions chosen to make the dynamics visible.</p>
       <p><b>Mergers.</b> PSA Group (Peugeot, Citroën, Opel) and Fiat Chrysler merged into Stellantis on 16 January 2021. In the simulation their two ladders slide together and become one double ladder, two ladders glued along a shared middle rail. Workers move over with them: about 65% keep their floor, about 25% are moved down a floor because the merged company has duplicate roles, and about 10% are laid off to the ground. Those shares are illustrative assumptions. The predecessors take Stellantis's colour, since they no longer have reviews of their own.</p>
       <p><b>The transition rule.</b> A company is marked "in transition" when it has announced major job cuts, a restructuring, a large merger still being integrated, or a review that could lead to selling or closing parts of the business, within the last 12 months. In the simulation, the ladder only fades and slows promotions from the month the transition began: February 2025 for Porsche, when its first job cuts were announced, and July 2026 for FDJ United, when it began reviewing its online business. Before that they behave like any other company.</p>
-      <p><b>Growing ladders.</b> Every company starts small, so ladders grow as companies do. Nvidia's ladder follows its real headcount history: 392 staff in January 2000, past 1,000 in 2002 and past 10,000 in 2017. Companies founded after 2000, such as Airbnb, Spotify, Zalando, Duolingo and MrBeast, appear as a one-floor ladder in their founding year and grow to today's height. Their timing is estimated, assuming fast early growth that slows later. Companies founded before 2000 are shown at today's height throughout, because their headcount history isn't in the model yet.</p>
-      <p><b>The three catastrophes.</b> The model shows 9/11, the 2008 financial crisis and the COVID-19 pandemic. Their effect on quits and layoffs is calibrated to the whole US economy, using the Bureau of Labor Statistics' JOLTS survey, and applied to every company alike, so the simulated workers behave like the average employee rather than the worst-hit ones. After 9/11, quits fell about 13% while layoffs economy-wide barely moved (−6%): the damage was concentrated in airlines and hotels. In the 2008 crisis, quits fell about 39% and layoffs rose about 20%. In March and April 2020, layoffs jumped about sixfold, with 13.0 million in March alone, and quits fell by a third. Because simulated workers reconsider their jobs only about once a year, this is modelled as one wave of layoffs at lockdown, sized to match. Then came the Great Resignation of 2021–22, when quits rose about 15% above pre-pandemic levels and layoffs fell about 21%. On top of the averages, company-specific shocks still happen as outlier events. Most companies survived all three crises, but some crashed: Sabena after 9/11; Lehman Brothers, Washington Mutual and Circuit City in 2008; Flybe and Arcadia Group during COVID-19, alongside Chrysler's bankruptcy and the airline cuts after 9/11. Their ladders break apart in the model, but everything that happens at failed companies (promotions, quits and the mass layoffs when they collapse) is kept out of the economy chart and the impact table, because extreme cases would distort the picture of the typical worker. The effect on promotions and job-search length is an assumption, because no official data tracks them.</p>
-      <p><b>Industry mix and hiring.</b> Simulated workers are hired so that each industry gets its real share of US jobs (Bureau of Labor Statistics, September 2026): education and health 18%, government 15%, leisure and hospitality 14%, professional and business services 14%, trade 14%, manufacturing 8%, finance 6%, construction 6%, transportation 5%, and information, where most tech companies sit, under 2%. Inside an industry, bigger companies hire proportionally more people, and a better career score makes a company somewhat more attractive. So a tech company can appear in the model as a ladder without taking a bigger share of the workforce than tech really has. Companies' sizes change over time where their growth is modelled.</p>
-      <p><b>Reference employers.</b> To keep the sample representative, the model includes large, typical employers from sectors that were missing: Walmart (retail), HCA Healthcare (health care), JPMorgan Chase (finance), Marriott and Starbucks (hospitality and food service), the US Postal Service (government) and VINCI (construction). Companies best known for one extreme event, such as General Motors' bankruptcy, Citigroup's 52,000 job cuts in 2008 or Boeing's 9/11 layoffs, were left out on purpose.</p>
-      <p><b>Retirement and a settled start.</b> About 2.5% of workers retire each year and are replaced by newcomers at entry level, as in a real workforce. Before the run starts in 2000, the statistical sample quietly lives through 20 years so it begins in a realistic, settled state.</p>
-      <p><b>Quitting and job hunting.</b> Each year a worker may quit and walk their floor looking for something better. The chance follows the company's published attrition rate where there is one: about 13 to 14% at TCS, Infosys, Wipro and Accenture, and 3.7% at Nvidia. Every other company uses its industry's real quit rate from the BLS JOLTS survey, from 0.8% a month in government to 3.4% a month in leisure and hospitality. Layoffs in normal years follow each industry's real layoff rate the same way, from 0.4% a month in government to 2.0% in professional and business services. Job hoppers quit more often, nepo hires rarely. People who quit never have to take a lower job: if no seat on their floor is free, they keep looking until one is. About 1 in 20 quitters above entry level choose a lower job anyway (our estimate, informed by Pew Research's 2022 survey of people who quit in 2021). Most people who quit already have their next job lined up: in September 2026 only 741,000 of the unemployed had quit their last job, against 3.1 million quits a month (BLS). So about 9 in 10 simulated quitters move on after a handover of two to six weeks (our estimate from those figures). Everyone else, including everyone laid off, searches for as long as real unemployment lasts (BLS Current Population Survey, September 2026): half find work within about 11.5 weeks, the average is about 25 weeks, and a few take a year or more. During the 2008 crisis and COVID they last about twice as long, as they did in reality. After the search, about half of job seekers land a role one floor higher at another company, which is how many people get promoted in practice. The rest move sideways.</p>
+      <p><b>Growing ladders.</b> Ladders widen as companies grow. Nvidia's follows its real headcount history: 392 staff in January 2000, past 1,000 in 2002 and past 10,000 in 2017. Companies founded after 2000, such as Airbnb, Spotify, Zalando, Duolingo, United Homes Group and MrBeast, start narrow in their founding year and widen to today's size, with estimated timing that assumes fast early growth that slows later. The biggest older companies now follow their real headcount histories too, from annual reports: Amazon grows from about 9,000 staff in 2000 to 1.5 million, Google from under 300 in 2001 to about 190,000, Accenture from about 71,000 to 779,000, Infosys from about 5,000 to 328,000; the US Postal Service shrinks from about 925,000 to 624,000. Smaller older companies are shown at today's size. A company's size group can change as it grows or shrinks, and with it the group of jobs it stands for.</p>
+      <p><b>Company histories and US workforces.</b> Documented job cuts at sample companies happen on their real dates, on top of their industry's normal rate: Cisco's 8,500 in 2001, United Airlines' 20,000 after 9/11, Starbucks' 12,000 in 2008, Chrysler's bankruptcy in 2009, JPMorgan's 9,200 after taking over Washington Mutual, Volkswagen's 30,000 after the diesel scandal, Google's 12,000 and Accenture's 19,000 in 2023, and others. Each hits the same share of the company's simulated workers as of its real staff at the time. Because the model's economy is the United States, each company hires in proportion to its US workforce and is placed in the size group of that workforce, as the Census counts firm size: Siemens has more than 45,000 US staff, Stellantis about 50,000. Companies with no US operations, such as Schlecker, Air Berlin or Zalando, stay in the model as ladders and events but hire no simulated workers. Some US shares are our estimates.</p>
+      <p><b>The events are markers only.</b> 9/11, the 2008 financial crisis, COVID-19 and the Great Resignation are shown as shaded bands and banners, but they change nothing in the model: no rate, ratio or share depends on them, and switching them off changes only what is displayed. Everything that moves over time comes from real dated data: quits and layoffs from JOLTS month by month, job-search length from the yearly median duration of unemployment, the industry mix by year, layoffs by floor from occupation data by year, and documented company events on their dates. So the events show what the numbers did at those times: after 9/11, quits fell about 12% while layoffs barely moved; in 2008–10, quits fell about a third, layoffs rose about a fifth and job searches more than doubled; in March–April 2020 layoffs jumped about sixfold, unevenly across industries (in the worst month restaurants, hotels and entertainment laid off about 28% of their staff, government about 1%; JOLTS, BLS Monthly Labor Review, June 2021). New events can be added as markers without touching any number. Layoffs above the normal level hit workers broadly rather than mainly the frequent movers, as recession layoffs reach settled workers too, and every quit and layoff is drawn ahead using each month's real rate and placed on the date it happens. Most companies survived all three crises, but some crashed: Sabena after 9/11; Lehman Brothers, Washington Mutual and Circuit City in 2008; Flybe and Arcadia Group during COVID-19, alongside Chrysler's bankruptcy and the airline cuts after 9/11. Their ladders break apart in the model, but everything that happens at failed companies (promotions, quits and the mass layoffs when they collapse) is kept out of the economy chart and the impact table, because extreme cases would distort the picture of the typical worker. Promotions have no event effect: they slow down in bad times only because fewer people quit and fewer seats open.</p>
+      <p><b>Turnover over the years.</b> Quits and layoffs follow the BLS JOLTS survey month by month from 2001 to August 2026: each industry keeps its own level, and the whole economy rises and falls with the real monthly rates. Quits ran at about 26 per 100 workers a year in 2001, fell to 16 in 2009, climbed to 28 in 2019 and peaked at about 33 in 2021–22, then eased to about 24. Layoffs ran at about 18 a year in the early 2000s, 21 in 2009, and fell to 12–13 after the pandemic. A move straight to another employer counts as a quit, as it does in JOLTS. Across 26 years the simulated yearly rates come within a few percent of the real ones on average and follow the same ups and downs (correlation about 0.95). The mix of jobs changes over time too: manufacturing held about 13% of US jobs in 2000 and about 8% today, while education and health grew from about 12% to 18% (BLS Current Employment Statistics and Employment Projections; 2005 and 2020 interpolated).</p>
+      <p><b>Industry mix and hiring.</b> Simulated workers are hired so that each industry gets its real share of US jobs in that year (Bureau of Labor Statistics); today that is education and health 18%, government 15%, leisure and hospitality 14%, professional and business services 14%, trade 14%, manufacturing 8%, finance 6%, construction 6%, transportation 5%, and information, where most tech companies sit, under 2%. Inside an industry, jobs are also split by company size in real proportions (see below), each company sharing its size group's jobs with the others in it in proportion to its size, and a better career score makes a company somewhat more attractive. So a tech company can appear in the model as a ladder without taking a bigger share of the workforce than tech really has. Companies' sizes change over time where their growth is modelled.</p>
+      <p><b>Is the sample representative?</b> A handful of companies can't contain the US economy, so each company stands for a group of jobs: its industry and its size group. Real US jobs are split over those groups and each group's jobs are shared by the companies in it. A 38-person manufacturer like Electro-Sensors therefore stands for all manufacturing jobs in firms under 100 staff (about 2.4% of US jobs), and Walmart can take no more than its share of retail jobs in the largest firms. Every industry has a company in every size group. Industry shares come from the BLS (September 2026). Company sizes come from Census and BLS firm data: firms under 100 staff hold about 34% of private-sector jobs (BLS Business Employment Dynamics, Q1 2025: 34.1%), firms under 500 about 46% (Census Statistics of U.S. Businesses, 2021: 45.9%), firms with 10,000 or more about 30% (Census, 2019). The split between 10,000–99,999 and 100,000 or more (21% and 9%) and the share of firms with 500–999 staff are our estimates. Each industry's share in small firms also comes from Census data: 82% of construction jobs are in firms under 500 staff, against 28% in finance. Government is matched by level instead (federal 11%, state 23%, local 65%; BLS, September 2026), because there is no national data on the size of public employers. Headcounts of the companies added for this come from their annual reports (10-K) or official figures. In a full run the simulated workforce stays within about 2 points of every industry's real share and within about 2 points of every size group's.</p>
+      <p><b>Reference employers.</b> To keep the sample representative, the model includes large, typical employers from sectors that were missing: Walmart (retail), HCA Healthcare (health care), JPMorgan Chase (finance), Marriott and Starbucks (hospitality and food service), the US Postal Service (government) and VINCI (construction). Companies best known for one extreme event, such as General Motors' bankruptcy, Citigroup's 52,000 job cuts in 2008 or Boeing's 9/11 layoffs, were left out on purpose. Version 26 added 34 employers to fill every industry and size group, from Progressive and Cheesecake Factory to Fairfax County Public Schools and small listed firms such as AMREP and Hennessy Advisors.</p>
+      <p><b>Age, retirement and a settled start.</b> Every simulated worker has an age. Newcomers start between 18 and 26, and people retire at about 62 on average, rarely before 55 or after 70 (Gallup's average retirement age is 61–62). Young workers change jobs far more often than older ones, following the US National Longitudinal Survey of Youth (NLSY79): about 0.8 new jobs a year at 18–24, falling to about 0.2 at 45 and over. Retirees are replaced by newcomers at entry level, as in a real workforce. Before the run starts in 2000, the statistical sample quietly lives through 20 years of job changes so it begins in a realistic, settled state; then every worker is given an age from the real age mix of employed Americans in 2000 (median about 39), older workers more often on higher floors. As the baby boomers age, the median rises to about 42 by the mid-2020s, as it did in reality. Promotions also come mostly early in a career (Pergamit and Veum; McCue), so the median age on each floor ends up close to BLS occupation data: about 33 at entry level, 46 for managers and 52 at the top (chief executives: 51.6).</p>
+      <p><b>Movers and stayers.</b> A small group of workers changes jobs again and again, while most stay put for years. Each simulated worker has a lasting tendency to move, drawn at random; layoffs are even more concentrated on the frequent movers than quits, because most layoffs and discharges counted by JOLTS are recalls, dismissals and the end of short, seasonal or temporary jobs. Only a few per 100 workers a year lose a job they had settled into: the Displaced Workers Survey finds 7–10% of workers over three normal years and about 16% in 2007–09 (Farber). The gap between movers and stayers narrows with age. The result matches the BLS tenure survey (January 2024): a median of about 4 years with the current employer and about a quarter of workers with 10 years or more. These factors only decide who is let go within a floor and an industry; how often each floor and each industry is hit comes from the data, so no industry's layoff rate drifts from its BLS level. In career stories, a company with fewer than 100 staff is named as "a small firm like …", because it stands for many small employers. During a crisis, only the extra layoffs above the normal level are blamed on it.</p>
+      <p><b>Layoffs by floor and by kind.</b> JOLTS counts about 13 to 21 layoffs and discharges per 100 workers a year, so they are common, but they are not all the same. Who is hit follows unemployment rates by occupation year by year (BLS Current Population Survey, Table 25, 2002–2025): entry-level jobs about 25 per 100 a year before 2008 and about 18 now, directors and executives about 8 to 10, with managers hit relatively harder in 2008–10. Career stories tell three kinds apart. About 4 in 10 layoffs are temporary, with a recall to the same job weeks later, most often in construction, manufacturing, hotels and restaurants, and transport (relative chances by industry are our assumption). Some short lower-level jobs simply end ("their temporary job ends"): among unemployed job losers, about 19% had finished a temporary job (BLS, September 2026). The rest are permanent layoffs. Firms in their first two years rarely cut jobs (our assumption).</p>
+      <p><b>Quitting and job hunting.</b> A worker may quit at any time and walk their floor looking for something better. The chance is highest in the first months at a new employer and falls with tenure, as in US worker data (Farber); layoffs also hit newcomers hardest, and they hit lower floors more often than higher ones: entry level about 2.5 times as often as directors and executives (BLS Current Population Survey, 2025). About 4 in 10 layoffs end with a recall to the same job at the same employer, as in US data (Fujita and Moscarini), and a recalled worker keeps their tenure. The chance follows the company's published attrition rate where there is one: about 13 to 14% at TCS, Infosys, Wipro and Accenture, and 3.7% at Nvidia. Every other company uses its industry's real quit rate from the BLS JOLTS survey, from 0.8% a month in government to 3.4% a month in leisure and hospitality. Layoffs in normal years follow each industry's real layoff rate the same way, from 0.4% a month in government to 2.0% in professional and business services. Job hoppers quit more often, nepo hires rarely. People who quit never have to take a lower job: if no seat on their floor is free, they keep looking until one is. About 1 in 20 quitters above entry level choose a lower job anyway (our estimate, informed by Pew Research's 2022 survey of people who quit in 2021). Most people who quit already have their next job lined up: in September 2026 only 741,000 of the unemployed had quit their last job, against 3.1 million quits a month (BLS). So about 9 in 10 simulated quitters move on after a handover of two to six weeks (our estimate from those figures). Everyone else, including everyone laid off, searches for as long as real unemployment lasts. The BLS Current Population Survey (September 2026) reports a median of 11.5 weeks for people unemployed now, but that snapshot over-represents long searches, so the model uses the completed lengths consistent with it: half end within about 5 weeks, most within a few months, and a few take a year or more. During the 2008 crisis and COVID they last about twice as long, as they did in reality. Most moves between companies are sideways: about 1 in 5 promotions come from changing employer, as in real data (in Finnish employer records, promotions from another firm are 4.3% of job entries against 24.5% for internal promotions, DeVaro et al.; among US MBA graduates, 77% of moves into bigger roles were internal, Bidwell and Mollick 2015). About 85% of those step-ups stay in the worker's own industry, because people moving between firms usually keep the same job title (DeVaro et al.); the model has no occupations, so the industry stands in for the field.</p>
+      <p><b>Consulting layoff rates are approximate.</b> Bain, BCG, McKinsey and the IT services firms use the layoff rate of the whole professional and business services industry, which includes temporary staffing agencies with very high turnover. BLS publishes no separate rate for consulting, so the model doesn't invent one; their real layoff rates are probably lower.</p>
       <p><b>Why consulting scores so high.</b> Bain, BCG and McKinsey run an "up or out" model: consultants are promoted on a fixed schedule or expected to leave. That makes career progression fast and visible for those who stay, which shows in their scores, but it also means many people exit after a few years.</p>
-      <p><b>Why the shortest ladders are grey.</b> Companies with under 100 staff rarely have enough employee reviews for a reliable score. No well-known company that small, Telegram and Craigslist included, has a usable Glassdoor career rating, so their ladders stay grey rather than being given a guessed colour.</p>
+      <p><b>Why the narrowest ladders are grey.</b> Companies with a few hundred staff or fewer rarely have enough employee reviews for a reliable score: Telegram, Craigslist, Electro-Sensors, AMREP and the other small firms in the sample have no usable Glassdoor career rating, so their ladders stay grey rather than being given a guessed colour. In the simulation they count as an average-rated employer.</p>
       <p><b>Missing:</b> the measures that would show stagnation directly, such as time spent at one level before promotion, the share of senior roles filled internally, and mid-level turnover. Most companies don't publish them.</p>
     </div>
   </section>
@@ -364,7 +375,53 @@ td a,.detail a{color:var(--ink)}
     <h2>Release notes</h2>
     <div class="rel">
       <article class="relv cur">
-        <h3>Version 25 · Quitters don't step down <span>19 Oct 2026 · current</span></h3>
+        <h3>Version 30 · Events as markers, real company histories <span>19 Oct 2026 · current</span></h3>
+        <ul><li><b>9/11, 2008, COVID-19 and the Great Resignation are now markers only.</b> They no longer change any rate: the extra crisis effects on promotions, job searches and step-ups are gone, and the COVID lockdown wave is replaced by the real March–April 2020 JOLTS layoff rates. Job searches now follow the real yearly median duration of unemployment. New events can be added without changing any number.</li>
+          <li><b>Quits and layoffs land on their real dates.</b> Each is drawn ahead from each month's real rate and placed on the day it happens, so the March 2020 spike shows in March, not weeks later.</li>
+          <li><b>Real headcount histories</b> for Amazon, Google, Netflix, Cisco, Accenture, TCS, Infosys, Wipro, Starbucks, JPMorgan, Walmart, Target, HCA, Progressive, EMCOR, J.B. Hunt, Marriott, United Airlines, the US Postal Service, Volkswagen, Siemens and VINCI.</li>
+          <li><b>Documented job cuts</b> at sample companies happen on their real dates.</li>
+          <li><b>US workforces.</b> Companies hire in proportion to their US staff; companies with no US operations hire no simulated workers.</li>
+          <li><b>End-of-run summary.</b> Every finished run now shows a summary card: where the workforce ended up, yearly promotions, quits and layoffs, the kinds of layoffs, and how 2008 compared with reality. Followed careers always end with their story card.</li>
+          <li><b>Checked run by run.</b> In 40 runs, 36 matched all 13 data benchmarks; see the notes for the career-level checks.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 29 · Layoffs checked floor by floor, company by company <span>19 Oct 2026</span></h3>
+        <ul><li><b>Layoffs by floor follow the data each year.</b> The entry floor was laid off far too often (about 40 per 100 a year against about 25) and the upper floors far too rarely (about 3 against 8–10), because youth, short tenure and frequent moving were stacked on top of the occupation ratios. Those factors now only decide who is let go within a floor, and the ratios between floors change year by year with BLS occupation data from 2002 to 2025.</li>
+          <li><b>Every industry keeps its BLS layoff rate.</b> Stable industries such as government and finance had drifted 30–40% above their real rates, because frequent movers carried their risk with them. In 40 runs, 58 of the 69 companies with enough simulated workers are within 15% of their industry's JOLTS rate.</li>
+          <li><b>Fixed: the first weeks in a new job were skipped</b> when checking for quits and layoffs, which had needed large correction factors.</li>
+          <li><b>Three kinds of job loss in stories:</b> temporary layoffs with a recall, temporary jobs that end, and permanent layoffs. Recalls are more common in construction, manufacturing and hospitality.</li>
+          <li><b>New firms</b> rarely cut jobs in their first two years.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 28 · Movers, stayers and real ages <span>19 Oct 2026</span></h3>
+        <ul><li><b>Fixed: no job changes during the warm-up.</b> Before 2000 the statistical sample is meant to live through 20 years of normal job changes, but an error switched quits and layoffs off, so the 2000 workforce started with tenures far too long and ages far too old.</li>
+          <li><b>Real ages.</b> The 2000 workforce now has the real US age mix (median about 39, rising to about 42 by the mid-2020s), and the median age on each floor is close to BLS data, from about 33 at entry level to 52 at the top.</li>
+          <li><b>Movers and stayers.</b> Workers differ lastingly in how often they change jobs, and layoffs keep hitting the same frequent movers. Tenure now matches the BLS tenure survey by age, and far fewer careers have four or more layoffs.</li>
+          <li><b>Promotions come earlier in life</b>, as in US survey data.</li>
+          <li><b>Career changers</b> can now start over from Junior level too, not only from Senior upwards.</li>
+          <li><b>Fairer stories.</b> Crises are blamed only for the extra layoffs they caused, and the smallest firms are named as examples ("a small firm like AMREP").</li>
+          <li><b>Checked over 200 full runs</b> against BLS, JOLTS, NLSY79 and Displaced Workers Survey benchmarks.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 27 · Real turnover, year by year <span>19 Oct 2026</span></h3>
+        <ul><li><b>Quits and layoffs follow the real monthly rates.</b> Instead of a fixed level with a multiplier during each crisis, the whole economy now rises and falls with the BLS JOLTS rates for every month from 2001 to August 2026: the dot-com bust, the 2008 crisis, the low-churn 2010s, the Great Resignation and the cooling since. The simulated yearly rates now average within a few percent of the real ones.</li>
+          <li><b>The industry mix changes over time.</b> Hiring follows each industry's real share of US jobs in that year, so manufacturing shrinks from about 13% of jobs in 2000 to 8% today and health care and education grow.</li>
+          <li><b>Moving straight to another employer counts as a quit</b>, as in JOLTS. These moves were left out of the chart before, which had made the other quits too frequent.</li>
+          <li><b>The COVID layoff wave hits industries unevenly</b>, as it did: hardest in hospitality, lightest in finance and government.</li>
+          <li><b>Ages and retirement.</b> Workers have ages, retire at about 62 and change jobs more often when young.</li>
+          <li><b>Tenure and floors matter.</b> New hires are the likeliest to quit or be laid off; lower floors are laid off more often; 4 in 10 layoffs end in a recall to the same job.</li>
+          <li><b>Promotions are spaced out.</b> Nobody is promoted twice within a year or within their first year at a company, and promotions happen when a seat above opens.</li>
+          <li><b>Fairer crisis table.</b> The real change in the impact table is now computed from the JOLTS months that match each simulated window exactly, and rates are per employed worker, as in JOLTS.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 26 · A sample that matches the US economy <span>19 Oct 2026</span></h3>
+        <ul><li><b>Company sizes match reality.</b> 93% of simulated workers used to work at companies with 100,000 or more staff, against about 9% in reality, and almost none at small firms. 34 real employers were added, with headcounts from annual reports or official figures, so every industry has a company in every size group, and each company now stands for its industry and size group. Firms under 100 staff now employ about a third of private-sector workers, as in Census and BLS data, and no single company holds more than its real share.</li>
+          <li><b>Every company has every career stage.</b> With realistic company sizes, the old rule (small companies stop at Junior) left only 0.2% of workers able to reach Executive, against 2.4% in reality, because small firms have owners and managers too. Ladders now all reach Executive; what differs is how many seats each floor has, set by industry (BLS occupation data), size and career score. Rung spacing shows how hard each step is, and width shows company size. Floor labels are the plain role names.</li>
+          <li><b>Promotions mostly happen inside the company.</b> 71% of promotions used to come from switching employer, and 70% of those crossed industries (a Junior at Starbucks becoming a Senior at Cisco). Research shows about 1 in 5 promotions come from switching and most stay in the same field. Now about 20% do, and about 85% of those stay in the same industry. Free seats are filled mainly from the floor below, as in real vacancy chains.</li>
+          <li><b>New panel and section.</b> A live company-size panel sits next to the industry mix, and "Is the sample representative?" explains how the sample was built, with sources. Clicking a company shows what it stands for and its hardest step.</li></ul>
+      </article>
+      <article class="relv">
+        <h3>Version 25 · Quitters don't step down <span>19 Oct 2026</span></h3>
         <ul><li><b>People who quit rarely take a lower job.</b> A worker who quit and found no free seat on their floor used to take a lower job after a second search. Now they keep looking in short rounds until a seat on their own floor opens. About 1 in 20 quitters above entry level still choose a lower job. The 1 in 20 is our estimate: Pew Research found that 9% of college graduates and 18% of other workers who quit in 2021 had fewer chances to advance in their new job, and moving down a floor is a bigger step than that. People who are laid off still step down when they need to.</li></ul>
       </article>
       <article class="relv">
@@ -469,11 +526,18 @@ td a,.detail a{color:var(--ink)}
       <div class="relv lim">
         <h3>Known limitations</h3>
         <ul>
-          <li>No official data tracks promotions or job-search length economy-wide, so their crisis effects are assumptions.</li>
+          <li>No official data tracks promotions economy-wide; the model's level-to-level promotions (about 11–16 per 100 workers a year under 35, 5–7 at 35–56) sit below the broader self-reported promotion rates in the NLSY (about 16–18% a year at 23–33), which also count promotions within the same level.</li>
           <li>The economy-wide data is for the United States; the model includes European and Asian companies.</li>
-          <li>Ladder growth for companies founded before 2000 isn't modelled; they appear at today's height.</li>
-          <li>Short events like the two-month COVID shock give noisier percentages than long ones, even with the large sample.</li>
+          <li>Headcount histories cover the largest companies; smaller companies founded before 2000 appear at today's size. Some early values and some US workforce shares are estimates.</li>
+          <li>Turnover rises and falls by the same monthly factor in every industry, except in March–April 2020. In reality 2008–10 hit construction and manufacturing harder than the average and health care and government less.</li>
+          <li>Workers over 45 change employer a little more often than in the NLSY79 survey (about 0.24 new jobs a year against 0.19), and workers aged 55–64 have a median of about 7.6 years with their employer against 9.6 in the BLS tenure survey, because layoffs on the upper floors follow occupation unemployment rates, which may overstate managers' layoff risk.</li>
+          <li>About 17% of workers lose a job without a recall over three normal years, against 7–10% in the Displaced Workers Survey. The survey leaves out dismissals and most short temporary jobs, which the model's layoffs include, so part of the gap is definitional.</li>
+          <li>About 1 in 10 simulated careers contains a stretch that looks unusual: four or more new employers in one year after 25, three permanent job losses within three years after 30, three or more step-downs, or three or more years out of work. Such careers exist, but with no survey benchmark for them, the model probably has a few too many, mostly among frequent movers.</li>
+          <li>Short events like the two-month COVID shock give noisier percentages than long ones, even with the large sample, and so do small industries in a single year.</li>
           <li>Company stability (credit ratings) is planned for a later version.</li>
+          <li>How much harder a step is in small or large firms (the size factors for seats) is our assumption; only the direction comes from research. The split of firms with 10,000 or more staff into 10,000–99,999 and 100,000 or more is our estimate.</li>
+          <li>Small companies each stand for a very large group of jobs, so a 45-person firm can appear in many careers.</li>
+          <li>Government is matched by level of government, not by employer size, because no national data on public employer sizes exists. The City of Phoenix headcount dates from 2019.</li>
         </ul>
       </div>
     </div>
@@ -514,6 +578,42 @@ const DATA=[
   ["US Postal Service",624492,"FY2025 (career and pre-career)",3.1,21049,[["USPS annual report FY2025","https://about.usps.com/what/financials/annual-reports/fy2025.pdf"],[GD,"https://www.glassdoor.com/Jobs/-Jobs-E3032.htm"]],null,1775],
   ["Starbucks",381000,"Sep 2025, 10-K",3.3,86450,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/829224/000082922425000114/sbux-20250928.htm"],[GD,"https://www.glassdoor.co.in/Overview/Working-at-EI_IE2202.htm"]],null,1971],
   ["VINCI",293786,"end 2025",3.7,1581,[["VINCI universal registration document 2025","https://www.vinci.com/publi/vinci/a11y/2025/vinci-urd/article/R5/"],[GD+" (review count shown inconsistently)","https://static.glassdoor.com.mx/Overview/Working-at-EI_IE10584.htm"]],null,1899],
+  // sample employers (v26): one or more real employers for every industry and company size, so the simulated workforce
+  // matches the real US mix of both. Headcounts from annual reports (10-K) or official government figures.
+  ["Netflix",16000,"end 2025, 10-K",3.7,2563,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/1065280/000106528026000034/nflx-20251231.htm"],[GD,"https://www.glassdoor.com/Overview/Working-at-Netflix-EI_IE11891.11,18.htm"]],null,1997],
+  ["The New York Times",6000,"end 2025, 10-K (full-time equivalent)",3.6,945,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/71691/000007169126000011/nyt-20251231.htm"],[GD,"https://clear.glassdoor.nl/Reviews/New-York-Times-Reviews-E960.htm"]],null,1851],
+  ["Daily Journal",424,"Sep 2025, 10-K (about 415 full-time incl. contractors, 9 part-time)",null,null,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/783412/000143774925038836/djco20250930_10k.htm"]],null,1888],
+  ["Encompass Health",42000,"end 2025, 10-K",3.9,2939,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/785161/000078516126000081/ehc-20251231.htm"],[GD,"https://static.glassdoor.ch/Reviews/Encompass-Health-Reviews-E1959649_P2.htm"]],null,1984],
+  ["Strategic Education",6134,"end 2025, 10-K (full and part time)",3.0,163,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/1013934/000101393426000006/stra-20251231.htm"],[GD,"https://www.glassdoor.com/Overview/-EI_IE2436603.htm"]],null,1892],
+  ["FONAR",535,"Aug 2025, 10-K (FONAR and its imaging-centre business HMCA)",null,null,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/355019/000173112225001281/e6836_10k.htm"]],null,1978],
+  ["American Shared Hospital Services",87,"end 2025, 10-K (incl. per diem and part time)",null,null,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/744825/000143774926010731/asha20251231_10k.htm"]],null,1983],
+  ["Cheesecake Factory",48400,"Dec 2025, 10-K",3.6,6391,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/887596/000110465926018643/cake-20251230x10k.htm"],[GD,"https://www.glassdoor.ca/Overview/Working-at-EI_IE2229.htm"]],null,1978],
+  ["Nathan's Famous",131,"Mar 2025, 10-K",2.7,67,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/69733/000143774925019916/nath20250331_10k.htm"],[GD+" (67 reviews, small sample)","https://www.glassdoor.com.au/Reviews/Nathan-s-Famous-Reviews-E2285.htm"]],null,1916],
+  ["Wilhelmina",89,"end 2024, 10-K (full time)",null,null,[["10-K 2024","https://www.sec.gov/Archives/edgar/data/1013706/000168316825001932/wilhelmina_i10k-123124.htm"]],null,1967],
+  ["Exponent",1168,"Jan 2025, 10-K",3.0,361,[["10-K FY2024","https://www.sec.gov/Archives/edgar/data/851520/000095017025030001/expo-20250103.htm"],[GD,"https://www.glassdoor.com/Reviews/Exponent-Reviews-E2069.htm"]],null,1967],
+  ["NRC Health",357,"end 2025, 10-K",3.2,294,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/70487/000143774926007002/nrc20251231_10k.htm"],[GD,"https://www.glassdoor.co.in/Reviews/NRC-Health-Reviews-E7092.htm"]],null,1981],
+  ["HireQuest",88,"end 2025, 10-K (own staff, not workers placed)",null,null,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/1140102/000143774926010435/hqi20251231_10k.htm"]],null,1991],
+  ["Havertys",2392,"end 2025, 10-K",2.9,606,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/216085/000162828026012199/hvt-20251231.htm"],[GD,"https://www.glassdoor.com/Reviews/Havertys-Reviews-E1477.htm"]],null,1885],
+  ["Envela",276,"2025, 10-K",null,3,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/701719/000070171926000004/ela-20251231x10k.htm"],[GD+" (3 reviews, too few to use)","https://www.glassdoor.ca/Reviews/Envela-Reviews-E8922698.htm"]],null,1965],
+  ["Jewett-Cameron",45,"Aug 2025, 10-K (full time)",null,null,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/885307/000155335025000164/jctc_10k-083125.htm"]],null,1953],
+  ["Graco",4400,"Dec 2025, 10-K",3.3,357,[["10-K 2025 (via Boardroom Alpha)","https://www.boardroomalpha.com/sec/ggg-10-k-2026-02-17-0000042888-26-000081"],[GD,"https://www.glassdoor.com/Reviews/Graco-Reviews-E294.htm"]],null,1926],
+  ["Hurco",651,"Oct 2025, 10-K (full time)",3.0,25,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/315374/000110465926002512/hurc-20251031x10k.htm"],[GD+" (25 reviews, small sample)","https://www.glassdoor.co.in/Reviews/Hurco-Reviews-E1497.htm"]],null,1968],
+  ["Electro-Sensors",38,"end 2025, 10-K",null,null,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/351789/000155485526000455/else-20251231.htm"]],null,1968],
+  ["Progressive",70000,"end 2025, 10-K",3.8,9163,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/80661/000008066126000086/pgr-20251231.htm"],[GD,"https://glassdoor.com/Reviews/Progressive-Insurance-Reviews-E546.htm"]],null,1937],
+  ["Frost Bank",6008,"end 2025, Cullen/Frost 10-K (full-time equivalent)",3.7,910,[["Cullen/Frost 10-K 2025","https://www.sec.gov/Archives/edgar/data/39263/000003926326000011/cfr-20251231.htm"],[GD,"https://glassdoor.com/Reviews/Frost-Bank-Reviews-E1311.htm"]],null,1868],
+  ["Diamond Hill",120,"end 2025, 10-K",null,null,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/909108/000119312526076604/dhil-20251231.htm"]],null,1990],
+  ["Hennessy Advisors",18,"Sep 2025, 10-K",null,null,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/1145255/000143774925036795/hnna20250930_10k.htm"]],null,1989],
+  ["EMCOR",44000,"end 2025, 10-K",3.3,464,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/105634/000010563426000025/eme-20251231.htm"],[GD,"https://www.glassdoor.ca/Reviews/EMCOR-Group-Reviews-E3564.htm"]],null,1994],
+  ["Granite Construction",5800,"end 2025, 10-K (2,500 salaried, 3,300 hourly)",4.2,496,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/861459/000086145926000004/gva-20251231.htm"],[GD,"https://api.glassdoor.com/Reviews/Granite-Construction-Reviews-E1779.htm"]],null,1922],
+  ["United Homes Group",195,"end 2025, 10-K (full time)",null,null,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/1830188/000183018826000009/uhg-20251231.htm"]],null,2004],
+  ["AMREP",49,"Apr 2025, 10-K",null,null,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/6207/000141057825001515/axr-20250430x10k.htm"]],null,1961],
+  ["J.B. Hunt",31750,"end 2025, 10-K",3.3,3915,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/728535/000143774926005294/jbht20251231_10k.htm"],[GD,"https://www.glassdoor.com/Reviews/J-B-Hunt-Transport-Reviews-E1540.htm"]],null,1961],
+  ["Heartland Express",3630,"Jan 2026, 10-K (drivers and other staff)",2.8,353,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/799233/000079923326000006/htld-20251231.htm"],[GD,"https://www.glassdoor.sg/Reviews/Heartland-Express-Reviews-E1481.htm"]],null,1978],
+  ["York Water",129,"early 2026, 10-K",null,6,[["10-K 2025","https://www.sec.gov/Archives/edgar/data/108985/000010898526000015/form10k.htm"],[GD+" (6 reviews, too few to use)","https://www.glassdoor.com/Overview/X-EI_IE13142.htm"]],null,1816],
+  ["Pure Cycle",44,"Aug 2025, 10-K (full time)",null,null,[["10-K FY2025","https://www.sec.gov/Archives/edgar/data/276720/000110465925110312/pcyo-20250831x10k.htm"]],null,1976],
+  ["State of Washington",77784,"Sep 2026, general government excluding higher education",null,null,[["Washington OFM workforce data","https://ofm.wa.gov/state-human-resources/workforce-data/workforce"]],null,1889],
+  ["Fairfax County Public Schools",25625,"2025–26, full-time equivalent staff",3.5,1645,[["Wikipedia (FCPS budget figures)","https://en.wikipedia.org/wiki/Fairfax_County_Public_Schools"],[GD,"https://www.glassdoor.com/Reviews/Fairfax-County-Public-Schools-Reviews-E132623.htm"]],null,1922],
+  ["City of Phoenix",14821,"Jul 2019, latest published total",null,null,[["ABC15, Nov 2019","https://www.abc15.com/news/business/these-city-of-phoenix-employees-draw-the-biggest-paychecks"]],null,1881],
   // well-rated employers
   ["Bain & Company",22033,"Mar 2026, estimate",4.5,8564,[["Revelio Labs","https://www.reveliolabs.com/companies/bain/employees/"],[GD,"https://www.glassdoor.ie/Overview/Working-at-EI_IE3752.htm"]],null,1973],
   ["BCG",33500,"end 2025",4.4,13269,[["BCG press release, Apr 2026","https://www.bcg.com/press/23april2026-bcg-revenue-22nd-consecutive-year-growth"],[GD,"https://www.glassdoor.ca/Jobs/-Jobs-E3879.htm"]],null,1963],
@@ -545,7 +645,7 @@ const DATA=[
 ];
 const levelFor=n=>n<100?1:n<1000?2:n<10000?3:n<100000?4:5;
 const fmt=n=>n.toLocaleString('en-US');
-const GAP=2.4, SIZE=34, LW=0.34, START=2000, END=2026.8;
+const GAP=2.4, SIZE=44, LW=0.34, START=2000, END=2026.8;
 
 const stage=document.getElementById('stage'), canvas=document.getElementById('c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
@@ -585,27 +685,75 @@ const tagsEl=document.getElementById('tags');
 let seed=11, ladders=[], selected=null;
 function rnd(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}
 
-function ladderMeshes(g,mat,top,dbl){
-  g.clear();
-  const h=top*GAP+.35, n=Math.round(top*GAP/.3), m=new THREE.Matrix4(), q=new THREE.Quaternion(), e=new THREE.Euler(0,0,Math.PI/2);
+// Every company has all six career stages (every firm has someone in charge). Width shows company size; rung spacing shows how
+// hard each step is there: dense rungs mean many seats on the floor above (an easier step), sparse rungs mean few (a harder one).
+const widthFor=n=>Math.min(.72,Math.max(.2,.16+.085*Math.log10(Math.max(1,n))));
+function ladderMeshes(g,mat,top,dbl,w,rungs){
+  g.clear(); w=w||LW; rungs=rungs||[8,8,8,8,8];
+  const h=top*GAP+.35, m=new THREE.Matrix4(), q=new THREE.Quaternion(), e=new THREE.Euler(0,0,Math.PI/2);
   // a double ladder is two ladders glued side by side: three rails, the middle one shared
-  const cols=dbl?[-LW/2-.02,LW/2+.02]:[0], rails=dbl?[-LW-.04,0,LW+.04]:[-LW/2,LW/2];
+  const cols=dbl?[-w/2-.02,w/2+.02]:[0], rails=dbl?[-w-.04,0,w+.04]:[-w/2,w/2];
   // rails and rungs are drawn as instanced meshes: one draw call each instead of one per rung
   const R=new THREE.InstancedMesh(railGeo,mat,rails.length+(dbl?1:0));
   rails.forEach((rx,i)=>{m.compose(new THREE.Vector3(rx,h/2,0),new THREE.Quaternion(),new THREE.Vector3(1,h,1));R.setMatrixAt(i,m)});
   if(dbl){m.compose(new THREE.Vector3(0,h/2+.05,0),new THREE.Quaternion(),new THREE.Vector3(1.6,h+.1,1.6));R.setMatrixAt(rails.length,m)}
   g.add(R);
+  const n=rungs.slice(0,top).reduce((a,b)=>a+b,0);
   const U=new THREE.InstancedMesh(rungGeo,mat,Math.max(1,n*cols.length)); q.setFromEuler(e); let k=0;
-  for(const cx of cols) for(let i=1;i<=n;i++){m.compose(new THREE.Vector3(cx,i*.3,0),q,new THREE.Vector3(1,1,1));U.setMatrixAt(k++,m)}
+  for(const cx of cols) for(let f=0;f<top;f++) for(let j=1;j<=rungs[f];j++){m.compose(new THREE.Vector3(cx,f*GAP+j*GAP/rungs[f],0),q,new THREE.Vector3(1,w/LW,1));U.setMatrixAt(k++,m)}
   U.count=k; g.add(U);
-  const cap=new THREE.Mesh(capGeo,mat); cap.position.set(0,top*GAP+.38,0); if(dbl) cap.scale.set(1.6,1,1.1); g.add(cap);
+  const cs=Math.max(.7,w/.44), cap=new THREE.Mesh(capGeo,mat); cap.position.set(0,top*GAP+.38,0); cap.scale.set(dbl?1.6*cs:cs,1,dbl?1.1*cs:cs); g.add(cap);
 }
-function setTop(L,t){L.top=t;ladderMeshes(L.g,L.mat,t,L.dbl);L.growI=L.growth?L.growth.steps.filter(s=>s[1]<=t).length:0}
+function redrawLadder(L){L.w=widthFor(sizeNow(L));ladderMeshes(L.g,L.mat,L.top,L.dbl,L.w,L.rungs)}
+/* Real headcount histories (worldwide staff at year end or fiscal year end), so ladders and hiring follow how big each company
+   really was. Sources: company 10-K and annual-report figures as compiled by Stock Analysis and TickerLeague; USPS "employees since
+   1926" (career staff, scaled to today's total including non-career staff); Volkswagen 2020 annual report. Values marked * are our
+   estimates where no figure was found (Volkswagen, Siemens and VINCI before 2020, TCS before 2007, Netflix 2000). */
+const HIST={
+  "Amazon":[[2000,9000],[2005,12000],[2010,33700],[2012,88400],[2014,154100],[2016,341400],[2018,647500],[2019,798000],[2020,1298000],[2021,1608000],[2023,1525000],[2025.9,1576000]],
+  "Google":[[2001,284],[2003,1628],[2005,5680],[2007,16805],[2009,19835],[2011,32467],[2013,47756],[2015,61814],[2017,88110],[2019,118899],[2021,156500],[2022,190234],[2024,183323],[2025.9,190820]],
+  "Netflix":[[2000,350],[2002,381],[2004,940],[2008,1644],[2012,2045],[2014,2189],[2016,4700],[2018,7100],[2020,9400],[2022,12800],[2024,14000],[2025.9,16000]],
+  "Cisco":[[2000,34000],[2001,38000],[2003,34000],[2005,38413],[2007,61535],[2010,70700],[2015,70000],[2020,77500],[2024,90400],[2025.9,86200]],
+  "Accenture":[[2000,71300],[2002,75000],[2005,123000],[2008,186000],[2009,177000],[2012,257000],[2015,358000],[2018,459000],[2020,506000],[2022,721000],[2025.9,779000]],
+  "Infosys":[[2000,5390],[2002,10740],[2004,25700],[2006,52700],[2008,91200],[2010,113800],[2012,150000],[2015,176187],[2018,204107],[2020,242371],[2022,314015],[2023,343234],[2024,317240],[2026,328062]],
+  "Wipro":[[2001,14181],[2003,23300],[2005,46500],[2008,90000],[2010,108000],[2012,130000],[2015,140000],[2018,160000],[2020,175000],[2022,240000],[2023,250000],[2026,236328]],
+  "TCS":[[2000,20000],[2007,89419],[2008,111407],[2011,198614],[2012,238583],[2018,394998],[2020,448464],[2021,488649],[2022.5,600000],[2026,598056]],
+  "Starbucks":[[2000,47000],[2003,74000],[2005,115000],[2007,172000],[2008,176000],[2009,142000],[2010,137000],[2013,182000],[2015,238000],[2019,346000],[2022,402000],[2024,361000],[2025.9,381000]],
+  "JPMorgan Chase":[[2000,91867],[2003,93453],[2004,160968],[2007,180667],[2008,224961],[2010,239515],[2012,258965],[2015,234598],[2020,255351],[2022,293723],[2025.9,318512]],
+  "Walmart":[[2000,1140000],[2002,1383000],[2005,1700000],[2008,2100000],[2016,2300000],[2019,2200000],[2022,2300000],[2023,2100000],[2025.9,2100000]],
+  "Target":[[2000,255000],[2004,328000],[2008,366000],[2012,365000],[2017,323000],[2020,368000],[2022,450000],[2024,415000],[2025.9,415000]],
+  "HCA Healthcare":[[2000,164000],[2005,191100],[2010,194000],[2015,233000],[2020,275000],[2025.9,316000]],
+  "Progressive":[[2000,19490],[2005,28336],[2010,24638],[2015,28580],[2018,37346],[2020,43326],[2022,55100],[2024,66300],[2025.9,70000]],
+  "EMCOR":[[2000,22000],[2002,26000],[2007,29000],[2010,24000],[2015,29000],[2019,36000],[2020,33000],[2023,38300],[2025.9,44000]],
+  "J.B. Hunt":[[2000,15000],[2003,15700],[2006,17150],[2009,14171],[2014,20158],[2018,27621],[2022,37151],[2025.9,31750]],
+  "Marriott":[[2000,153000],[2005,143000],[2008,151000],[2011,120000],[2015,127500],[2016,226500],[2019,174000],[2020,121000],[2021,120000],[2023,148000],[2024,155000],[2025.9,148000]],
+  "United Airlines":[[2000,100000],[2002,102000],[2003,63000],[2006,55000],[2009,47000],[2010,86000],[2015,84000],[2019,96000],[2020,74400],[2022,92800],[2024,107300],[2025.9,113200]],
+  "US Postal Service":[[2000,925000],[2005,828000],[2008,779000],[2010,686000],[2013,577000],[2016,598000],[2020,583000],[2023,617000],[2025.9,624492]],
+  "Volkswagen":[[2000,324000],[2007,329000],[2010,399000],[2015,610000],[2020,662575],[2025.9,662942]],
+  "Siemens":[[2000,447000],[2005,461000],[2010,405000],[2015,348000],[2020,293000],[2025.9,318000]],
+  "VINCI":[[2000,115000],[2005,133000],[2010,179000],[2015,185000],[2020,217000],[2025.9,293786]]};
+const HIST_SRC=["Stock Analysis and TickerLeague headcount histories (10-K and annual-report figures); USPS; some early values estimated","https://stockanalysis.com/list/most-employees"];
+/* share of each company's staff who work in the United States. The model's economy is the US, so a company hires in proportion to its
+   US workforce and is placed in the size group of its US workforce, as the Census counts firm size. Sources where available: Siemens
+   USA (more than 45,000 of about 318,000), Stellantis (about 50,000 in the US in 2024), Walmart (about 1.6 million US associates);
+   the rest are our estimates from company reports and news. Companies with no US operations stay in the model as ladders and events but hire no simulated US workers. */
+const US_SHARE={"Siemens":.14,"Stellantis":.19,"Fiat Chrysler":.3,"Volkswagen":.014,"Porsche":.01,"adidas":.14,"Puma":.1,
+  "VINCI":.02,"TCS":.06,"Infosys":.08,"Wipro":.065,"Accenture":.08,"Dussmann":.03,"Spotify":.27,"Walmart":.76,
+  "PSA Group":0,"Zalando":0,"Schlecker":0,"Air Berlin":0,"Thomas Cook":0,"Wirecard":0,"Sabena":0,"Flybe":0,"Arcadia Group":0,"FDJ United":0,"Telegram":0};
+const usSize=L=>sizeNow(L)*(US_SHARE[L.d[0]]??1);
 // Ladders grow as companies grow. Nvidia uses its real headcount history. Companies founded after 2000 grow from a
 // small founding team to today's headcount, assuming fast early growth that slows later (an estimate, not data).
 const BAND=[0,100,1000,10000,100000];
 function growthFor(d,dbl){
   if(d[11]) return d[11];
+  if(HIST[d[0]]){const pts=HIST[d[0]],steps=[];
+    for(let i=1;i<pts.length;i++){const a=levelFor(pts[i-1][1]),b=levelFor(pts[i][1]);
+      if(b>a)steps.push([pts[i][0],b,`grows past ${fmt(BAND[b-1])} employees (${fmt(pts[i][1])} in ${Math.floor(pts[i][0])})`,'widens']);
+      else if(b<a)steps.push([pts[i][0],b,`falls below ${fmt(BAND[a-1])} employees (${fmt(pts[i][1])} in ${Math.floor(pts[i][0])})`,'narrows']);}
+    // redraw at every recorded year so shrinking and growing within a size group also show
+    pts.forEach(([y])=>{if(y>START&&!steps.some(s=>s[0]===y))steps.push([y,0,'','quiet'])});
+    steps.sort((x,y)=>x[0]-y[0]);
+    return {start:1,steps,pts,src:HIST_SRC}}
   if(dbl||d[7]<=START) return null;
   const N=d[1], n0=d[12]&&d[12].n0||10, f=d[7], T=d[8]?d[8].at:2025.9, final=levelFor(N);
   if(final<2) return null;
@@ -619,7 +767,8 @@ function build(){
   const far=(x,z,dmin,skip)=>!placed.some(p=>p!==skip&&Math.hypot(p[0]-x,p[1]-z)<dmin);
   const lim=SIZE-2.5;
   for(const d of DATA){
-    const mg=d[9]||null, dbl=!!(mg&&mg.from), growth=growthFor(d,dbl), top=growth?growth.start:levelFor(d[1]), tr=d[6];
+    const mg=d[9]||null, dbl=!!(mg&&mg.from), growth=growthFor(d,dbl), top=5, tr=d[6];
+    const n0=growth&&growth.pts?growth.pts[0][1]:growth&&growth.est?growth.n0:d[1], w=widthFor(n0), rungs=rungsFor(d);
     let x,z,t=0;
     if(dbl){ // the merged company stands exactly between the two companies it came from
       const a=ladders.find(l=>l.d[0]===mg.from[0]), b=ladders.find(l=>l.d[0]===mg.from[1]);
@@ -627,23 +776,23 @@ function build(){
     }else if(mg&&mg.into&&ladders.some(l=>l.d[9]&&l.d[9].into===mg.into)){ // second partner: 4-6 units from the first, with room in between
       const a=ladders.find(l=>l.d[9]&&l.d[9].into===mg.into);
       do{const ang=rnd()*Math.PI*2,r=4+rnd()*2;x=a.x+Math.cos(ang)*r;z=a.z+Math.sin(ang)*r;t++}
-      while(t<500&&(Math.abs(x)>lim/2||Math.abs(z)>lim/2||!far(x,z,4.4)||!far((a.x+x)/2,(a.z+z)/2,2.6,placed.find(p=>p[0]===a.x&&p[1]===a.z))));
+      while(t<500&&(Math.abs(x)>lim/2||Math.abs(z)>lim/2||!far(x,z,3.9)||!far((a.x+x)/2,(a.z+z)/2,2.6,placed.find(p=>p[0]===a.x&&p[1]===a.z))));
     }else{
-      do{x=(rnd()-.5)*lim;z=(rnd()-.5)*lim;t++} while(t<400&&!far(x,z,4.4));
+      do{x=(rnd()-.5)*lim;z=(rnd()-.5)*lim;t++} while(t<600&&!far(x,z,3.9));
     }
     placed.push([x,z]);
     const mat=new THREE.MeshLambertMaterial({color:scoreColor(d),transparent:true,opacity:1});
     const g=new THREE.Group(); g.position.set(x,0,z); const rot=rnd()*Math.PI; g.rotation.y=rot;
-    ladderMeshes(g,mat,top,dbl);
+    ladderMeshes(g,mat,top,dbl,w,rungs);
     ladderGroup.add(g);
-    const el=document.createElement('button'); el.className='co'+(dbl?' dbl':''); el.textContent=d[0]; el.setAttribute('aria-pressed','false');
+    const el=document.createElement('button'); el.className='co'+(dbl?' dbl':'')+(d[1]<1000?' sm':''); el.textContent=d[0]; el.setAttribute('aria-pressed','false');
     el.style.setProperty('--c',hex(scoreColor(d)));
     el.addEventListener('pointerdown',e=>e.stopPropagation());
     el.addEventListener('click',()=>select(d));
     tagsEl.appendChild(el);
     // front of the ladder, where workers step on
     const fx=x+Math.sin(rot)*.32, fz=z+Math.cos(rot)*.32;
-    ladders.push({d,x,z,fx,fz,top,mat,el,g,vis:0,alive:false,failed:false,merged:false,slide:null,
+    ladders.push({d,x,z,fx,fz,top,w,rungs,mat,el,g,vis:0,alive:false,failed:false,merged:false,slide:null,
       growth,trFrom:tr?tr.from:null,trOn:false,founded:d[7],collapse:d[8]||null,mergeInto:mg&&mg.into||null,mergeAt:mg&&mg.at||null,dbl});
   }
 }
@@ -686,9 +835,11 @@ function select(d,keep){
     <dt>Industry</dt><dd>${SECTORS[SECTOR_OF[name]||'prof'].name}</dd>
     <dt>Turnover</dt><dd>${d[10]?'Own attrition data (see below)':`Industry rate: ${SECTORS[SECTOR_OF[name]||'prof'].q}% quit and ${SECTORS[SECTOR_OF[name]||'prof'].l}% laid off a month`}</dd>
     ${(()=>{const st=sampleStatus(L);return `<dt>In economy graph</dt><dd>${st.ok?'Yes':'No'}: ${st.why.charAt(0).toLowerCase()+st.why.slice(1)}</dd>`})()}
-    <dt>Ladder reaches</dt><dd>L${lv} ${LEVELS[lv-1]}</dd>
+    <dt>Size group</dt><dd>${BAND_NAMES[lv-1]}</dd>
+    ${L&&L.alive?standsFor(L):''}
+    ${L&&L.alive?stepsCard(L):''}
     ${d[9]&&d[9].into?`<dt>Status</dt><dd>Merged with ${DATA.filter(x=>x[9]&&x[9].into===d[9].into&&x!==d).map(x=>x[0]).join(', ')} into ${d[9].into}, 16 Jan 2021</dd>`:''}${d[9]&&d[9].from?`<dt>Formed</dt><dd>Merger of ${d[9].from.join(' and ')}, 16 Jan 2021</dd>`:''}${d[9]&&d[9].into?'':cl?`<dt>Status</dt><dd>${cl.label}</dd>`:`<dt>Career score</dt><dd>${score==null?'Not enough reviews':score.toFixed(1)+' / 5 from '+fmt(rev)+' reviews'}</dd>`}
-    ${L&&L.growth?`<dt>Ladder growth</dt><dd>${L.growth.est?'Grows from founding to today, timing estimated':'Grows with its real headcount history'}; now L${L.top}</dd>`:''}
+    ${L&&L.growth?`<dt>Ladder growth</dt><dd>${L.growth.est?'Grows from founding to today, timing estimated':'Grows with its real headcount history'}; now about ${fmt(Math.round(sizeNow(L)))} staff</dd>`:''}
     ${d[10]?`<dt>Attrition</dt><dd>${d[10].label}</dd>`:''}
     <dt>Simulated staff</dt><dd>${L&&L.alive?here+' now':L&&L.failed?'Ladder gone':L&&L.merged?'Moved to '+L.mergeInto:'Not founded yet in '+Math.floor(year)}</dd></dl>
     ${name==='Target'?`<div class="trnote" style="border-left-color:var(--p-case)">The red figure is Michael Fiddelke, who joined as a finance intern in 2003 and became CEO in February 2026. <a href="https://mediabrief.com/michael-fiddelkes-22-year-journey-at-target/" target="_blank" rel="noopener">MediaBrief</a> · <a href="https://corporate.target.com/sustainability-governance/governance-and-reporting/corporate-governance/board-of-directors-and-management/michael-j-fiddelke" target="_blank" rel="noopener">Target</a></div>`:''}
@@ -699,13 +850,29 @@ function select(d,keep){
   detail.hidden=false;
 }
 
+/* what a company stands for in the sample, and how hard each step is there */
+const SECTOR_SHORT={edhealth:"education and health",gov:"government",leisure:"leisure, hospitality and other services",prof:"professional and business services",
+  trade:"retail and wholesale",manuf:"manufacturing",fin:"finance",constr:"construction",transport:"transportation and utilities",info:"information"};
+const GOV_NAMES={federal:"the federal government",state:"state governments",localEd:"local government education (school districts)",localGen:"other local government (cities, counties)"};
+function standsFor(L){
+  const C=cells(alive()), c=cellOf(L), t=C.tgt[c]||0, mates=alive().filter(o=>cellOf(o)===c).length, [s,b]=c.split('|');
+  const what=s==='gov'?GOV_NAMES[b]:`${SECTOR_SHORT[s]} employers with ${BAND_NAMES[+b].toLowerCase()}`;
+  return `<dt>Stands for</dt><dd>${what}: ${(100*t/C.tot).toFixed(1)}% of US jobs in ${Math.floor(year)}${mates>1?`, shared with ${mates-1} other ${mates>2?'companies':'company'}`:''}</dd>`;
+}
+function stepsCard(L){
+  countSeats(); const sh=shares(L), names=['Senior','Lead','Director','Executive'], vals=[2,3,4,5].map(i=>100*sh[i]), avg=[2,3,4,5].map(i=>100*SEAT_SHARE[i]);
+  const ratio=vals.map((v,i)=>v/avg[i]), h=ratio.indexOf(Math.min(...ratio));
+  return `<dt>Seats per 100</dt><dd>${names.map((n,i)=>`${n} ${vals[i].toFixed(1)}`).join(' · ')} <span class="small">(US: ${avg.map(v=>v.toFixed(1)).join(' · ')})</span></dd>
+    <dt>Hardest step</dt><dd>${ratio[h]<.95?`Up to ${names[h]}: ${(1/ratio[h]).toFixed(1)}× fewer seats than average`:'None: every step has at least as many seats as average'}</dd>`;
+}
+
 /* table */
 function renderTable(){
   document.querySelector('#table tbody').innerHTML=DATA.slice().sort((a,b)=>b[1]-a[1]).map(d=>{
     const [name,emp,note,score,rev,src,tr,,cl]=d, lv=levelFor(emp), c=hex(scoreColor(d));
     return `<tr><td><b>${name}</b>${tr?`<span class="trtag">In transition</span><div class="small">${tr.note} <a href="${tr.src[1]}" target="_blank" rel="noopener">${tr.src[0]}</a>${tr.src2?` · <a href="${tr.src2[1]}" target="_blank" rel="noopener">${tr.src2[0]}</a>`:''}</div>`:''}${cl?`<span class="trtag dead">Collapsed</span><div class="small">${cl.label}</div>`:''}${d[9]&&d[9].from?`<span class="trtag">Merger</span><div class="small">Formed by ${d[9].from.join(' and ')}, 16 Jan 2021</div>`:''}</td>
     <td class="num">${fmt(emp)}<div class="small">${note}</div></td>
-    <td class="band">L${lv} ${LEVELS[lv-1]}${(()=>{const L=ladders.find(l=>l.d===d);const st=sampleStatus(L||{d,collapse:d[8]});return st.ok?'':`<div class="small" title="${st.why}">Not in economy graph</div>`})()}</td>
+    <td class="band">${BAND_NAMES[lv-1]}${(()=>{const L=ladders.find(l=>l.d===d);const st=sampleStatus(L||{d,collapse:d[8]});return st.ok?'':`<div class="small" title="${st.why}">Not in economy graph</div>`})()}</td>
     <td><span class="score" style="--c:${c}"><i></i>${d[9]&&d[9].into?'Merged into '+d[9].into+' (2021)':cl?'Company gone':score==null?'No usable score':score.toFixed(1)}</span></td>
     <td class="num">${rev?fmt(rev):'–'}${d[10]?`<div class="small">Attrition ${(d[10].rate*100).toFixed(1)}%</div>`:''}</td>
     <td class="small">${srcLinks(src,'<br>')}</td></tr>`}).join('');
@@ -713,14 +880,18 @@ function renderTable(){
 
 /* ---------- simulation ---------- */
 const TYPES={
-  regular:{name:"Regular employee",desc:"Does the job and takes promotions when they come. Only moves company when their ladder runs out.",n:36},
-  climber:{name:"Climber",desc:"Wants the top floor. Switches company when a ladder runs out or stalls.",n:24},
+  regular:{name:"Regular employee",desc:"Does the job and takes promotions when they come. Rarely changes company unless they quit or lose their job.",n:36},
+  climber:{name:"Climber",desc:"Wants the top floor. Switches company when promotions stall.",n:24},
   steady:{name:"Settler",desc:"Happy once they reach a level that suits them, usually Senior or Lead.",n:24},
   hopper:{name:"Job hopper",desc:"After each promotion, looks for a better company on the same floor.",n:21},
   changer:{name:"Career changer",desc:"At some point leaves to start over at entry level in a new field.",n:15},
   nepo:{name:"Nepo hire",desc:"Family connections. Skips entry level and rides up without using the rungs. Gets promoted far faster where the family controls the company, a little faster elsewhere, but only into a free seat.",n:12}
 };
-const BASE=[.45,.35,.22,.12,.05]; // yearly promotion chance from L0 Entry, L1 Junior, L2 Senior, L3 Lead, L4 Director
+// yearly chance that a worker moves up when a seat on the floor above is free at their company (from L0 Entry ... L4 Director).
+// Real organisations fill vacancies quickly and mostly from inside (77% of moves into bigger roles were internal among US MBA
+// graduates, Bidwell & Mollick 2015), so a free seat is usually taken by someone from the floor below within about a year: one
+// person leaving sets off a chain of promotions. Seats, not this chance, are what limit careers.
+const BASE=[1.53,1.53,1.53,1.53,1.53]; // a yearly rate: about an 80% chance within a year
 const NEPO_BOOST=2.6;
 // Real career paths, replayed step by step
 const CASES=[
@@ -740,14 +911,14 @@ const CASES=[
   {at:2026.1,lvl:6,text:"Fiddelke becomes CEO of Target, 22 years and 10 months after joining as an intern."}
  ]},
  {key:'founderCase',name:"Jensen Huang",company:"Nvidia",cls:'founder',startTop:true,steps:[
-  {at:2000.05,text:"Jensen Huang co-founded Nvidia in April 1993, aged 30, and has been its CEO from day one. Before that he washed dishes, bussed tables and waited at Denny's from age 15 (1978–1983), then designed chips at AMD and became a director at LSI Logic. In 2000 Nvidia has 392 employees, so the ladder he built only reaches Senior."},
-  {at:2002.08,lift:'top',text:"Huang: Nvidia passes 1,000 employees. The ladder he built grows a floor, and he rises with it."},
-  {at:2017.09,lift:'top',text:"Huang: Nvidia passes 10,000 employees. Another floor appears beneath him."},
+  {at:2000.05,text:"Jensen Huang co-founded Nvidia in April 1993, aged 30, and has been its CEO from day one. Before that he washed dishes, bussed tables and waited at Denny's from age 15 (1978–1983), then designed chips at AMD and became a director at LSI Logic. In 2000 Nvidia has 392 employees: he stands at the top of a narrow ladder."},
+  {at:2002.08,lift:'top',text:"Huang: Nvidia passes 1,000 employees. The ladder he built widens."},
+  {at:2017.09,lift:'top',text:"Huang: Nvidia passes 10,000 employees. His ladder widens again."},
   {at:2025.8,text:"Huang: Nvidia becomes the first public company worth more than $5 trillion."},
   {at:2026.07,text:"Huang: Nvidia reaches about 42,000 employees, still run by its founder after 33 years."}
  ]},
  {key:'beastCase',name:"Jimmy Donaldson (MrBeast)",company:"MrBeast",cls:'beast',founder:true,steps:[
-  {at:2012.1,lift:'top',text:"Jimmy Donaldson, 13, starts the MrBeast YouTube channel in North Carolina. A company of one: the ladder he builds only reaches Junior."},
+  {at:2012.1,lift:'top',text:"Jimmy Donaldson, 13, starts the MrBeast YouTube channel in North Carolina. A company of one: he stands at the top of the narrowest possible ladder."},
   {at:2019.8,text:"Donaldson: launches #TeamTrees, a fundraiser to plant trees, with his team."},
   {at:2021.8,text:"Donaldson: launches #TeamSeas, an ocean clean-up fundraiser."},
   {at:2022.1,text:"Donaldson: co-founds Feastables, a chocolate brand. More than 100 people later work on it."},
@@ -836,7 +1007,18 @@ const SECTOR_OF={"HCA Healthcare":"edhealth","US Postal Service":"gov",
   "JPMorgan Chase":"fin","Lehman Brothers":"fin","Wirecard":"fin","FTX":"fin",
   "VINCI":"constr",
   "United Airlines":"transport","Air Berlin":"transport","Enron":"transport","Sabena":"transport","Flybe":"transport","Washington Mutual":"fin","Circuit City":"trade","Arcadia Group":"trade",
-  "Google":"info","Spotify":"info","Telegram":"info","Craigslist":"info","Duolingo":"info","MrBeast":"info","Airbnb":"info"};
+  "Google":"info","Spotify":"info","Telegram":"info","Craigslist":"info","Duolingo":"info","MrBeast":"info","Airbnb":"info",
+  // sample employers (v26)
+  "Netflix":"info","The New York Times":"info","Daily Journal":"info",
+  "Encompass Health":"edhealth","Strategic Education":"edhealth","FONAR":"edhealth","American Shared Hospital Services":"edhealth",
+  "Cheesecake Factory":"leisure","Nathan's Famous":"leisure","Wilhelmina":"leisure",
+  "Exponent":"prof","NRC Health":"prof","HireQuest":"prof",
+  "Havertys":"trade","Envela":"trade","Jewett-Cameron":"trade",
+  "Graco":"manuf","Hurco":"manuf","Electro-Sensors":"manuf",
+  "Progressive":"fin","Frost Bank":"fin","Diamond Hill":"fin","Hennessy Advisors":"fin",
+  "EMCOR":"constr","Granite Construction":"constr","United Homes Group":"constr","AMREP":"constr",
+  "J.B. Hunt":"transport","Heartland Express":"transport","York Water":"transport","Pure Cycle":"transport",
+  "State of Washington":"gov","Fairfax County Public Schools":"gov","City of Phoenix":"gov"};
 // Which companies count in the economy graph. A company is left out if it failed, if it is in transition
 // (from the month the transition began), or if it is listed here with the reason.
 const NOT_SAMPLE={
@@ -870,18 +1052,111 @@ function sizeNow(L){
 // career score only matters within an industry, so it can't shift the overall industry mix
 // current share of employed workers by industry, refreshed during the run; hiring leans gently towards
 // industries below their real share, as real labour markets rebalance through wages and openings
-let mixNow=null;
-function updateMixNow(){countSeats();const c={};let n=0;for(const p of people){if(p.comp){const k=sectorOf(p.comp);c[k]=(c[k]||0)+1;n++}}
-  mixNow={};for(const k in SECTORS)mixNow[k]=n?(c[k]||0)/n:0}
+/* ---------- a representative sample ----------
+   Every company stands for a cell: its industry and its size band (the same bands that set a ladder's height).
+   Real US jobs are split over those cells, and each cell's jobs are shared by the companies in it, in proportion to size.
+   So a 38-person firm can stand for millions of jobs in small manufacturing firms, and Walmart can't take more than its cell.
+   Private sector, share of jobs by employer size (Census and BLS): under 100 staff 34% (BLS Business Employment Dynamics,
+   Q1 2025: 34.1%; BEA from Census data, 2017: 34.6%); 100–999 17% (Census SUSB 2021: firms under 500 hold 45.9%, so 100–499
+   about 11.8%; 500–999 about 5%, our estimate); 1,000–9,999 19% (the remainder); 10,000 and more 30% (Census SUSB 2019),
+   split 21% for 10,000–99,999 and 9% for 100,000 and more (our estimate from the US headcounts of the largest employers).
+   Each industry's share in firms under 500 staff: Census SUSB 2021, via the SBA Office of Advocacy, combining its sub-industries
+   by their approximate employment. Both sets of totals are met together by iterative proportional fitting.
+   Government has no national data on employer size, so it is matched by level of government instead (BLS, Sep 2026). */
+const BAND_OF=n=>levelFor(n)-1; // 0: under 100, 1: 100–999, 2: 1,000–9,999, 3: 10,000–99,999, 4: 100,000+
+const SIZE_TARGET=[.34,.17,.19,.21,.09];
+const BAND_NAMES=["Under 100 staff","100–999 staff","1,000–9,999 staff","10,000–99,999 staff","100,000+ staff"];
+const SMALL500={edhealth:.44,leisure:.68,prof:.40,trade:.40,manuf:.41,fin:.385,constr:.79,transport:.32,info:.273};
+// thousands of jobs: federal 2,682, state 5,472, local 15,173 (BLS, Sep 2026); local split by the 8.2 of 14.0 million local
+// government employees who work in education (Census Survey of Public Employment, 2022)
+const GOV_CELL={"US Postal Service":["federal",2682],"State of Washington":["state",5472],"Fairfax County Public Schools":["localEd",8887],"City of Phoenix":["localGen",6286]};
+/* the industry mix changes over time: jobs by industry in thousands (BLS Current Employment Statistics via FRED, January of each year:
+   MANEMP, USEHS, USGOVT, USLAH + USSERV, USPBS, USTRADE + USWTRADE, USFIRE, CES4300000001 + CES4422000001; September 2026 for the
+   last point). Construction and mining, and information, come from BLS employment tables (Monthly Labor Review, January 2012, for 2000
+   and 2010; BLS Employment Projections for 2015 and 2025); their 2005 and 2020 values are interpolated, so the 2005 construction boom
+   is not shown. Between the points the mix is interpolated; before 2000 the 2000 mix applies. */
+const JOBS_YEARS=[2000,2005,2010,2015,2020,2025,2026.7];
+const JOBS_BY_YEAR={
+  edhealth:[15100,17471,19829,21746,24510,27006,28005], gov:[20571,21735,22491,21960,22781,23557,23327],
+  leisure:[16859,18063,18257,20514,22756,22807,23008], prof:[16488,16714,16627,19519,21476,22480,22482],
+  trade:[21073,20770,19748,21233,21409,21532,21558], manuf:[17284,14257,11447,12265,12745,12673,12652],
+  fin:[7769,8143,7733,8059,8833,9187,9082], constr:[7306,6744,6182,7221,8031,8841,8971],
+  transport:[4970,4855,4685,5325,6367,7262,7220], info:[3631,3171,2711,2750,2806,2862,2739]};
+function jobsAt(k,y){const Y=JOBS_YEARS,v=JOBS_BY_YEAR[k];if(y<=Y[0])return v[0];for(let i=1;i<Y.length;i++)if(y<=Y[i])return v[i-1]+(v[i]-v[i-1])*(y-Y[i-1])/(Y[i]-Y[i-1]);return v[v.length-1]}
+const jobsTotalAt=y=>Object.keys(SECTORS).reduce((a,k)=>a+jobsAt(k,y),0);
+const shareAt=(k,y)=>jobsAt(k,y)/jobsTotalAt(y);
+let ctCache={};
+function cellTargetsFor(y){
+  y=Math.round(Math.max(2000,y)*4)/4; if(ctCache[y]) return ctCache[y];
+  const priv=Object.keys(SMALL500).reduce((a,k)=>a+jobsAt(k,y),0);
+  const lt100=SIZE_TARGET[0]/.459, big=[.055,.19,.21,.09], bs=big.reduce((a,b)=>a+b,0), T={};
+  for(const k in SMALL500){const s=SMALL500[k],l=1-s;T[k]=[s*lt100,s*(1-lt100)+l*big[0]/bs,l*big[1]/bs,l*big[2]/bs,l*big[3]/bs].map(x=>x*jobsAt(k,y))}
+  for(let it=0;it<80;it++){ // iterative proportional fitting: industry totals and size totals both exact
+    for(let b=0;b<5;b++){const col=Object.keys(T).reduce((a,k)=>a+T[k][b],0);for(const k in T)T[k][b]*=SIZE_TARGET[b]*priv/col}
+    for(const k in T){const row=T[k].reduce((a,b)=>a+b,0);T[k]=T[k].map(x=>x*jobsAt(k,y)/row)}}
+  const out={};for(const k in T)T[k].forEach((v,b)=>out[k+'|'+b]=v);
+  const g=jobsAt('gov',y)/23327; for(const n in GOV_CELL)out['gov|'+GOV_CELL[n][0]]=GOV_CELL[n][1]*g;
+  return ctCache[y]=out;
+}
+const CELL_TARGET=cellTargetsFor(2026.7);
+const cellOf=L=>{const g=GOV_CELL[L.d[0]];if(g)return 'gov|'+g[0];const s=sectorOf(L);return s==='gov'?'gov|federal':s+'|'+BAND_OF(usSize(L))};
+// companies in each cell right now, and each cell's target; a cell with no company at the moment (e.g. before its only company
+// was founded) passes its jobs to the nearest size band of the same industry
+let cellCache=null;
+function cells(pool){
+  const key=pool.length+'|'+Math.floor(year*20), CT=cellTargetsFor(year);
+  if(cellCache&&cellCache.key===key) return cellCache;
+  const m={};
+  for(const L of pool){const n=usSize(L);if(!n)continue;const c=cellOf(L),e=m[c]||(m[c]={size:0,sfw:0,out:0});e.size+=n;e.sfw+=n*sf(L);e.out+=n*(quitRate(L)+layoffRate(L)+RETIRE)}
+  const tgt={};
+  for(const c in CT){
+    let dest=m[c]?c:null;
+    if(!dest){const [s,b]=c.split('|');
+      if(s==='gov') dest=Object.keys(m).find(k=>k.startsWith('gov|'))||null;
+      else for(let d=1;d<5&&!dest;d++) for(const bb of [+b-d,+b+d]) if(!dest&&bb>=0&&bb<5&&m[s+'|'+bb]) dest=s+'|'+bb;}
+    if(dest) tgt[dest]=(tgt[dest]||0)+CT[c];
+  }
+  return cellCache={key,m,tgt,tot:jobsTotalAt(year)};
+}
+/* turnover falls with tenure: half of all new jobs end within the first year (Farber), and the job-loss rate of workers with 20+ years
+   is about 35% of the first-year rate (Farber, from the Displaced Workers Survey); the layoff curve is fitted to that. Quits fall faster
+   with tenure than layoffs; the quit curve is our assumption. Both shapes are rescaled across all employed workers, so every industry keeps its BLS quit and layoff rates. */
+const TEN_L=t=>Math.pow(t+.25,-.32); // fitted to Farber: 20+ years of tenure gives about 35% of the first-year job-loss rate
+const TEN_Q=t=>Math.pow(t+.25,-1.1); // our assumption: quits fall faster with tenure than layoffs
+/* quitting also falls with age: people born 1957–64 held 0.80 jobs a year at ages 18–24, 0.45 at 25–34, 0.29 at 35–44 and 0.19 at 45–56
+   (BLS National Longitudinal Survey of Youth 1979, 2023 release). Those ratios set how readily each age group quits (45 and over taken
+   as one group), rescaled across all employed workers so the total stays at the BLS quit rate. */
+/* promotions come mostly early in a career: in US survey data the chance of a promotion falls steadily with age (Pergamit and Veum,
+   NLSY; McCue, PSID). Our factors, set so the median age on each floor comes close to BLS occupation data (managers 46, chief executives 52). */
+const PA=globalThis.PA||[1.4,1.1,.75,.45];
+const PROMO_AGE=p=>{if(p.born==null)return 1;const a=year-p.born;return a<30?PA[0]:a<40?PA[1]:a<50?PA[2]:PA[3]};
+const AQ=globalThis.AQ||[1.6,.6,.3,.18], AL=globalThis.AL||[2,1.3,.85,.7];
+const AGE_Q=a=>a<25?AQ[0]:a<35?AQ[1]:a<45?AQ[2]:AQ[3];
+const AGE_L=a=>a<25?AL[0]:a<35?AL[1]:a<45?AL[2]:AL[3];
+let TEN_NORM={q:1,l:1,lv:[1,1,1,1,1,1],sl:{}};
+let mixNow=null, cellNow=null;
+function updateMixNow(){countSeats();const c={},cc={};let n=0;for(const p of people){if(p.comp){const k=sectorOf(p.comp);c[k]=(c[k]||0)+1;const q=cellOf(p.comp);cc[q]=(cc[q]||0)+1;n++}}
+  mixNow={};for(const k in SECTORS)mixNow[k]=n?(c[k]||0)/n:0;
+  cellNow={};for(const q in cc)cellNow[q]=cc[q]/n;
+  let sq=0,sl=0,m=0;const lvs=[0,0,0,0,0,0],lvn=[0,0,0,0,0,0],cs={},cn={},qs={},qn={};for(const p of people){if(!p.comp||p.since==null||p.since>year)continue;const t=year-p.since; /* workers placed for 2000 are skipped during the warm-up before it */const z=czQ(p),xq=TEN_Q(t)*(p.born!=null?AGE_Q(year-p.born):.3)*z;sq+=xq;{const sk=sectorOf(p.comp);qs[sk]=(qs[sk]||0)+xq;qn[sk]=(qn[sk]||0)+1}const x=TEN_L(t)*(p.born!=null?AGE_L(year-p.born):1)*czL(p);sl+=x;lvs[p.level]+=x;lvn[p.level]++;const ck=sectorOf(p.comp)+p.level;cs[ck]=(cs[ck]||0)+x;cn[ck]=(cn[ck]||0)+1;m++}
+  // layoffs: tenure, age and the mover factor only decide who is laid off within a floor; how often each floor is hit comes from the
+  // occupation data (layoffFactor), so these factors are averaged out floor by floor instead of across everyone
+  // ... and industry by industry, so that frequent movers who land in a stable industry don't push its layoff rate above its BLS level
+  if(m){const lv=lvs.map((x,i)=>lvn[i]?x/lvn[i]:1),sl2={};for(const k in cs)sl2[k]=cn[k]>=25?cs[k]/cn[k]:lv[+k.slice(-1)];const sq2={};for(const k in qs)sq2[k]=qn[k]>=25?qs[k]/qn[k]:sq/m;TEN_NORM={q:sq/m,l:sl/m,lv,sl:sl2,sq:sq2}}
+  calibrateSeats()}
+const qnorm=p=>(TEN_NORM.sq&&TEN_NORM.sq[sectorOf(p.comp)])||TEN_NORM.q;
+const lnorm=p=>TEN_NORM.sl[sectorOf(p.comp)+p.level]||TEN_NORM.lv[p.level];
 function hireWeight(L,pool,stock){
-  const sec=sectorOf(L), mates=pool.filter(o=>sectorOf(o)===sec);
-  const inSec=mates.reduce((a,o)=>a+sizeNow(o),0)||1, meanSf=mates.reduce((a,o)=>a+sizeNow(o)*sf(o),0)/inSec||1;
-  // industries that lose people faster also hire more to replace them, so each keeps its real share of jobs
-  const out=mates.reduce((a,o)=>a+sizeNow(o)*(quitRate(o)+layoffRate(o)+RETIRE),0)/inSec||.2; // everyone who leaves: quits, layoffs and retirement
-  const share=SECTORS[sec].jobs/JOBS_TOTAL;
-  if(stock) return share*sizeNow(L)/inSec*sf(L)/meanSf; // placing the existing workforce: by real job shares
-  const corr=mixNow&&mixNow[sec]>0?Math.min(3,Math.max(.33,Math.pow(share/mixNow[sec],1.5))):1;
-  return share*out*corr*sizeNow(L)/inSec*sf(L)/meanSf;
+  if(!usSize(L)) return 0; // no US workforce: not part of the simulated US economy
+  const C=cells(pool), c=cellOf(L), e=C.m[c], t=C.tgt[c]||0;
+  if(!e||!t) return 0;
+  // inside its cell a company hires in proportion to its size; a better career score makes it somewhat more attractive
+  const within=usSize(L)/e.size*sf(L)/(e.sfw/e.size);
+  if(stock) return t*within; // placing the existing workforce: by real job shares
+  // cells that lose people faster (quits, layoffs, retirement) also hire more to replace them, so each keeps its real share,
+  // and hiring leans gently towards cells below their real share, as real labour markets rebalance
+  const corr=cellNow&&cellNow[c]>0?Math.min(3,Math.max(.33,Math.pow(t/C.tot/cellNow[c],1.5))):1;
+  return t*(e.out/e.size)*corr*within;
 }
 function pick(opts,stock){
   const pool=alive(); const w=opts.map(L=>hireWeight(L,pool,stock));
@@ -901,15 +1176,52 @@ function join(p,L,lvl){ // p is on its current floor; go to L, climb to lvl, sta
   if(p.type==='nepo'&&lvl!==p.level){walkTo(p,s[0],s[1]);vert(p,lvl*GAP,'lift')}
   else{walkTo(p,L.fx,L.fz); if(lvl!==p.level) vert(p,lvl*GAP,'climb'); walkTo(p,s[0],s[1])}
   if(p.avoid&&sectorOf(L)!==p.avoid) p.avoid=null; // the career changer has found work in a new field
-  p.comp=L; p.level=lvl; setLaidOff(p,false); p.seeking=false; setSeeker(p,false);
+  p.comp=L; p.level=lvl; setLaidOff(p,false); p.seeking=false; p.notice=false; setSeeker(p,false);
+  if(!p.tracked||!p.lockUntil) p.next=Math.min(p.next||Infinity,year+.03+Math.random()*.07); // a new job: first check within months
 }
 function setSeeker(p,on){p.f.mark.visible=on&&!p.laidOff}
 // yearly quit chance: the company's own published attrition where it exists, otherwise its industry's real rate
 const quitRate=L=>(L.d[10]?L.d[10].rate:SECTORS[sectorOf(L)].q*12/100);
-const layoffRate=L=>SECTORS[sectorOf(L)].l*12/100;
-// job search length follows the real spread of unemployment spells (BLS CPS, September 2026: median 11.5 weeks, mean 24.8 weeks):
-// most searches are short and a few last a year or more (a log-normal spread with that median and mean, capped at three years)
-function searchLength(){const z=Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());return Math.min(3,.22*Math.exp(1.25*z))}
+/* turnover over time: every month, quits and layoffs scale with the real economy-wide rates for that month (BLS JOLTS, total nonfarm,
+   seasonally adjusted, January 2001 to August 2026, FRED series JTSQUR and JTSLDR), relative to the period the industry rates come from
+   (August 2025 and May–August 2026: quits 1.96%, layoffs 1.10% a month). So industries keep their relative levels while the whole
+   economy follows its real course: the high turnover of 2001, the 2009 trough in quits, the slow recovery, the 2021–22 quits boom.
+   Before 2001 the 2001 average applies; after August 2026, the last month. The March–April 2020 layoff spike is applied separately, as
+   one wave at lockdown, so those two months use the February 2020 rate here. Companies with their own published attrition rate follow
+   the same monthly pattern. */
+const JQ=`2.4 2.3 2.3 2.4 2.3 2.2 2.2 2.2 2.1 2.1 2.0 2.0 2.2 2.0 1.9 2.0 1.9 1.9 2.0 2.0 1.9 1.9 1.8 1.9 1.9 1.9 1.8 1.8 1.8 1.8 1.7 1.7 1.8 1.9 1.8 1.9 1.8 1.9 2.0 1.9 1.8 2.0 2.0 2.0 1.9 1.9 2.1 2.0 2.1 2.0 2.1 2.1 2.1 2.1 2.0 2.2 2.3 2.1 2.1 2.1 2.2 2.2 2.2 2.0 2.2 2.2 2.2 2.2 2.1 2.2 2.2 2.2 2.1 2.1 2.2 2.1 2.2 2.1 2.1 2.2 1.9 2.1 2.0 2.0 2.1 2.1 1.9 2.1 1.9 1.9 1.8 1.8 1.8 1.7 1.6 1.5 1.5 1.5 1.4 1.3 1.3 1.3 1.3 1.2 1.2 1.3 1.4 1.4 1.3 1.4 1.4 1.5 1.4 1.5 1.4 1.4 1.5 1.4 1.4 1.5 1.4 1.5 1.5 1.4 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.6 1.6 1.6 1.6 1.6 1.5 1.5 1.4 1.5 1.5 1.5 1.7 1.7 1.6 1.7 1.6 1.6 1.7 1.7 1.7 1.7 1.7 1.7 1.7 1.8 1.8 1.8 1.8 1.8 1.9 1.8 2.0 1.9 1.9 1.8 2.0 1.9 2.0 1.9 1.9 1.9 1.9 2.0 2.0 2.0 2.0 2.1 2.0 2.1 2.0 2.1 2.1 2.1 2.1 2.1 2.1 2.1 2.1 2.1 2.2 2.1 2.2 2.1 2.1 2.2 2.1 2.1 2.2 2.2 2.2 2.2 2.0 2.2 2.2 2.3 2.3 2.3 2.3 2.3 2.3 2.3 2.3 2.3 2.3 2.4 2.3 2.3 2.3 2.3 2.4 2.3 2.3 2.3 2.3 2.3 2.3 2.3 1.9 1.5 1.7 1.9 2.2 2.1 2.2 2.3 2.2 2.4 2.3 2.4 2.5 2.7 2.6 2.8 2.8 2.8 2.9 2.8 3.0 2.9 2.9 2.8 2.9 3.0 2.8 2.7 2.6 2.8 2.7 2.6 2.6 2.7 2.5 2.5 2.4 2.3 2.6 2.4 2.3 2.3 2.3 2.3 2.3 2.2 2.1 2.2 2.1 2.2 2.1 2.1 2.1 2.1 2.0 2.0 1.9 1.9 2.0 2.0 2.2 2.0 2.1 2.1 2.0 2.0 1.9 1.9 2.0 2.0 2.0 1.9 2.0 1.9 2.0 2.0 1.9 1.9`.split(' ').map(Number), JL=`1.7 1.4 1.6 1.4 1.5 1.5 1.5 1.5 1.6 1.8 1.7 1.5 1.5 1.5 1.4 1.5 1.5 1.5 1.6 1.5 1.5 1.5 1.5 1.5 1.6 1.5 1.5 1.5 1.6 1.6 1.6 1.7 1.5 1.5 1.5 1.5 1.6 1.5 1.6 1.5 1.5 1.4 1.4 1.5 1.5 1.4 1.5 1.5 1.5 1.6 1.6 1.5 1.5 1.5 1.4 1.4 1.5 1.4 1.3 1.4 1.3 1.4 1.4 1.4 1.5 1.3 1.4 1.3 1.3 1.4 1.4 1.3 1.4 1.3 1.4 1.5 1.4 1.3 1.4 1.5 1.6 1.4 1.4 1.4 1.4 1.4 1.4 1.4 1.4 1.6 1.5 1.6 1.5 1.7 1.7 1.8 1.9 1.9 1.9 2.0 1.7 1.7 1.7 1.6 1.7 1.6 1.5 1.6 1.4 1.4 1.5 1.3 1.3 1.6 1.7 1.4 1.4 1.3 1.4 1.4 1.4 1.3 1.4 1.4 1.4 1.5 1.4 1.4 1.4 1.4 1.4 1.4 1.3 1.4 1.3 1.4 1.5 1.4 1.3 1.4 1.3 1.4 1.4 1.3 1.2 1.2 1.3 1.3 1.3 1.3 1.3 1.3 1.4 1.2 1.2 1.3 1.3 1.3 1.2 1.3 1.2 1.3 1.3 1.2 1.2 1.3 1.2 1.3 1.3 1.2 1.4 1.3 1.2 1.3 1.2 1.2 1.4 1.3 1.2 1.3 1.3 1.3 1.3 1.2 1.3 1.2 1.2 1.3 1.1 1.1 1.2 1.2 1.2 1.2 1.2 1.2 1.2 1.3 1.3 1.3 1.2 1.2 1.2 1.2 1.3 1.2 1.2 1.2 1.2 1.2 1.2 1.2 1.2 1.2 1.3 1.2 1.1 1.2 1.1 1.3 1.2 1.2 1.2 1.2 1.3 1.2 1.2 1.3 1.2 1.3 8.6 7.0 1.6 1.6 1.3 1.1 1.1 1.2 1.5 1.3 1.1 1.1 1.0 1.0 0.9 0.9 1.0 0.9 1.0 0.9 0.9 0.9 0.9 0.9 0.9 0.9 1.0 1.0 1.0 1.0 0.9 1.0 1.0 1.0 1.1 1.0 1.2 1.1 1.0 1.1 1.1 1.1 1.0 1.0 1.0 1.1 1.0 1.1 1.0 1.0 1.1 0.9 1.1 1.1 1.1 1.0 1.2 1.1 1.1 1.2 1.0 1.1 1.1 1.2 1.1 1.2 1.1 1.2 1.0 1.1 1.0 1.1 1.2 1.0 1.1 1.1 1.1 1.0`.split(' ').map(Number);
+const JL_REAL=JL.slice(); // kept for the real comparison in the crisis table
+const JQ_BASE=1.96, JL_BASE=1.10;
+function joltsMult(arr,base,t0,t1){ // average of the monthly rate over [t0,t1], relative to the base period
+  const m=t=>{const i=Math.floor((t-2001)*12);return i<0?arr.slice(0,12).reduce((a,b)=>a+b,0)/12:arr[Math.min(arr.length-1,i)]};
+  let s=0,n=0;for(let t=t0;t<t1;t+=1/12){s+=m(t);n++}return (n?s/n:m(t0))/base}
+/* industries' layoff rates move together with the economy-wide monthly JOLTS rate, except in March–April 2020, when they diverged
+   far more than in any other months of the period: in the worst month restaurants, hotels and entertainment laid off about 28% of
+   their February 2020 staff, construction 9%, retail and wholesale 8%, finance about 3% and government about 1% (JOLTS series highs,
+   BLS Monthly Labor Review, June 2021; CES employment). For those two months each industry's rate is scaled by these shares,
+   rescaled so the economy-wide rate stays at JOLTS. This is data for those dates, not an effect of the COVID marker. */
+const COVID_IND={leisure:27.7,constr:9.3,trade:7.7,info:6.8,transport:6.6,edhealth:6.2,prof:6.0,manuf:5.9,fin:2.6,gov:1.3};
+const IND20_AVG=(()=>{let a=0,n=0;for(const k in SECTORS){a+=SECTORS[k].jobs*SECTORS[k].l*(COVID_IND[k]||1);n+=SECTORS[k].jobs*SECTORS[k].l}return a/n})();
+const layoffRate=L=>{const k=sectorOf(L);return SECTORS[k].l*12/100*(year>=2020+2/12&&year<2020+4/12?(COVID_IND[k]||1)/IND20_AVG:1)};
+// job search length: the BLS Current Population Survey (September 2026) reports how long people who are unemployed now have been searching:
+// median 11.5 weeks, mean 24.8 weeks. That snapshot over-represents long searches (someone searching for a year is far more likely to be
+// caught by a survey than someone who finds work in two weeks), so completed searches are much shorter. Assuming a log-normal spread,
+// completed searches with a median of about 2.4 weeks and a spread of 1.245 reproduce exactly the survey's 11.5 and 24.8 weeks for
+// searches in progress; their mean is about 5 weeks, in line with the CPS labour force flows (about half of the unemployed leave
+// unemployment each month). Searches are capped at three years.
+/* job searches take longer when the labour market is slack and shorter when it is tight, following the real median duration of
+   unemployment year by year (BLS Current Population Survey, annual averages, weeks): 5.9 in 2000, 9.4 in 2008, 21.4 in 2010–11,
+   9.1 in 2019, 16.5 in 2021, 8.7 in 2022, 9.9 in 2025 and 11.5 in September 2026, the level the search lengths were fitted to.
+   That median describes spells still in progress, which lag behind the searches starting now, so a search starting in a given
+   month uses the median measured about half a year later. */
+const DUR_MED={2000:5.9,2001:6.8,2002:9.1,2003:10.1,2004:9.8,2005:8.9,2006:8.3,2007:8.5,2008:9.4,2009:15.1,2010:21.4,2011:21.4,2012:19.3,
+  2013:17.0,2014:14.0,2015:11.6,2016:10.6,2017:10.0,2018:9.3,2019:9.1,2020:9.7,2021:16.5,2022:8.7,2023:8.9,2024:9.6,2025:9.9,2026.7:11.5};
+const DUR_YRS=Object.keys(DUR_MED).map(Number).sort((a,b)=>a-b);
+function durFactor(t){t+=.5;const a=DUR_YRS[0],b=DUR_YRS[DUR_YRS.length-1];const v=y=>DUR_MED[y];
+  if(t<=a+.5)return v(a)/11.5;if(t>=b)return v(b)/11.5;
+  for(let i=0;i<DUR_YRS.length-1;i++){const x=DUR_YRS[i]+.5,z=DUR_YRS[i+1]+(DUR_YRS[i+1]%1?0:.5);if(t>=x&&t<=z)return (v(DUR_YRS[i])+(v(DUR_YRS[i+1])-v(DUR_YRS[i]))*(t-x)/(z-x))/11.5}
+  return 1}
+function searchLength(){const z=Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());return Math.min(3,.09*Math.exp(1.245*z)*durFactor(year))}
 // most people who quit already have the next job lined up: in September 2026 only 741,000 of the unemployed were job leavers (BLS CPS),
 // against 3.1 million quits a month (JOLTS, August 2026). So about 9 in 10 quitters move on after a short handover of 2 to 6 weeks (our estimate).
 function startSearch(p,lined){p.seeking=true;p.seekUntil=year+(lined?.04+Math.random()*.08:searchLength()*cm('searchMult'));p.next=Math.min(p.next||Infinity,p.seekUntil);setSeeker(p,true)}
@@ -919,7 +1231,8 @@ function setLaidOff(p,on){
   const m=on?(p.ownLaid||typeMats.laid):(p.ownMat||typeMats[p.type]); p.f.meshes.forEach(x=>x.material=m);
   p.f.head.position.z=on?.06:0; p.f.head.position.y=on?.6:.66; // head drops forward
 }
-function transfer(p,N){takeSeat(p,N,p.level);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;tally.hops++}
+function transfer(p,N){bump('quits'); // a direct move to another employer is a quit in JOLTS too
+  takeSeat(p,N,p.level);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;tally.hops++;p.next=Math.min(p.next||Infinity,year+.03+Math.random()*.07)}
 
 /* ---------- seats: every floor has a limited number of jobs ----------
    Share of jobs at each stage, from the BLS Occupational Employment and Wage Statistics (May 2025):
@@ -943,11 +1256,45 @@ function occOf(L){let o=occ.get(L);if(!o){o=[0,0,0,0,0,0,0];occ.set(L,o)}return 
    then each company's shares are rescaled to its own workforce. This is our assumption: Glassdoor scores reflect how employees
    rate their prospects, and no public data gives each company's real mix of senior roles. */
 let SF_MEAN=1;
-function shares(L){const r=sf(L)/SF_MEAN,w=[];let t=0;for(let i=0;i<=L.top;i++){w[i]=SEAT_SHARE[i]*(i>=2?r:1);t+=w[i]}return w.map(x=>x/t)}
+/* Every company has all six floors, but how many seats each floor has depends on the company, so some steps are much harder
+   at some companies than at others.
+   Industry: the management floors (Lead, Director, Executive) follow each industry's share of management occupations (BLS
+   Occupational Employment and Wage Statistics, May 2023, industry-specific estimates by NAICS sector, combined by employment),
+   and Senior seats its share of professional and business/financial specialist jobs (BLS Current Population Survey, Table A-21,
+   September 2026: professional plus management, business and financial jobs, minus the OEWS management share).
+   A hospital or a consultancy has far more Senior seats than a restaurant or a builder.
+   Size: bigger firms have more layers of management (Caliendo, Monte & Rossi-Hansberg 2015, French employer data), so Director
+   seats grow with size, while in small firms the owner or general manager is a bigger share of the staff. The size factors are
+   our assumption; only their direction comes from the research.
+   Career score: as before, a better score means more seats from Senior up (our assumption).
+   Finally, all companies' seats are calibrated together so the whole economy matches the BLS shares in SEAT_SHARE. */
+const IND_SEN={edhealth:.644,leisure:.214,prof:.517,trade:.104,manuf:.322,fin:.424,constr:.191,transport:.139,info:.578,gov:.423};
+const IND_MGR={edhealth:.050,leisure:.051,prof:.105,trade:.057,manuf:.066,fin:.136,constr:.078,transport:.039,info:.124,gov:.067};
+const SIZE_DIR=[.25,.6,1,1.3,1.5], SIZE_EXEC=[2,1.4,1,.75,.6];
+const roleSector=name=>name==='Fairfax County Public Schools'?'edhealth':(SECTOR_OF[name]||'prof'); // a school district staffs like education
+function seatProfile(name,band,r){const s=roleSector(name),m=IND_MGR[s]*r;return [1,1,IND_SEN[s]*r,m,m*SIZE_DIR[band],m*SIZE_EXEC[band]]}
+let SEAT_CAL=[1,1,1,1,1,1];
+function shares(L){const pr=seatProfile(L.d[0],BAND_OF(sizeNow(L)),sf(L)/SF_MEAN),w=[];let t=0;
+  for(let i=0;i<=L.top;i++){w[i]=SEAT_SHARE[i]*pr[i]*SEAT_CAL[i];t+=w[i]}return w.map(x=>x/t)}
+// economy-wide calibration: scale each floor so that, across all companies and their current workforces, seats per floor match BLS
+function calibrateSeats(){
+  for(let it=0;it<6;it++){const tot=[0,0,0,0,0,0];let n=0;
+    for(const [L,o] of occ){if(!L.alive||!o[6])continue;const sh=shares(L);for(let i=0;i<6;i++)tot[i]+=sh[i]*o[6];n+=o[6]}
+    if(!n) return;
+    for(let i=0;i<6;i++) SEAT_CAL[i]*=Math.pow(SEAT_SHARE[i]*n/Math.max(1e-9,tot[i]),.8)}
+}
+// rung spacing on the ladder: seats on each floor relative to the average company (static, from today's size and score)
+const sfOf=d=>Math.max(.25,.4+((d[3]==null?3.3:d[3])-2.5)*.6);
+function rungsFor(d){
+  const live=DATA.filter(x=>!x[8]), avg=[0,0,0,0,0,0];
+  for(const x of live){const p=seatProfile(x[0],BAND_OF(x[1]),sfOf(x));p.forEach((v,i)=>avg[i]+=v/live.length)}
+  const p=seatProfile(d[0],BAND_OF(d[1]),sfOf(d));
+  return [1,2,3,4,5].map(i=>Math.min(14,Math.max(3,Math.round(8*Math.sqrt(p[i]/avg[i]/(p[1]/avg[1]))))));
+}
 function seatCap(L,lv,extra){return Math.floor(shares(L)[lv]*(occOf(L)[6]+extra)+(L.dith?L.dith[lv]:.5))}
 // is there a free seat on floor lv at L for worker p? (entry level is never full)
 function hasSeat(L,lv,p){if(lv<=0)return L.top>=0;if(lv>L.top)return false;return occOf(L)[lv]<seatCap(L,lv,p&&p.comp===L?0:1)}
-function takeSeat(p,L,lv){if(p.comp){const o=occOf(p.comp);o[p.level]--;o[6]--}const o=occOf(L);o[lv]++;o[6]++}
+function takeSeat(p,L,lv){if(p.comp!==L)p.since=year;if(p.comp){const o=occOf(p.comp);o[p.level]--;o[6]--}const o=occOf(L);o[lv]++;o[6]++}
 // the best job a worker can land: their own floor if some company has a free seat there, otherwise the highest floor below it that does
 function landing(p,opts,lv){for(let l=lv;l>=0;l--){const o=opts.filter(L=>hasSeat(L,l,p));if(o.length)return [fieldPick(p,o,null,l),l]}return null}
 /* staying in the same field: about 37–39% of US job-to-job moves stay in the same industry sector (Census Job-to-Job Flows,
@@ -956,6 +1303,12 @@ function landing(p,opts,lv){for(let l=lv;l>=0;l--){const o=opts.filter(L=>hasSea
    worker's own industry makes about 40% of all moves actually stay in it, close to the real figure. */
 const STAY_FIELD=.65;
 const QUIT_DOWN=.05; // share of quitters above entry level who choose a lower floor
+let UP_SWITCH=.095; // chance that a finished job search ends one floor higher (calibrated: about 1 in 5 promotions come from switching)
+const UP_SAME=.85;
+// calibration: with every factor in place, quits (including direct moves to another employer) come out at about 90% of the JOLTS
+// level and layoffs at about 93%, tested over 2001–2026; these factors bring both to the real level. The cause of the gap isn't pinned down.
+let QUIT_CAL=+(globalThis.QC||1.11);
+let LAYOFF_CAL=+(globalThis.LC||1.07);
 const backIn=p=>{if(!(p.comp&&p.comp===p.left))return '';if(p._bi)return '';p._bi=true;return ' (it stands for its whole industry in the model)'};
 const fieldOf=p=>p.comp?sectorOf(p.comp):p.left?sectorOf(p.left):null;
 function fieldPick(p,opts,sec,lv){
@@ -963,7 +1316,7 @@ function fieldPick(p,opts,sec,lv){
   const f=sec||fieldOf(p);
   // an industry that already has more than its real share of workers keeps fewer of its movers, one with less keeps more,
   // the same rebalancing hiring uses, so the industry mix stays at its real shares
-  const corr=mixNow&&mixNow[f]>0?Math.min(3,Math.max(.33,Math.pow(SECTORS[f].jobs/JOBS_TOTAL/mixNow[f],1.5))):1;
+  const corr=mixNow&&mixNow[f]>0?Math.min(3,Math.max(.33,Math.pow(shareAt(f,year)/mixNow[f],1.5))):1;
   if(f&&!p.avoid&&Math.random()<Math.min(.95,STAY_FIELD*corr)){const o=opts.filter(L=>sectorOf(L)===f);if(o.length)return pick(o)
     // some industries have a single company in the model (health care: HCA Healthcare; government: the US Postal Service).
     // That company stands for its whole industry, so staying in the field can mean being hired by it again.
@@ -979,43 +1332,33 @@ function seatReport(){countSeats();const lv=[0,0,0,0,0,0];let n=0,over=0,cells=0
 // Economy-wide shifts are calibrated to US JOLTS data (BLS, via FRED): every company follows the average change,
 // so the sample behaves like the economy. Company-specific shocks are kept as separate "outlier" events.
 const CRISES=[
- {id:'sep11',name:"9/11 attacks",short:"9/11",from:2001.7,to:2002.7,quitMult:.88,layoffMult:.97,promoMult:.85,upMult:.85,searchMult:1.3,
-  outlier:{companies:["United Airlines","Air Berlin","Thomas Cook"],rate:.18,why:"Air travel collapses after 9/11"},
-  sub:"Quits −13% · layoffs flat economy-wide · airlines and travel hit hard",
-  startText:"Terrorist attacks on 11 September 2001. Air travel stops and tourism collapses; airlines and travel firms cut jobs fast. Across the whole economy, though, layoffs barely move: quits fall about 13% as people stay put.",
+ {id:'sep11',name:"9/11 attacks",short:"9/11",from:2001.7,to:2002.7,
+  sub:"Quits −12% · layoffs flat economy-wide · airlines and travel hit hard",
+  startText:"Terrorist attacks on 11 September 2001. Air travel stops and tourism collapses; airlines and travel firms cut jobs fast. Across the whole economy, though, layoffs barely move, while quits fall about 12% as people stay put.",
   endText:"The 9/11 shock fades. Travel demand slowly recovers."},
- {id:'gfc',name:"2008 financial crisis",short:"2008",from:2008.7,to:2010.25,quitMult:.62,layoffMult:1.25,promoMult:.5,upMult:.4,searchMult:2,
-  sub:"Quits −39% · layoffs +20% · fewer promotions · longer job searches",
-  startText:"The 2008 financial crisis hits. Economy-wide, quits fall about 39% and layoffs rise about 20%. Promotions slow and job searches take longer.",
-  endText:"The crisis eases. Quits slowly recover and layoffs return to normal.",
-  event:{at:2009.33,run(c){
-    const L=ladders.find(l=>l.d[0]==="Fiat Chrysler"&&l.alive); if(!L) return;
-    people.filter(p=>p.comp===L&&p.shadow&&Math.random()<.3).forEach(p=>quietly(()=>crisisLayoff(p,'',true)));
-    const hit=people.filter(p=>p.comp===L&&!p.def&&!p.shadow&&!(p.lockUntil&&year<p.lockUntil)&&Math.random()<.3);hit.forEach(p=>crisisLayoff(p,`Chrysler files for bankruptcy and Fiat takes a stake. Laid off as ${lvName(p.level)}.`,true));
-    addLog(`Chrysler files for Chapter 11 bankruptcy; Fiat takes a 20% stake in the new company. ${hit.length?hit.length+' simulated worker'+(hit.length>1?'s':'')+' laid off.':''}`,'bad')}}},
- {id:'covid',name:"COVID-19 pandemic",short:"COVID",from:2020.17,to:2020.34,quitMult:.68,layoffMult:1,
-  // In March–April 2020 US layoffs reached about six times their normal level (13.0 and 9.2 million). Workers in the model
-  // only reconsider their job about once a year, so the wave is applied once at lockdown, sized so the two months match.
-  event:{at:2020.19,run(c){
-    const emp=people.filter(p=>p.comp&&!p.def&&!(p.lockUntil&&year<p.lockUntil));let n=0;
-    for(const p of emp){if(Math.random()<.12){p.shadow?quietly(()=>crisisLayoff(p,'',false)):crisisLayoff(p,`Lockdown: ${p.comp.d[0]} lays off staff as the economy shuts down. Laid off as ${lvName(p.level)}.`);if(!p.shadow)n++}}
-    addLog(`Lockdowns begin. A wave of layoffs hits almost every industry at once${n?': '+n+' visible workers lose their jobs':''}.`,'bad')}},promoMult:.4,upMult:.3,searchMult:2,
-  sub:"March–April 2020: layoffs ×6 · quits −32% · hiring freezes",
-  startText:"COVID-19 is declared a pandemic on 11 March 2020 and lockdowns begin. US layoffs jump to 13.0 million in March alone, about six times normal, and quits fall by a third.",
+ {id:'gfc',name:"2008 financial crisis",short:"2008",from:2008.7,to:2010.25,
+  sub:"Real data: quits −33% · layoffs +19% · job searches twice as long",
+  startText:"The 2008 financial crisis hits. In the real data, quits fall about a third, layoffs rise about a fifth, and the median job search more than doubles by 2010.",
+  endText:"The crisis eases. Quits slowly recover and layoffs return to normal."},
+ {id:'covid',name:"COVID-19 pandemic",short:"COVID",from:2020.17,to:2020.34,
+  sub:"March–April 2020: layoffs ×6 · quits −25% · hiring freezes",
+  startText:"COVID-19 is declared a pandemic on 11 March 2020 and lockdowns begin. US layoffs jump to 13.0 million in March alone, about six times normal, and quits fall about a quarter.",
   endText:"The first lockdown shock passes. Hiring snaps back from May 2020."},
- {id:'greatres',name:"Great Resignation",short:"QUITS BOOM",from:2021.25,to:2022.95,quitMult:1.12,layoffMult:.82,promoMult:1,upMult:1.3,searchMult:.8,mild:true,
-  sub:"After COVID: quits +15% · layoffs −21% · switching jobs pays",
+ {id:'greatres',name:"Great Resignation",short:"QUITS BOOM",from:2021.25,to:2022.95,mild:true,
+  sub:"After COVID: quits +24% · layoffs −23% · switching jobs pays",
   startText:"After the pandemic, the Great Resignation: quits rise about 15% above pre-pandemic levels, layoffs fall to record lows, and workers who switch jobs often move up.",
   endText:"The quitting wave cools down."}
 ];
 CRISES.forEach(c=>c.on=true);
 const activeCrisis=()=>CRISES.find(c=>c.on&&year>=c.from&&year<c.to)||null;
 const inCrisis=()=>!!activeCrisis();
-const cm=k=>{const c=activeCrisis();return c?c[k]:1};
+// crises are markers only: they never change any rate in the model (all changes over time come from the real monthly and yearly data)
+const cm=k=>1;
 let yearly={};
 let events={promos:[],quits:[],layoffs:[]}, sampleHist=[];
 const BK=.02, bk=t=>Math.floor((t-START)/BK);
-function sampleCount(){return people.filter(p=>p.comp&&sampleStatus(p.comp).ok||(!p.comp&&p.left&&sampleStatus(p.left).ok)).length}
+// employed workers at companies in the economy sample: the base of every rate in the chart and table, like JOLTS (per employed worker)
+function sampleCount(){return people.filter(p=>p.comp&&sampleStatus(p.comp).ok).length}
 let curP=null; // worker whose decision is being made, so their company can be checked
 function bump(k,outlier){if(burning)return;const co=curP&&(curP.comp||curP.left);if(co&&!sampleStatus(co).ok)outlier=true;
   if(outlier){tally.outlierLaid=(tally.outlierLaid||0)+1;return} // outlier events stay out of the economy chart
@@ -1023,9 +1366,14 @@ function bump(k,outlier){if(burning)return;const co=curP&&(curP.comp||curP.left)
 // windows: before / during / after each crisis, all inside this one run
 // before / during / after windows inside this one run, and the real US change for the same comparison (BLS JOLTS via FRED)
 const WIN={
- sep11:{before:[2000,2001.7],after:[2002.7,2004.7],real:{quits:-13,layoffs:-6},realNote:"2002 vs 2001"},
- gfc:{before:[2005.7,2008.7],after:[2010.25,2012.25],real:{quits:-39,layoffs:20},realNote:"2009–early 2010 vs 2006–07"},
- covid:{before:[2017.2,2020.17],after:[2021.25,2022.95],real:{quits:-32,layoffs:508},realAfter:{quits:15,layoffs:-21},realNote:"Mar–Apr 2020 vs Jul 2019–Jan 2020; after = 2021–22"}};
+ // the run's first months are a start-up period, so the 9/11 comparison starts in mid-2000; JOLTS data starts in December 2000
+ sep11:{before:[2000.5,2001.7],after:[2002.7,2004.7]},
+ gfc:{before:[2005.7,2008.7],after:[2010.25,2012.25]},
+ covid:{before:[2017.2,2020.17],after:[2021.25,2022.95]}};
+// the real change for exactly the same periods, from the monthly JOLTS rates (months before 2001 use 2001)
+function realRate(k,a,b){const arr=k==='quits'?JQ:JL_REAL;const i0=Math.max(0,Math.round((a-2001)*12)),i1=Math.max(i0+1,Math.round((b-2001)*12));
+  let s=0,n=0;for(let i=i0;i<i1&&i<arr.length;i++){s+=arr[i];n++}return n?s/n:null}
+const realChange=(k,w,a,b)=>{const x=realRate(k,...w.before),y=realRate(k,a,b);return x&&y?Math.round((y/x-1)*100):null};
 function countEv(k,a,b){let n=0;const arr=events[k];for(let i=Math.max(0,bk(a)),j=bk(b);i<j;i++)n+=arr[i]||0;return n}
 function sampleN(a,b){const h=sampleHist.filter(x=>x[0]>=a&&x[0]<b);return h.length?h.reduce((s,x)=>s+x[1],0)/h.length:people.length}
 function rate(k,a,b){const end=Math.min(b,year);if(end-a<Math.min(.25,(b-a)*.95))return null;return countEv(k,a,end)/(end-a)/sampleN(a,end)*100}
@@ -1039,13 +1387,85 @@ function drawImpact(){
   for(const c of CRISES){const w=WIN[c.id]; if(!w) continue;
     ['promos','quits','layoffs'].forEach((k,i)=>{
       const b=rate(k,...w.before), d=rate(k,c.from,c.to), a=rate(k,...w.after);
-      h+=`<tr>${i===0?`<td rowspan="4"><b>${c.name}</b><div class="small">${Math.floor(w.before[0])}–${Math.floor(w.after[1])}</div></td>`:''}<td>${{promos:'Promotions',quits:'Quits',layoffs:'Layoffs'}[k]}</td><td class="num">${f(b)}</td><td class="num">${f(d)}${pc(ch(d,b),k)}</td><td class="num">${real(k==='promos'?null:w.real[k])}</td><td class="num">${f(a)}${pc(ch(a,b),k)}</td><td class="num">${w.realAfter?real(k==='promos'?null:w.realAfter[k]):'<span class="real">–</span>'}</td></tr>`});
-    h+=`<tr><td colspan="6" class="real">Real-world comparison: ${w.realNote}</td></tr>`}
+      h+=`<tr>${i===0?`<td rowspan="4"><b>${c.name}</b><div class="small">${Math.floor(w.before[0])}–${Math.floor(w.after[1])}</div></td>`:''}<td>${{promos:'Promotions',quits:'Quits',layoffs:'Layoffs'}[k]}</td><td class="num">${f(b)}</td><td class="num">${f(d)}${pc(ch(d,b),k)}</td><td class="num">${real(k==='promos'?null:realChange(k,w,c.from,c.to))}</td><td class="num">${f(a)}${pc(ch(a,b),k)}</td><td class="num">${real(k==='promos'?null:realChange(k,w,...w.after))}</td></tr>`});
+    h+=`<tr><td colspan="6" class="real">Real: BLS JOLTS quit and layoff rates for exactly the same months</td></tr>`}
   t.innerHTML=h+'</tbody>';
 }
-function crisisLayoff(p,why,outlier){
-  const L=p.comp, c=activeCrisis(); note(p,why||(c?`${L.d[0]} cuts jobs during the ${c.name}. Laid off as ${lvName(p.level)}.`:`Laid off by ${L.d[0]} as ${lvName(p.level)}.`),'laid');
-  p.left=L; p.comp=null; setLaidOff(p,true); startSearch(p); if(c) tally.crisisLaid=(tally.crisisLaid||0)+1; bump('layoffs',outlier);
+/* who gets laid off: the risk differs by floor, following unemployment rates by occupation year by year (BLS Current Population
+   Survey, annual averages, Table 25): entry level = service, production and transportation jobs; junior = sales and office;
+   senior = professional; lead = management, business and financial; director and executive = management. Unemployment rates stand
+   in for layoff risk. The ratios move over time: in 2007 the entry floor's rate was about 3.3 times management's, in 2009 about 2.6
+   times, as the financial crisis also hit managers. Years in between are interpolated; 2000–01 use 2002. The factors are normalised
+   for each company, so its average layoff rate stays at its industry's BLS rate: this changes who is laid off, not how many. */
+// year: service, production, transportation, sales, office, professional, management/business/financial, management
+const OCC_U={2002:[6.6,7.8,7.4,5.9,5.4,3.0,3.0,3.0],2003:[7.1,7.7,8.2,5.9,5.2,3.2,3.1,2.9],2004:[6.6,7.0,7.4,5.4,5.0,2.8,2.6,2.5],
+  2005:[6.4,6.7,6.2,5.0,4.6,2.4,2.2,2.1],2007:[5.9,5.7,6.0,4.8,4.0,2.1,1.9,1.8],2008:[6.7,7.7,7.6,5.7,5.1,2.7,2.7,2.5],
+  2009:[9.6,14.7,12.0,8.8,8.3,4.4,4.9,4.6],2010:[10.3,13.1,12.4,9.4,8.7,4.5,5.1,4.8],2012:[9.1,9.3,10.3,7.9,7.6,4.2,4.0,3.7],
+  2013:[8.6,8.7,9.4,7.3,7.1,3.6,3.5,3.3],2015:[6.7,5.7,6.8,5.5,4.7,2.6,2.4,2.2],2016:[5.8,5.7,6.5,4.8,4.5,2.5,2.5,2.3],
+  2018:[4.8,4.0,5.0,4.1,3.6,2.2,2.0,1.8],2019:[4.4,3.9,4.7,3.8,3.6,2.1,1.8,1.6],2020:[13.0,9.0,11.1,8.8,7.3,4.9,4.1,3.9],
+  2021:[7.8,5.8,8.0,5.6,5.0,2.8,2.8,2.7],2022:[4.8,3.9,5.5,3.9,3.6,2.1,1.8,1.6],2023:[4.5,3.8,5.7,3.9,3.4,2.0,1.9,1.7],
+  2024:[5.0,4.5,5.8,4.3,3.5,2.3,2.2,2.0],2025:[5.3,4.1,6.0,4.6,3.9,2.6,2.3,2.1]};
+const OCC_YRS=Object.keys(OCC_U).map(Number);
+function occAt(y){const a=OCC_YRS[0],b=OCC_YRS[OCC_YRS.length-1];if(y<=a)return OCC_U[a];if(y>=b)return OCC_U[b];
+  for(let i=0;i<OCC_YRS.length-1;i++){const x=OCC_YRS[i],z=OCC_YRS[i+1];if(y>=x&&y<=z){const f=(y-x)/(z-x);return OCC_U[x].map((v,k)=>v+(OCC_U[z][k]-v)*f)}}}
+let relCache={};
+function layoffRel(y){const k=Math.round(y*4);if(relCache[k])return relCache[k];const [sv,pr,tr,sa,of,pf,mbf,mg]=occAt(k/4);
+  return relCache[k]=[(sv+pr+tr)/3,(sa+of)/2,pf,mbf,mg,mg]}
+function layoffFactor(L,lv){const R=layoffRel(year),sh=shares(L);let m=0;for(let i=0;i<6;i++)m+=sh[i]*R[i];return R[lv]/m}
+/* recalls: over 40% of unemployed people go back to their previous employer after a jobless spell, and those recalled are out of
+   work at least a month less than others (Fujita and Moscarini, American Economic Review, 2017). So 40% of laid-off workers whose
+   employer still exists are recalled to their old floor after a short spell of 2 to 12 weeks (the spell length is our estimate). */
+const RECALL=.4;
+/* temporary layoffs with a recall are most common where work is seasonal or follows orders: construction, manufacturing, hotels and
+   restaurants, transport (BLS). Relative chances by industry are our assumption, rescaled so the economy-wide share stays at 40%. */
+const RECALL_IND={constr:1.4,manuf:1.3,leisure:1.3,transport:1.15,trade:.9,edhealth:.85,gov:.8,prof:.75,fin:.5,info:.5};
+let recallNorm=null;
+function recallP(L){if(!recallNorm){let a=0,n=0;for(const k in SECTORS){a+=SECTORS[k].jobs*SECTORS[k].l*(RECALL_IND[k]||1);n+=SECTORS[k].jobs*SECTORS[k].l}recallNorm=a/n}
+  return Math.min(.9,RECALL*(RECALL_IND[sectorOf(L)]||1)/recallNorm)}
+let layoffKinds={temp:0,tempEnd:0,perm:0};
+/* documented job cuts at sample companies, on top of their industry's normal layoff rate. Each hits the same share of the company's
+   simulated workers as of its real staff at the time; programmes spread over several years are split by year. */
+const CUTS=[
+  {co:"Cisco",at:2001.3,n:8500,what:"as the dot-com bust hits orders",src:"Cisco, April 2001"},
+  {co:"United Airlines",at:2001.72,n:20000,what:"as air travel collapses after 9/11",src:"United Airlines, September 2001"},
+  {co:"Fiat Chrysler",at:2009.33,share:.3,text:"Chrysler files for Chapter 11 bankruptcy and Fiat takes a stake",src:"Chrysler, April 2009 (share laid off: our estimate)"},
+  {co:"Starbucks",at:2008.55,n:12000,what:"closing 600 US stores",src:"Starbucks, July 2008"},
+  {co:"JPMorgan Chase",at:2009.15,n:9200,what:"after taking over Washington Mutual",src:"https://www.nbcnews.com/news/amp/wbna28002323"},
+  {co:"Volkswagen",at:2017.5,n:7500,what:"part of 30,000 cuts after the diesel scandal",src:"Volkswagen Future Pact, November 2016"},
+  {co:"Volkswagen",at:2018.5,n:7500,what:"part of 30,000 cuts after the diesel scandal",src:"Volkswagen Future Pact, November 2016"},
+  {co:"Volkswagen",at:2019.5,n:7500,what:"part of 30,000 cuts after the diesel scandal",src:"Volkswagen Future Pact, November 2016"},
+  {co:"Volkswagen",at:2020.6,n:7500,what:"part of 30,000 cuts after the diesel scandal",src:"Volkswagen Future Pact, November 2016"},
+  {co:"Siemens",at:2018.3,n:6900,what:"restructuring its power and gas business",src:"Siemens, November 2017"},
+  {co:"Netflix",at:2022.45,n:450,what:"after losing subscribers",src:"Netflix, May–June 2022"},
+  {co:"Google",at:2023.05,n:12000,what:"after over-hiring in the pandemic",src:"https://www.npr.org/2023/01/20/1150234270/google-layoffs-12000-jobs"},
+  {co:"Amazon",at:2023.1,n:27000,what:"in its largest round of corporate cuts",src:"https://peoplematters.in/article/strategic-hr/the-biggest-layoffs-of-2023-amazon-to-microsoft-firms-fired-employees-in-jaw-dropping-numbers-39753"},
+  {co:"Accenture",at:2023.25,n:19000,what:"amid a gloomy outlook",src:"https://www.theregister.com/2023/03/24/accenture_19000_layoffs/"},
+  {co:"TCS",at:2025.6,n:12000,what:"(about 2% of its workforce)",src:"https://en.wikipedia.org/wiki/Tata_Consultancy_Services"},
+  {co:"Amazon",at:2025.82,n:14000,what:"cutting corporate roles",src:"https://chainstoreage.com/amazon-reportedly-eliminate-14000-corporate-jobs"},
+  {co:"Target",at:2025.82,n:1800,what:"cutting corporate roles",src:"Target, October 2025"}];
+let cutsDone=new Set();
+function companyCuts(){
+  CUTS.forEach((c,i)=>{if(cutsDone.has(i)||year<c.at)return;cutsDone.add(i);
+    const L=ladders.find(l=>l.d[0]===c.co);if(!L||!L.alive)return;
+    const share=c.share||Math.min(.5,c.n/sizeNow(L));let k=0;
+    for(const p of people){if(p.comp!==L||p.def||(p.lockUntil&&year<p.lockUntil))continue;if(Math.random()<share){
+      const t=c.text?`${c.text}. Laid off as ${lvName(p.level)}.`:`${c.co} cuts ${fmt(c.n)} jobs ${c.what}. Laid off as ${lvName(p.level)}.`;
+      p.shadow?quietly(()=>crisisLayoff(p,t,false,true)):(crisisLayoff(p,t,false,true),k++)}}
+    addLog(`${c.text?c.text:`${c.co} cuts about ${fmt(c.n)} jobs ${c.what}`}${k?': '+k+' visible worker'+(k>1?'s':'')+' affected':''}.`,'bad')});
+}
+function crisisLayoff(p,why,outlier,perm){
+  // during a crisis only the extra layoffs above normal are blamed on it: with layoffs 20% above normal, about 1 in 6 is
+  const L=p.comp, c0=activeCrisis(), ex=joltsMult(JL,JL_BASE,year,year+1/12), c=c0&&Math.random()<Math.max(0,1-1/ex)?c0:null;
+  // what kind of job loss it is. Among unemployed job losers (BLS CPS, September 2026): about 26% on temporary layoff, waiting to be
+  // recalled; 55% permanent job losers; 19% finished a temporary job. Temporary jobs are mostly lower-level, so the end of one is
+  // told only for jobs held less than a year on the bottom three floors (our assumption).
+  const recall=!outlier&&!perm&&Math.random()<recallP(L), tempEnd=!why&&!recall&&!c&&p.since!=null&&year-p.since<1&&Math.random()<[.6,.5,.2,0,0,0][p.level];
+  if(!burning&&!outlier){const K=recall?'temp':tempEnd?'tempEnd':'perm';layoffKinds[K]++}
+  note(p,why||(recall?`Temporarily laid off by ${L.d[0]} as ${lvName(p.level)}${c?` during the ${c.name}`:''}.`:tempEnd?`Their temporary job at ${L.d[0]} ends (${lvName(p.level)}).`:c?`${L.d[0]} cuts jobs during the ${c.name}. Laid off as ${lvName(p.level)}.`:`Laid off by ${L.d[0]} as ${lvName(p.level)}.`),'laid');
+  p.left=L; p.sinceBefore=p.since; p.comp=null; setLaidOff(p,true);
+  if(recall){p.recall=L;p.seeking=true;p.seekUntil=year+.04+Math.random()*.19;p.next=Math.min(p.next||Infinity,p.seekUntil);setSeeker(p,true)}
+  else{p.recall=null;startSearch(p)}
+  if(c) tally.crisisLaid=(tally.crisisLaid||0)+1; bump('layoffs',outlier);
 }
 function crisisTick(){
   const banner=document.getElementById('crisis');
@@ -1075,11 +1495,11 @@ function drawReal(){
 function drawYearly(){
   const svg=document.getElementById('yearly'); if(!svg) return;
   const W=640,H=180,P={l:30,r:10,t:12,b:22};
-  const ys=[];for(let y=START;y<=Math.floor(END);y++)ys.push(y);
+  const ys=[];for(let y=START+1;y<=Math.floor(END);y++)ys.push(y); // from 2001, like the real data; 2000 is a start-up year
   const ser=['promos','quits','layoffs'], col2={promos:'var(--hi)',quits:'var(--accent)',layoffs:'var(--lo)'};
   const max=Math.max(2,...ys.map(y=>Math.max(...ser.map(k=>((yearly[y]||{})[k]||0)/sampleN(y,y+1)*100))));
   const nice=Math.ceil(max/2)*2;
-  const X=y=>P.l+(y-START)/(ys.length-1)*(W-P.l-P.r), Y=v=>H-P.b-v/nice*(H-P.t-P.b);
+  const X=y=>P.l+(y-ys[0])/(ys.length-1)*(W-P.l-P.r), Y=v=>H-P.b-v/nice*(H-P.t-P.b);
   let g='';
   for(const c of CRISES) if(c.on&&!c.mild) g+=`<rect x="${X(c.from)}" y="${P.t}" width="${Math.max(3,X(c.to)-X(c.from))}" height="${H-P.t-P.b}" fill="var(--lo)" opacity=".1"/><text x="${X(c.from)+4}" y="${P.t+11}" font-size="10" fill="var(--lo)" font-family="var(--mono)">${c.short}</text>`;
   for(let v=0;v<=nice;v+=nice/2){g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${P.l-6}" y="${Y(v)+3}" font-size="10" text-anchor="end" fill="var(--muted)" font-family="var(--mono)">${v}</text>`}
@@ -1094,8 +1514,12 @@ function drawYearly(){
 let follow=null, tracked=null, journey=[];
 const lvName=l=>l?LEVELS[l-1]:ENTRY;
 const KIND_COL={start:'--ink',hired:'--ink',promo:'--hi',quit:'--accent',move:'--p-hopper',laid:'--lo',drop:'--lo',merge:'--p-hopper',real:'--p-nepo',end:'--ink'};
+// a firm with fewer than 100 staff stands for a large group of small employers, so a career story names it as an example
+function smallNames(text){for(const L of ladders){if(sizeNow(L)>=100||!text.includes(L.d[0]))continue;
+  const i=text.indexOf(L.d[0]);text=text.slice(0,i)+(i===0?'A':'a')+' small firm like '+L.d[0]+text.slice(i+L.d[0].length)}return text}
 function note(p,text,kind){
   if(!p||!p.tracked) return;
+  text=smallNames(text);
   journey.push({y:Math.floor(year),text,kind});
   const st=p.st; if(kind==='promo')st.promos++; if(kind==='quit')st.quits++; if(kind==='laid')st.laid++; if(kind==='drop')st.drops++;
   if(p.comp) st.companies.add(p.comp.d[0]); else if(p.def&&p.company) st.companies.add(p.company);
@@ -1142,8 +1566,8 @@ function ownMaterials(p){
 }
 // how each type of worker behaves, for the reveal
 const TYPE_REVEAL={
-  regular:p=>"As a regular employee, they took promotions when they came and only moved company when their ladder ran out.",
-  climber:p=>"As a climber, they aimed for the top floor and switched companies whenever a ladder ran out or stalled.",
+  regular:p=>"As a regular employee, they took promotions when they came and rarely changed company unless they quit or lost their job.",
+  climber:p=>"As a climber, they aimed for the top floor and switched companies whenever promotions stalled.",
   steady:p=>`As a settler, they only wanted to reach ${lvName(p.target)} and stop there${p.level>=p.target?', and that is where they settled':', but they ended the run below it'}.`,
   hopper:p=>"As a job hopper, they looked for a better company on the same floor after every promotion.",
   changer:p=>p.changed?"As a career changer, at one point they left everything behind and started over at entry level in a new field.":"As a career changer, they planned to start over in a new field, but the run ended before they did.",
@@ -1191,6 +1615,9 @@ function setupTracked(){
       const T=pick(alive(),true),lvl=startLevel(T,follow.type);p.comp=T;p.level=lvl;const s2=spot(p,T);p.x=s2[0];p.z=s2[1];p.y=lvl*GAP;p.st.companies.add(T.d[0])}
     else{p.x=(Math.random()-.5)*8;p.z=(Math.random()-.5)*8}
     f.g.position.set(p.x,p.y,p.z);
+    // age: like everyone else, from the starting floor; someone looking for a first job is a newcomer.
+    // In the collapse and merger scenarios they are young enough to still be working when the event comes.
+    setAge(p,p.level,START,!p.comp); if(sc.lock&&p.born+p.retireAt<sc.lock+1) p.born=sc.lock+1-p.retireAt;
     people.push(p);
   }
   tracked=p; trailMat.color=trailColor(); trailLineMat.color=trailColor();
@@ -1202,16 +1629,17 @@ function setupTracked(){
 function finishJourney(){
   if(!tracked||!follow) return;
   const p=tracked, st=p.st, real=!!p.def;
-  note(p,`The run ends in ${Math.floor(END)} with them at ${lvName(p.level)}${p.comp?' at '+p.comp.d[0]:p.seeking?', still job hunting':''}.`,'end');
+  if(!p.retired) note(p,`The run ends in ${Math.floor(END)} with them at ${lvName(p.level)}${p.comp?' at '+p.comp.d[0]:p.seeking?', still job hunting':''}${real||p.born==null?'':`, aged ${ageOf(p)}`}.`,'end');
   const sum=document.getElementById('jsum');
   sum.innerHTML=`<b>Journey summary</b><dl>
     <dt>Final floor</dt><dd>L${p.level} ${lvName(p.level)}</dd>
+    ${p.retired?`<dt>Retired</dt><dd>${p.retiredIn}, at ${p.retiredAge}</dd>`:real||p.born==null?'':`<dt>Age in ${Math.floor(END)}</dt><dd>${ageOf(p)}</dd>`}
     <dt>Promotions</dt><dd>${real?'see steps above':st.promos}</dd>
     <dt>Companies</dt><dd>${[...st.companies].join(', ')||'none'}</dd>
     ${real?'':`<dt>Times quit</dt><dd>${st.quits}</dd><dt>Laid off</dt><dd>${st.laid}</dd><dt>Dropped a floor</dt><dd>${st.drops}</dd>`}
   </dl><span class="small">The trail in the model shows the full route. Big dots mark the key moments, coloured like the steps above.</span>`;
   sum.hidden=false;
-  if(follow.mystery&&!revealed){
+  if(!real&&!revealed){
     revealed=true; renderJourney();
     document.getElementById('jhead').innerHTML=`<i style="--c:var(--p-${follow.type})"></i>Following: ${TYPES[follow.type].name} · ${SCEN[follow.scen].label}`;
     const rv=document.getElementById('reveal');
@@ -1220,11 +1648,11 @@ function finishJourney(){
     if(follow.scen==='typical') start+=st.first&&st.first.y<=START?` They were working ${st.first.lvl?'as '+lvName(st.first.lvl):'at entry level'} at ${st.first.co}.`:' They were looking for their first job.';
     else if(follow.scen==='ordinary'&&st.first) start=`They started out in 2000 with no company chosen in advance. Their first job was ${st.first.lvl?'as '+lvName(st.first.lvl):'at entry level'} at ${st.first.co}${follow.type==='nepo'&&st.first.lvl>=1?(FAMILY[st.first.co]?', through family connections: the company is controlled by '+FAMILY[st.first.co]:', helped by family connections'):''}.`;
     else if(follow.type==='nepo'&&follow.scen!=='ordinary'&&follow.scen!=='typical') start=start.replace('They started at','Through family connections, they started above entry level at');
-    const end=p.comp?`working as <b>${p.level?lvName(p.level):'entry level'}</b> at ${p.comp.d[0]}`:p.laidOff?`at <b>${lvName(p.level)}</b> level, laid off and looking for work`:`at <b>${lvName(p.level)}</b> level, between jobs after quitting`;
+    const end=p.retired?`retired: they retired in ${p.retiredIn} at ${p.retiredAge}, as <b>${p.retiredAs?lvName(p.retiredAs):'entry level'}</b>${p.retiredFrom?' at '+p.retiredFrom:''}`:p.comp?`working as <b>${p.level?lvName(p.level):'entry level'}</b> at ${p.comp.d[0]}`:p.laidOff?`at <b>${lvName(p.level)}</b> level, laid off and looking for work`:`at <b>${lvName(p.level)}</b> level, between jobs after quitting`;
     const parts=[`${st.promos} promotion${st.promos===1?'':'s'}`,st.quits?`quit ${st.quits} time${st.quits===1?'':'s'}`:'never quit',st.laid?`laid off ${st.laid} time${st.laid===1?'':'s'}`:'never laid off'];
     rv.innerHTML=`<div class="cap">${an} ${tn.toLowerCase()} · the scenario was</div><h3>${SCEN[follow.scen].label}</h3><p>${start}</p>
       <p>${TYPE_REVEAL[follow.type](p)}</p>
-      <p>By 2026 they were ${end}: ${parts[0]}, ${parts[1]}, ${parts[2]}.</p>
+      <p>${p.retired?'By 2026 they had':'By 2026 they were'} ${p.retired?end.replace('retired: they retired','retired. They retired'):end}${p.retired?'. Over the career':''}: ${parts[0]}, ${parts[1]}, ${parts[2]}.</p>
       <div class="row"><button id="revealJourney">See the full journey</button><button id="revealClose">Close</button></div>`;
     rv.querySelector('#revealClose').onclick=()=>rv.classList.remove('show');
     rv.querySelector('#revealJourney').onclick=()=>{rv.classList.remove('show');document.getElementById('followBox').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})};
@@ -1267,8 +1695,8 @@ function makeCrowd(){
   for(const type of types) for(let k=0;k<Math.round(CROWD_N*TYPES[type].n/total);k++){
     const p={type,shadow:true,f:stubFig(),q:[],level:0,comp:null,ang:0,next:START-20+Math.random()*1.5,stuck:0,wantHop:false,laidOff:false,seeking:false,seekUntil:0,left:null,
       target:2+(Math.random()<.45?1:0),changeYear:2004+Math.random()*18,changed:false,reachedTop:false,x:0,y:0,z:0,walkT:0};
-    if(Math.random()<.9){const L=pick(open,true);p.comp=L;p.level=startLevel(L,type)}
-    else p.next=START+Math.random()*4;
+    if(Math.random()<.9){const L=pick(open,true);p.comp=L;p.level=startLevel(L,type);setAge(p,p.level,START-20)}
+    else{p.next=START+Math.random()*4;setAge(p,0,START-20,true)}
     p.y=p.level*GAP; people.push(p);
   }
 }
@@ -1276,7 +1704,7 @@ function reset(){
   figGroup.clear(); debrisGroup.clear(); debris=[]; people=[]; logItems=[]; tally={top:0,hit:0,dropped:0,restarts:0,hops:0};
   document.getElementById('log').innerHTML='';
   year=START;
-  ladders.forEach(L=>{L.alive=L.founded<=START&&!(L.collapse&&L.collapse.at<=START);L.failed=false;L.vis=L.alive?1:0;L.el.classList.remove('dead');L.trOn=false;L.el.classList.remove('tr');L.merged=false;L.slide=null;L.dith=[0,1,2,3,4,5].map(()=>Math.random());L.g.position.set(L.x,0,L.z);if(L.growth)setTop(L,L.growth.start)});
+  ladders.forEach(L=>{L.alive=L.founded<=START&&!(L.collapse&&L.collapse.at<=START);L.failed=false;L.vis=L.alive?1:0;L.el.classList.remove('dead');L.trOn=false;L.el.classList.remove('tr');L.merged=false;L.slide=null;L.dith=[0,1,2,3,4,5].map(()=>Math.random());L.g.position.set(L.x,0,L.z);if(L.growth){L.growI=0;redrawLadder(L)}});
   const open=alive();
   let i=0;
   for(const type in TYPES) for(let k=0;k<TYPES[type].n;k++,i++){
@@ -1286,11 +1714,12 @@ function reset(){
     if(i%10<9){ // most start already employed in a company that exists in 2000
       const L=pick(open,true);
       const lvl=startLevel(L,type);
-      p.comp=L; p.level=lvl; const s=spot(p,L); p.x=s[0]; p.z=s[1]; p.y=lvl*GAP;
-    }else{ p.x=(Math.random()-.5)*(SIZE-3); p.z=(Math.random()-.5)*(SIZE-3); p.y=0; p.next=START+Math.random()*4; }
+      p.comp=L; p.level=lvl; const s=spot(p,L); p.x=s[0]; p.z=s[1]; p.y=lvl*GAP; setAge(p,lvl,START);
+    }else{ p.x=(Math.random()-.5)*(SIZE-3); p.z=(Math.random()-.5)*(SIZE-3); p.y=0; p.next=START+Math.random()*4; setAge(p,0,START,true) }
     people.push(p);
   }
-  mixNow=null; makeCrowd(); crowdTally={}; burnIn();
+  mixNow=null; makeCrowd(); crowdTally={}; burnIn(); settleAges(); layoffKinds={temp:0,tempEnd:0,perm:0}; cutsDone=new Set();
+  {const rv=document.getElementById('reveal'); if(rv) rv.classList.remove('show');}
   caseFigs=CASES.map(def=>{ const f=makeFigure(def.key); f.g.scale.setScalar(1.45);
     const L=ladders.find(l=>l.d[0]===def.company);
     const c={type:def.key,def,company:def.company,f,q:[],level:0,ang:-Math.PI/2,i:0,x:L?L.fx+2.2:0,y:0,z:L?L.fz+1.2:0,walkT:0};
@@ -1302,18 +1731,86 @@ function reset(){
   updateStats();
 }
 
-const RETIRE=.025; // about 2.5% of workers retire each year (a roughly 40-year career) and a newcomer starts at entry level
+const RETIRE=.025; // about 2.5% of workers retire each year (a roughly 40-year career); used to size hiring flows
+/* ages and retirement: every worker has an age and retires at an age drawn around 62 (Gallup, April 2026: US retirees retired at
+   61 to 62 on average; the spread of about 3.5 years and the limits of 55 and 70 are our assumption). Workers already in place get an
+   age that fits their floor (our assumption: entry 18–35, junior 21–45, senior 24–58, lead 28–60, director 32–60, executive 36–61).
+   Newcomers start their first job at 18 to 26. A retiree is replaced by a newcomer at entry level. */
+const AGE0=[[18,35],[21,45],[24,58],[28,60],[32,60],[36,61]];
+function retireAge(){const z=Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());return Math.min(70,Math.max(55,62+3.5*z))}
+/* ages at the start: employed Americans in 2000 were 18–19: 3%, 20–24: 10%, 25–34: 23%, 35–44: 27%, 45–54: 22%, 55–64: 10%, 65 and over: 3%
+   (BLS Current Population Survey, 2000 annual averages; median about 39). After the warm-up every worker gets an age from that mix,
+   older workers more often on higher floors: ages are matched to floors by rank with some randomness, which gives a median age of about
+   33 at entry level and about 50 at the top (BLS 2025: food service workers 29.8, managers 46.1, chief executives 51.6). */
+const AGE_2000=[[18,20,.032],[20,25,.096],[25,35,.23],[35,45,.266],[45,55,.219],[55,65,.102],[65,71,.055]];
+let AGE_POOL=null; // ages by floor after the settle step, used for a followed worker
+function drawAge2000(){let u=Math.random();for(const [a,b,w] of AGE_2000){if(u<w)return a+Math.random()*(b-a);u-=w}return 40}
+function settleAges(){
+  const ps=people.filter(p=>!p.def&&p.comp), ages=ps.map(()=>drawAge2000()).sort((x,y)=>x-y);
+  const keyed=ps.map(p=>[p.level+4.5*Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random()),p]).sort((x,y)=>x[0]-y[0]);
+  AGE_POOL=[[],[],[],[],[],[]];
+  keyed.forEach(([k,p],i)=>{const a=ages[i];p.born=year-a;if(p.retireAt<=a)p.retireAt=Math.min(72,a+.5+Math.random()*4);
+    if(p.since!=null&&p.since<p.born+18)p.since=p.born+18;AGE_POOL[p.level].push(a)});
+  for(const p of people)if(!p.def&&!p.comp&&p.born!=null&&year-p.born>p.retireAt-1)p.born=year-(18+Math.random()*8);
+}
+/* people differ in how often they change jobs: a minority moves and is let go again and again (short, seasonal and temporary jobs),
+   while most stay put for years. Each worker gets a lasting churn factor, gamma-distributed with mean 1 (shape CHURN_K). */
+let CHURN_K=+(globalThis.CHURN_K||0.5);
+/* layoffs are even more concentrated than quits: of about 13 layoffs and discharges per 100 workers a year (JOLTS), only about 3 per 100
+   workers end a job the worker had settled into (the Displaced Workers Survey finds 7–10% of workers lose a job over three normal years and
+   about 16% in 2007–09; Farber). The rest are recalls, dismissals and the end of short, seasonal or temporary jobs, which keep hitting
+   the same people. So the layoff factor is the churn factor raised to the power CHURN_L, rescaled to a mean of 1. */
+// the gap between frequent movers and stayers in quitting narrows with age, as people settle into careers (our assumption, set so tenure by age
+// matches the BLS tenure survey): full strength up to 30, about a third of it from 55
+const churnAge=a=>a<30?1:a>=55?.35:1-(a-30)/25*.65;
+// the most frequent movers are capped, lower with age (our assumption), so no one cycles through a new job every few weeks for years
+const czCap=a=>a<30?4:a<45?3:2;
+const czQ=p=>{const a=p.born==null?40:year-p.born;return Math.min(czCap(a),1+((p.churn||1)-1)*churnAge(a))};
+const czL=p=>{const a=p.born==null?40:year-p.born;return Math.min(1.5*czCap(a),1+((p.churnL||1)-1)*(1-(1-churnAge(a))*.5))}; // for layoffs the gap narrows half as much
+let CHURN_L=+(globalThis.CHURN_L||2), CHURN_LM=(()=>{let s=0;for(let i=0;i<20000;i++)s+=Math.pow(gammaDraw(CHURN_K)/CHURN_K,CHURN_L);return s/20000})();
+function gammaDraw(k){if(k<1)return gammaDraw(k+1)*Math.pow(Math.random(),1/k);const d=k-1/3,c=1/Math.sqrt(9*d);
+  for(;;){let x,v;do{x=Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();
+    if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+function setAge(p,lv,at,newcomer){p.retireAt=retireAge();p.churn=gammaDraw(CHURN_K)/CHURN_K;p.churnL=Math.pow(p.churn,CHURN_L)/CHURN_LM;const [a,b]=newcomer?[18,26]:AGE0[lv||0];
+  const pool=!newcomer&&AGE_POOL&&AGE_POOL[lv||0]&&AGE_POOL[lv||0].length?AGE_POOL[lv||0]:null;
+  if(pool){const ag=pool[Math.floor(Math.random()*pool.length)];if(p.retireAt<=ag)p.retireAt=Math.min(72,ag+.5+Math.random()*4);p.born=at-ag}
+  else p.born=at-Math.min(p.retireAt-1,a+Math.random()*(b-a));
+  // time already spent with the current employer for those in work at the start (our assumption: about 6 years on average, never before age 18)
+  p.since=at-Math.min(Math.max(0,at-p.born-18),-6*Math.log(1-Math.random()))}
+const ageOf=p=>Math.floor(year-p.born);
+function retireTracked(p){
+  note(p,`Retires at ${ageOf(p)} as ${lvName(p.level)}${p.comp?' at '+p.comp.d[0]:', while out of work'}.`,'end');
+  p.retiredIn=Math.floor(year); p.retiredAge=ageOf(p); p.retiredAs=p.level; p.retiredFrom=p.comp?p.comp.d[0]:null;
+  p.comp=null; p.left=null; p.seeking=false; setSeeker(p,false); p.q.length=0; p.next=Infinity; p.retired=true;
+  if(p.f&&p.f.g&&p.f.g.visible!==undefined) p.f.g.visible=false;
+}
 function retire(p){
   p.q.length=0; if(p.comp||p.left){} p.comp=null; p.left=null; p.level=0; p.y=0; p.seeking=false; p.laidOff=false; setSeeker(p,false);
   p.avoid=null; p.reachedTop=false; p.changed=false; p.stuck=0; p.wantHop=false; p.changeYear=year+4+Math.random()*16; p.target=2+(Math.random()<.45?1:0);
   if(!p.shadow){const m=p.ownMat||typeMats[p.type];p.f.meshes.forEach(x=>x.material=m);p.f.head.position.set(0,.66,0);
     p.x=(Math.random()-.5)*(SIZE-3);p.z=(Math.random()-.5)*(SIZE-3);p.f.g.position.set(p.x,0,p.z)}
   tally.retired=(tally.retired||0)+1;
+  setAge(p,0,year,true);
   p.next=year+searchLength(); // the newcomer who replaces them looks for a first job for as long as a real job search takes
 }
 function decide(p){
-  p.next=year+.6+Math.random()*.9;
-  if(!p.tracked&&Math.random()<RETIRE*1.35){retire(p);return}
+  // workers reconsider their situation every few months; every chance below is a yearly rate turned into the chance of it happening
+  // before the next check, so how often they check doesn't change how often things happen, only how precisely they are timed
+  p.next=year+.1+Math.random()*.15;
+  // workers with a high chance of leaving (new in the job, young, frequent movers) check more often, so a high yearly rate
+  // isn't cut off by the gap between checks
+  if(p.comp&&p.since!=null){const t=Math.max(0,year-p.since),a=p.born!=null?year-p.born:40,z=czQ(p);
+    const mi=Math.floor((year-2001)*12), mq=joltsMult(JQ,JQ_BASE,year,year+.01), ml=joltsMult(JL,JL_BASE,year,year+.01);
+    const r=1.6*mq*quitRate(p.comp)*TEN_Q(t)*AGE_Q(a)*z/qnorm(p)+1.5*ml*layoffRate(p.comp)*layoffFactor(p.comp,p.level)*TEN_L(t)*AGE_L(a)*czL(p)/lnorm(p);
+    // when next month's real rate jumps (or drops) sharply, everyone is checked right after the month begins, so a sudden
+    // change in the data shows up in the month it happened
+    if(mi>=-1&&mi+1<JL.length){const tb=2001+(mi+1)/12,jn=JL[Math.max(0,mi+1)]/JL[Math.max(0,mi)],qn=JQ[Math.max(0,mi+1)]/JQ[Math.max(0,mi)];
+      if((jn>1.5||jn<.67||qn>1.3||qn<.77)&&tb<p.next)p.next=tb+Math.random()*.01}
+    if(r*(p.next-year)>.06)p.next=year+Math.max(.01,.06/r)}
+  // chance that something with a yearly rate r happens before the next decision, dtn years away
+  const dtn=p.next-year, hz=r=>1-Math.exp(-r*dtn), ten=p.comp&&p.since!=null?year-p.since:0;
+  const jq=joltsMult(JQ,JQ_BASE,year,year+.01)*QUIT_CAL;
+  if(p.born!=null&&year-p.born>=p.retireAt){p.tracked?retireTracked(p):retire(p);return}
   const open=alive(), lock=p.lockUntil&&year<p.lockUntil;
   if(!p.comp&&p.laidOff&&!p.seeking) startSearch(p);
   if(p.seeking){
@@ -1321,28 +1818,61 @@ function decide(p){
     // search over: take an offer, often one floor higher than the job they left
     const up=open.filter(L=>L!==p.left&&hasSeat(L,p.level+1,p)), same=open.filter(L=>L!==p.left&&L.top>=p.level);
     p.seeking=false; setSeeker(p,false);
+    if(p.recall){const R=p.recall;p.recall=null;
+      if(R.alive&&R.top>=p.level){p.tries=0;join(p,R,p.level);p.since=R===p.left&&p.sinceBefore!=null?p.sinceBefore:p.since;tally.recalled=(tally.recalled||0)+1;note(p,`Recalled by ${R.d[0]} to the same job, ${lvName(p.level)}.`,'hired');return}
+      startSearch(p);return} // the recall fell through: a normal search starts
     // people who quit chose to leave, so they rarely accept a lower job: about 1 in 20 of those above entry level do, by choice
     // (our estimate; Pew Research found 9–18% of 2021 quitters had fewer chances to advance in their new job, and a lower floor is a
     // bigger step down than that). Everyone else waits for their own floor, looking in short rounds until a seat opens.
     if(!p.laidOff&&p.level>0&&Math.random()<QUIT_DOWN){const low=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));
       if(low.length){const lv0=p.level;p.tries=0;join(p,fieldPick(p,low,null,lv0-1),lv0-1);note(p,`Chooses a lower job: ${lvName(p.level)} at ${p.comp.d[0]}.`,'drop');return}}
-    const upTo=up.length&&fieldPick(p,up,null,p.level+1);
-    if(!p.laidOff&&upTo&&Math.random()<Math.min(.9,.5*cm('upMult')*edgeOf(p,upTo))){bump('promos');join(p,upTo,p.level+1);tally.upSwitch=(tally.upSwitch||0)+1;note(p,`After job hunting, lands a role one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
+    // a step up by changing employer: most promotions happen inside the company, and most moves between companies are sideways.
+    // In Finnish employer records, promotions into a job from another firm are 4.3% of job entries against 24.5% for internal
+    // promotions (DeVaro et al.); among US MBA graduates, 77% of moves into bigger roles were internal (Bidwell & Mollick 2015).
+    // UP_SWITCH is set so that about 1 in 5 promotions come from switching. Most of these stay in the same field: about 85% of
+    // hires between firms keep the same job title (DeVaro et al.); the model has no occupations, so the industry stands in for it.
+    const f0=fieldOf(p), upSame=up.filter(L=>sectorOf(L)===f0), upPool=Math.random()<UP_SAME?upSame:up;
+    const upTo=year-(p.lastUp||-99)>=1&&upPool.length&&pick(upPool);
+    if(!p.laidOff&&upTo&&Math.random()<Math.min(.9,UP_SWITCH*cm('upMult')*edgeOf(p,upTo)*PROMO_AGE(p))){bump('promos');join(p,upTo,p.level+1);p.lastUp=year;tally.upSwitch=(tally.upSwitch||0)+1;note(p,`After job hunting, lands a role one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
     if(p.laidOff&&p.level>0&&Math.random()<.4){const lower=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));if(lower.length){const lv=p.level;join(p,fieldPick(p,lower,null,lv-1),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'drop');return}}
     const land=same.length&&landing(p,same,p.level);
     if(land&&land[1]<p.level&&!p.laidOff){if(!p.tries)note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');p.tries=1;startSearch(p,true);return}
-    if(land&&land[1]<p.level&&p.laidOff&&!p.tries){p.tries=1;startSearch(p);note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');return}
+    if(land&&land[1]<p.level&&p.laidOff&&!p.tries){p.tries=1;startSearch(p,true);note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');return}
     if(land){const wasLaid=p.laidOff,lv0=p.level;p.tries=0;join(p,land[0],land[1]);
-      note(p,p.level<lv0?`Still no ${lvName(lv0)} seat free anywhere; takes a step down to ${lvName(p.level)} at ${p.comp.d[0]}.`:wasLaid?`Hired again at ${p.comp.d[0]} as ${lvName(p.level)}${backIn(p)}.`:`Takes a role as ${lvName(p.level)} at ${p.comp.d[0]}, same floor as before${backIn(p)}.`,p.level<lv0?'drop':'hired');return}
+      note(p,p.level<lv0?`Still no ${lvName(lv0)} seat free anywhere; takes a step down to ${lvName(p.level)} at ${p.comp.d[0]}.`:wasLaid?`Back in work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`:`Moves to ${p.comp.d[0]}, same floor as before (${lvName(p.level)})${backIn(p)}.`,p.level<lv0?'drop':'hired');return}
   }
   if(p.comp&&!p.f.g.parent) return;
-  if(p.comp&&!p.def&&!lock){const c=activeCrisis(); // a followed worker in the collapse or merger scenario stays put until that event
-    if(c&&c.outlier&&c.outlier.companies.includes(p.comp.d[0])&&Math.random()<c.outlier.rate*1.35){crisisLayoff(p,`${c.outlier.why}: ${p.comp.d[0]} cuts jobs. Laid off as ${lvName(p.level)}.`,true);return}
-    if(Math.random()<layoffRate(p.comp)*cm('layoffMult')*1.35*(p.comp.trOn?1.5:1)){crisisLayoff(p);return}}
-  if(!lock&&p.comp&&p.level<5&&Math.random()<cm('quitMult')*quitRate(p.comp)*1.35*(p.type==='hopper'?1.6:p.type==='nepo'?.3:p.type==='steady'&&p.level>=p.target?.4:1)){
+  // quits and layoffs are drawn ahead for the time until the next check, using the real JOLTS rate of each month in that time, and
+  // placed on the exact date they happen; time in a new job not yet covered (since being hired) is included, so the first weeks,
+  // when leaving is most likely, are never skipped
+  let doLay=false, doQuit=false;
+  if(p.comp&&!p.def){
+    if(p.pend&&p.pend.comp===p.comp){if(year>=p.pend.t-1e-9){doLay=p.pend.kind==='l';doQuit=p.pend.kind==='q';p.pend=null}else p.next=Math.min(p.next,p.pend.t)}
+    else{p.pend=null;
+      const w0=Math.min(year,Math.max(p.cov!=null?p.cov:year,p.since!=null?p.since:year)), w1=p.next;
+      if(w1>w0){
+        const ind=TEN_L(ten)*czL(p)*(p.born!=null?AGE_L(year-p.born):1)/lnorm(p);
+        // a firm in its first two years is still growing and rarely cuts jobs (our assumption)
+        const bl=lock?0:layoffRate(p.comp)*layoffFactor(p.comp,p.level)*(p.comp.trOn?1.5:1)*(year-p.comp.founded<2?.3:1);
+        const bq=lock||p.level>=5?0:quitRate(p.comp)*TEN_Q(ten)*czQ(p)*(p.lastUp&&year-p.lastUp<1?.5:1)*(p.born!=null?AGE_Q(year-p.born):.3)/qnorm(p)*(p.type==='hopper'?1.6:p.type==='nepo'?.3:p.type==='steady'&&p.level>=p.target?.4:1);
+        const seg=[];let t=w0,Hl=0,Hq=0;
+        while(t<w1-1e-9){const mi=Math.floor((t-2001)*12+1e-9),te=Math.min(w1,2001+(mi+1)/12),d=te-t;
+          const J=(mi<0?JL.slice(0,12).reduce((a,b)=>a+b,0)/12:JL[Math.min(JL.length-1,mi)])/JL_BASE*LAYOFF_CAL;
+          const Q=(mi<0?JQ.slice(0,12).reduce((a,b)=>a+b,0)/12:JQ[Math.min(JQ.length-1,mi)])/JQ_BASE*QUIT_CAL;
+          // layoffs above the normal level hit workers broadly, not mainly the frequent movers and newest hires: recession and mass
+          // layoffs reach settled workers too (Farber, Displaced Workers Survey)
+          const hl=bl*(Math.min(J,LAYOFF_CAL)*ind+Math.max(0,J-LAYOFF_CAL))*d, hq=bq*Q*d;seg.push([t,d,hl,hq]);Hl+=hl;Hq+=hq;t=te}
+        if(Hl+Hq>0&&Math.random()<1-Math.exp(-(Hl+Hq))){const kind=Math.random()*(Hl+Hq)<Hl?'l':'q';
+          let u=Math.random()*(kind==='l'?Hl:Hq),at=w1;for(const [t0,d,hl,hq] of seg){const h=kind==='l'?hl:hq;if(u<=h){at=t0+d*u/Math.max(h,1e-12);break}u-=h}
+          if(at<=year){doLay=kind==='l';doQuit=kind==='q'}else{p.pend={t:at,kind,comp:p.comp};p.next=Math.min(p.next,at)}}
+      }
+      p.cov=w1}
+  }
+  if(doLay){crisisLayoff(p);return}
+  if(doQuit){
     note(p,`Quits ${p.comp.d[0]} as ${lvName(p.level)} to look for something better.`,'quit');
     p.left=p.comp; p.comp=null; tally.quit=(tally.quit||0)+1; bump('quits');
-    walkTo(p,p.x+(Math.random()-.5)*2,p.z+(Math.random()-.5)*2); startSearch(p,Math.random()<.9); return;
+    walkTo(p,p.x+(Math.random()-.5)*2,p.z+(Math.random()-.5)*2); {const ln=Math.random()<.9; startSearch(p,ln); p.notice=ln} return;
   }
   if(!p.comp){
     if(p.type==='nepo'&&p.level===0){ // family connections open a door above entry level: two floors up where the family controls the company, one elsewhere
@@ -1357,7 +1887,7 @@ function decide(p){
     note(p,p.level<lv0?`No ${lvName(lv0)} seat free; hired at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Hired at ${p.comp.d[0]} as ${lvName(p.level)}.`,p.level<lv0?'drop':'hired'); return;
   }
   const L=p.comp;
-  if(!lock&&p.type==='changer'&&!p.changed&&year>=p.changeYear&&p.level>=2){
+  if(!lock&&p.type==='changer'&&!p.changed&&year>=p.changeYear&&p.level>=1&&(p.born==null||ageOf(p)<50)){ // restarting at entry level: under 50 only (our assumption)
     p.changed=true; tally.restarts++; note(p,`Leaves ${L.d[0]} as ${lvName(p.level)} to start over at entry level in a new field.`,'drop');
     walkTo(p,L.fx,L.fz); vert(p,0,'climb');
     const s=[L.fx+(Math.random()-.5)*3,L.fz+(Math.random()-.5)*3]; walkTo(p,s[0],s[1]);
@@ -1371,20 +1901,22 @@ function decide(p){
   if(p.type==='steady'&&p.level>=p.target) return;
   if(L.top>p.level){
     const edge=edgeOf(p,L);
-    if(Math.random()<BASE[p.level]*sf(L)*edge*cm('promoMult')&&hasSeat(L,p.level+1,p)){bump('promos');takeSeat(p,L,p.level+1);
+    // nobody is promoted twice within a year, or within their first year at a company (our rule; LinkedIn career histories at 20 large firms show 30.4 months between promotions
+    // on average, and 10.4 months at the fastest, Tesla; Standout CV, 2024)
+    if(year-Math.max(p.lastUp||-99,p.since!=null?p.since:-99)>=1&&Math.random()<hz(BASE[p.level]*sf(L)*edge*cm('promoMult')*PROMO_AGE(p))&&hasSeat(L,p.level+1,p)){bump('promos');takeSeat(p,L,p.level+1);
       const s=spot(p,L);
       if(p.type==='nepo'){walkTo(p,s[0],s[1]);vert(p,(p.level+1)*GAP,'lift')}
       else{walkTo(p,L.fx,L.fz); vert(p,(p.level+1)*GAP,'climb'); walkTo(p,s[0],s[1])}
-      p.level++; p.stuck=0; if(p.type==='hopper') p.wantHop=true; note(p,`Promoted to ${lvName(p.level)} at ${L.d[0]}.`,'promo');
+      p.level++; p.stuck=0; p.lastUp=year; if(p.type==='hopper') p.wantHop=true; note(p,`Promoted to ${lvName(p.level)} at ${L.d[0]}.`,'promo');
       if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive at ${L.d[0]}.`,'good')}
-    }else if(++p.stuck>=4&&!lock&&p.type!=='steady'&&p.type!=='regular'){
+    }else if(year-Math.max(p.lastUp||0,p.since||0)>=4&&Math.random()<hz(.15*(jq/QUIT_CAL)*(p.born!=null?AGE_Q(year-p.born)/AGE_Q(40):1))&&!lock&&p.type!=='steady'&&p.type!=='regular'){
       // passed over: usually look for a better-rated company in the same industry, otherwise any company with a free seat
       const cand=open.filter(o=>o!==L&&o.top>p.level&&hasSeat(o,p.level,p)), better=cand.filter(o=>sectorOf(o)===sectorOf(L)&&sf(o)>sf(L));
       p.stuck=0; if(cand.length){const N=better.length&&Math.random()<.7?pick(better):fieldPick(p,cand);transfer(p,N);
         const rated=N.d[3]!=null&&L.d[3]!=null&&N.d[3]>L.d[3];
         note(p,`Passed over for promotion at ${L.d[0]}; moves to ${N.d[0]}${rated?', which is rated better':''}.`,'move')}
     }
-  }else if(!lock&&p.type!=='steady'&&(p.type!=='regular'||Math.random()<.3)){
+  }else if(!lock&&p.type!=='steady'&&(p.type!=='regular'||Math.random()<hz(.34*jq/QUIT_CAL))){
     const opts=open.filter(o=>o.top>p.level&&hasSeat(o,p.level,p));
     if(opts.length){transfer(p,fieldPick(p,opts));note(p,`${L.d[0]} has no higher floor. Moves to ${p.comp.d[0]}, which does.`,'move')}
   }
@@ -1480,30 +2012,53 @@ function simulate(dt){
   const sdt=dt*speed;
   year=Math.min(END,year+sdt/YEAR_SEC);
   for(const L of ladders){
-    if(L.growth&&L.alive){const gs=L.growth.steps[L.growI||0]; if(gs&&year>=gs[0]){setTop(L,gs[1]);addLog(`${L.d[0]} ${gs[2]}. Its ladder grows a floor: L${gs[1]} ${LEVELS[gs[1]-1]} now exists there.`,'good')}}
+    if(L.growth&&L.alive){const gs=L.growth.steps[L.growI||0]; if(gs&&year>=gs[0]){L.growI=(L.growI||0)+1;redrawLadder(L);if(gs[3]!=='quiet')addLog(`${L.d[0]} ${gs[2]}. Its ladder ${gs[3]==='narrows'?'narrows':'widens'}.`,gs[3]==='narrows'?'':'good')}}
     if(L.mergeAt&&!L.merged&&year>=L.mergeAt) merge(L.mergeInto);
     if(!L.alive&&!L.failed&&!L.merged&&L.founded<=year&&!(L.collapse&&L.collapse.at<=year)&&!(L.mergeAt&&year>=L.mergeAt)){L.alive=true; if(L.founded>START&&!L.dbl) addLog(`${L.d[0]} was founded. A new ladder appears.`)}
     if(L.alive&&L.collapse&&L.collapse.at<=year) collapse(L);
     if(L.trFrom&&!L.trOn&&year>=L.trFrom){L.trOn=true;L.el.classList.add('tr');addLog(`${L.d[0]} enters a transition: ${L.d[6].log}. Its ladder fades and promotions there slow down.`,'bad')}
   }
-  crisisTick();
+  crisisTick(); companyCuts();
   if(!mixNow||year-(mixNow._t||0)>=.1){updateMixNow();mixNow._t=year}
   if(!sampleHist.length||year-sampleHist[sampleHist.length-1][0]>=.05) sampleHist.push([year,sampleCount()]);
   for(const p of people){
     if(p.shadow){p.q.length=0;if(year>=p.next){curP=p;quietly(()=>decide(p));curP=null}p.q.length=0;p.y=p.level*GAP;continue}
     if(!p.q.length&&year>=p.next){curP=p;decide(p);curP=null} stepPerson(p,sdt) }
   stepCases(sdt);
-  if(year>=END){playing=false;setPlay();finishJourney();addLog(`The simulation reached ${Math.floor(END)}. ${tally.top} worker${tally.top===1?'':'s'} reached Executive; ${tally.hit} were hit by a collapse.`)}
+  if(year>=END){playing=false;setPlay();finishJourney();if(!follow)runSummary();addLog(`The simulation reached ${Math.floor(END)}. ${tally.top} worker${tally.top===1?'':'s'} reached Executive; ${tally.hit} were hit by a collapse.`)}
+}
+
+/* end-of-run summary for a plain run: where the whole simulated workforce ended up and what happened to it on the way */
+function runSummary(){
+  const rv=document.getElementById('reveal'); if(!rv) return;
+  const ws=people.filter(p=>!p.def&&p.born!=null), emp=ws.filter(p=>p.comp), n=ws.length||1;
+  const fl=[0,0,0,0,0,0]; emp.forEach(p=>fl[p.level]++);
+  const yrs=END-START, sum=k=>events[k].reduce((a,b)=>a+(b||0),0), base=sampleN(START,END)||1;
+  const per=k=>(sum(k)/yrs/base*100).toFixed(1);
+  const lk=layoffKinds, lt=lk.temp+lk.tempEnd+lk.perm||1, pc=x=>Math.round(100*x/lt);
+  const failed=ladders.filter(L=>L.failed).map(L=>L.d[0]);
+  const g=CRISES.find(c=>c.id==='gfc'), w=WIN.gfc, gb=rate('layoffs',...w.before), gd=rate('layoffs',g.from,g.to);
+  const gch=gb&&gd?Math.round((gd/gb-1)*100):null, greal=realChange('layoffs',w,g.from,g.to);
+  rv.innerHTML=`<div class="cap">The run reached ${Math.floor(END)} · summary</div><h3>${n.toLocaleString('en-US')} simulated workers, 26 years</h3>
+    <p><b>Where they are now:</b> ${Math.round(100*emp.length/n)}% in work. By floor: ${fl.map((x,i)=>`${i?LEVELS[i-1].split(' /')[0]:'Entry'} ${Math.round(100*x/(emp.length||1))}%`).join(' · ')}.</p>
+    <p><b>Each year, per 100 workers:</b> ${per('promos')} promotions, ${per('quits')} quits and ${per('layoffs')} layoffs. Of the layoffs, ${pc(lk.temp)}% were temporary, with a recall to the same job; ${pc(lk.tempEnd)}% were short temporary jobs ending; ${pc(lk.perm)}% were permanent.</p>
+    <p><b>Crises:</b> in the 2008 financial crisis layoffs rose ${gch==null?'–':(gch>0?'+':'')+gch+'%'} in the model against ${greal==null?'–':(greal>0?'+':'')+greal+'%'} in reality.${failed.length?` ${failed.length} companies collapsed along the way, including ${failed.slice(0,3).join(', ')}.`:''}</p>
+    <p class="small">Real-world benchmarks for every figure are in the chart and table below, and in the notes.</p>
+    <div class="row"><button id="revealJourney">See the charts</button><button id="revealClose">Close</button></div>`;
+  rv.querySelector('#revealClose').onclick=()=>rv.classList.remove('show');
+  rv.querySelector('#revealJourney').onclick=()=>{rv.classList.remove('show');document.getElementById('yearly').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})};
+  rv.addEventListener('pointerdown',e=>e.stopPropagation());
+  requestAnimationFrame(()=>rv.classList.add('show'));
 }
 
 /* stats */
 const peopleEl=document.getElementById('people');
 function stickSvg(type){return `<svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true" style="color:var(--p-${type})"><circle cx="7" cy="3.5" r="2.8" fill="currentColor"/><path d="M7 6.5v6.5M2.5 9h9M7 13l-3.5 6M7 13l3.5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>`}
 peopleEl.innerHTML=Object.entries(TYPES).map(([k,t])=>`<div class="ptype">${stickSvg(k)}<b>${t.name}</b><span class="n" id="n-${k}"></span><p>${t.desc}</p></div>`).join('');
-peopleEl.insertAdjacentHTML('beforeend',`<div class="ptype seek">${stickSvg('regular').replace('</svg>','<circle class="mark" cx="12" cy="2" r="1.8"/></svg>')}<b>Job seeker</b><span class="n" id="n-seek"></span><p>Quit to look for something better. Wanders across their floor, marked with an orange dot, until another company makes an offer, often one floor higher.</p></div>`);
-peopleEl.insertAdjacentHTML('beforeend',`<div class="ptype">${stickSvg('laid').replace('<circle cx="7" cy="3.5"','<circle cx="8.5" cy="4.5"')}<b>Laid off</b><span class="n" id="n-laid"></span><p>Anyone who loses their job in a collapse or merger turns grey, head down, until another company hires them at entry level.</p></div>
+peopleEl.insertAdjacentHTML('beforeend',`<div class="ptype seek">${stickSvg('regular').replace('</svg>','<circle class="mark" cx="12" cy="2" r="1.8"/></svg>')}<b>Job seeker</b><span class="n" id="n-seek"></span><p>Quit to look for something better. Wanders across their floor, marked with an orange dot, until another company makes an offer, usually on the same floor and sometimes one floor higher.</p></div>`);
+peopleEl.insertAdjacentHTML('beforeend',`<div class="ptype">${stickSvg('laid').replace('<circle cx="7" cy="3.5"','<circle cx="8.5" cy="4.5"')}<b>Laid off</b><span class="n" id="n-laid"></span><p>Anyone who loses their job turns grey, head down, until they are hired again. About 4 in 10 are recalled by the same employer within weeks.</p></div>
 <div class="ptype case">${stickSvg('case')}<b>Michael Fiddelke</b><span class="n">real path</span><p>Target's CEO, replayed from his actual job history: intern in 2003, Director in 2007, executive floor in 2013, CEO in 2026.</p></div>
-<div class="ptype founderCase">${stickSvg('founderCase')}<b>Jensen Huang</b><span class="n">real path</span><p>Started washing dishes at Denny's at 15, co-founded Nvidia at 30. Doesn't climb anyone's ladder: he stands on top of his own as it grows from Senior to Director height.</p></div>
+<div class="ptype founderCase">${stickSvg('founderCase')}<b>Jensen Huang</b><span class="n">real path</span><p>Started washing dishes at Denny's at 15, co-founded Nvidia at 30. Doesn't climb anyone's ladder: he stands on top of his own as it widens from 392 to about 42,000 staff.</p></div>
 <div class="ptype beastCase">${stickSvg('beastCase')}<b>Jimmy Donaldson (MrBeast)</b><span class="n">real path</span><p>Started his YouTube channel at 13 in 2012. Stands on top of his own ladder, which grows as the team behind it does.</p></div>
 <div class="ptype nepoCase">${stickSvg('nepo')}<b>John Elkann</b><span class="n">real path</span><p>Agnelli heir, on Fiat's board at 21. Rides straight to the top without rungs; chairman of Fiat at 34, then of Stellantis.</p></div>`);
 let statT=0;
@@ -1515,8 +2070,11 @@ function updateStats(){
   {const el=document.getElementById('n-seek'); if(el) el.textContent=`${vis.filter(p=>p.seeking&&!p.laidOff).length} now`}
   for(const k in TYPES){const ps=vis.filter(p=>p.type===k);const avg=ps.reduce((a,p)=>a+p.level,0)/ps.length;document.getElementById('n-'+k).textContent=`${ps.length} · avg L${avg.toFixed(1)}`}
   {const emp=people.filter(p=>p.comp);const cnt={};emp.forEach(p=>{const k=sectorOf(p.comp);cnt[k]=(cnt[k]||0)+1});
-   document.getElementById('mix').innerHTML=Object.entries(SECTORS).map(([k,x])=>{const sim=(cnt[k]||0)/Math.max(1,emp.length)*100, real=x.jobs/JOBS_TOTAL*100;
-     return `<div class="r"><span class="n" title="${x.name}">${x.name}</span><span class="b"><i style="width:${Math.min(100,sim*4)}%"></i><u style="left:${Math.min(100,real*4)}%"></u></span><span class="v">${sim.toFixed(0)}% / ${real.toFixed(0)}%</span></div>`}).join('')+`<div class="k">Bar: share of employed simulated workers (all ${people.length}). Line and second figure: real share of US jobs (BLS, Sep 2026).</div>`}
+   document.getElementById('mix').innerHTML=Object.entries(SECTORS).map(([k,x])=>{const sim=(cnt[k]||0)/Math.max(1,emp.length)*100, real=shareAt(k,year)*100;
+     return `<div class="r"><span class="n" title="${x.name}">${x.name}</span><span class="b"><i style="width:${Math.min(100,sim*4)}%"></i><u style="left:${Math.min(100,real*4)}%"></u></span><span class="v">${sim.toFixed(0)}% / ${real.toFixed(0)}%</span></div>`}).join('')+`<div class="k">Bar: share of employed simulated workers (all ${people.length}). Line and second figure: real share of US jobs in that year (BLS).</div>`;
+   const bc=[0,0,0,0,0];let np=0;emp.forEach(p=>{if(sectorOf(p.comp)!=='gov'){bc[BAND_OF(sizeNow(p.comp))]++;np++}});
+   document.getElementById('sizemix').innerHTML=BAND_NAMES.map((nm,i)=>{const sim=bc[i]/Math.max(1,np)*100, real=SIZE_TARGET[i]*100;
+     return `<div class="r"><span class="n">${nm}</span><span class="b"><i style="width:${Math.min(100,sim*2.5)}%"></i><u style="left:${Math.min(100,real*2.5)}%"></u></span><span class="v">${sim.toFixed(0)}% / ${real.toFixed(0)}%</span></div>`}).join('')+`<div class="k">Real shares: Census and BLS firm-size data (see "Is the sample representative?" below).</div>`}
   document.getElementById('tally').innerHTML=`<span>Reached Executive <b>${tally.top}</b></span><span>Company switches <b>${tally.hops}</b></span><span>Started over <b>${tally.restarts}</b></span><span>Hit by a collapse <b>${tally.hit}</b></span><span>Quit to look for better <b>${tally.quit||0}</b></span><span>Moved up by switching <b>${tally.upSwitch||0}</b></span><span>Laid off in a crisis <b>${tally.crisisLaid||0}</b></span><span>Moved by a merger <b>${tally.merged||0}</b></span>`;
   document.getElementById('year').textContent=Math.floor(year);
 }
@@ -1543,7 +2101,7 @@ function applyTheme(){
 
 /* level labels */
 const labelsEl=document.getElementById('labels'); const labelEls=[];
-for(let i=0;i<6;i++){const d=document.createElement('div');d.className='lvl';d.innerHTML=i?`<b>L${i}</b> You can become ${LEVELS[i-1]}`:`<b>L0</b> Entry level: everyone starts here`;labelsEl.appendChild(d);labelEls.push(d)}
+for(let i=0;i<6;i++){const d=document.createElement('div');d.className='lvl';d.innerHTML=`<b>L${i}</b> ${i?LEVELS[i-1]:ENTRY}`;labelsEl.appendChild(d);labelEls.push(d)}
 
 /* camera */
 const VIEWS={model:{az:.75,el:.5},side:{az:0,el:.02},top:{az:0,el:Math.PI/2-.0001}};
@@ -1551,7 +2109,7 @@ let az=.75,el=.5,zoom=1,tgt=null;
 function setView(v){tgt=VIEWS[v];['Model','Side','Top'].forEach(n=>document.getElementById('v'+n).setAttribute('aria-pressed',String(n.toLowerCase()===v)))}
 function updCam(){
   const w=stage.clientWidth,h=stage.clientHeight,a=w/h;
-  const span=(a<1?40/a*.62:33)/zoom;
+  const span=(a<1?51/a*.62:42)/zoom;
   cam.left=-span*a/2;cam.right=span*a/2;cam.top=span/2;cam.bottom=-span/2;cam.updateProjectionMatrix();
   const c=new THREE.Vector3(0,2.7*GAP,0), r=40;
   cam.position.set(r*Math.cos(el)*Math.sin(az),c.y+r*Math.sin(el),r*Math.cos(el)*Math.cos(az));
