@@ -112,6 +112,13 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .frow select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .jhead{font-family:var(--display);font-size:1.1rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .jhead i{width:12px;height:12px;border-radius:50%;background:var(--c)}
+.rvt{font-size:12.5px;min-width:520px;border-collapse:collapse;width:100%}
+.rvt th,.rvt td{padding:4px 7px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.rvt .num{text-align:right;font-variant-numeric:tabular-nums}
+.rvt td i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.jnav{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.jnav button{min-width:36px;font-size:16px;line-height:1}
+.jnav span{font-variant-numeric:tabular-nums}
 .jlog{max-height:300px}
 .jlog .k{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--kc);vertical-align:0}
 .jsum{border-top:1px solid var(--line);padding-top:10px;font-size:14px;display:grid;gap:6px}
@@ -174,6 +181,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .reveal .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .jlog .hiddenstep{color:var(--muted);font-style:italic}
 @media (prefers-reduced-motion: reduce){.reveal{transition:none}}
+.reveal.wide{width:min(760px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:auto}
 .ylegend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:6px 0}
 .ylegend span::before{content:"";display:inline-block;width:14px;height:3px;border-radius:2px;background:var(--c);margin-right:6px;vertical-align:3px}
 .realsim{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:6px}
@@ -260,6 +268,7 @@ td a,.detail a{color:var(--ink)}
       <span class="cap">Speed</span>
       <button id="s1" aria-pressed="true">1×</button>
       <button id="s3" aria-pressed="false">3×</button>
+      <button id="s5" aria-pressed="false">5×</button>
     </div>
     <div class="group" role="group" aria-label="View">
       <span class="cap">View</span>
@@ -268,7 +277,7 @@ td a,.detail a{color:var(--ink)}
       <button id="vTop" aria-pressed="false">Top-down</button>
     </div>
     <div class="group" role="group" aria-label="Detail">
-      <span class="cap" title="More workers make the charts steadier but run slower. The companies are the same at every setting.">Detail</span>
+      <span class="cap" title="How many companies represent each industry: Light about 72, Standard about 98, Full about 124. Every level was checked so each industry's group still mirrors its real employment.">Detail</span>
       <button id="dLight" aria-pressed="false">Light</button>
       <button id="dStd" aria-pressed="true">Standard</button>
       <button id="dFull" aria-pressed="false">Full</button>
@@ -277,7 +286,7 @@ td a,.detail a{color:var(--ink)}
   </div>
 
   <div class="follow box" id="followBox">
-    <div class="cap">Follow one career</div>
+    <div class="cap">Follow careers</div>
     <div class="frow">
       <label for="ftype">Worker</label>
       <select id="ftype">
@@ -294,10 +303,13 @@ td a,.detail a{color:var(--ink)}
         <option value="typical">Typical worker: picked at random from the 2000 workforce</option>
         <option value="ordinary">First job: looking for a first job in 2000</option>
       </select>
+      <label for="fcount">How many</label>
+      <select id="fcount"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="10">10</option></select>
       <button id="fstart">Follow from 2000</button>
       <button id="fstop" hidden>Stop following</button>
     </div>
     <div id="journey" hidden>
+      <div class="jnav" id="jnav" hidden><button id="jprev" aria-label="Previous worker">‹</button><span id="jpos"></span><button id="jnext" aria-label="Next worker">›</button></div>
       <div class="jhead" id="jhead"></div>
       <ol class="log jlog" id="jlog"></ol>
       <div class="jsum" id="jsum" hidden></div>
@@ -366,7 +378,7 @@ td a,.detail a{color:var(--ink)}
     <h2>What's real and what's simulated</h2>
     <div class="realsim">
       <div class="rs"><b>Real, the same every time</b><p>The companies, their headcounts year by year, their industries and founding years. Every rate that moves over time: quits and layoffs month by month in each industry, the mix of jobs by industry and company size, job openings, and the dates of 9/11, the 2008 crisis, COVID-19 and the Great Resignation, which are shown as markers.</p></div>
-      <div class="rs"><b>Simulated, different on every restart</b><p>The workers. No record exists of every employee's career, so the model creates fictional ones: a statistical sample (2,400 workers at Standard detail; 1,200 at Light, 4,800 at Full) that behaves like the real US workforce and produces every number on this page, and 135 visible stick figures with six personas (climbers, job hoppers, nepo hires and so on) that tell individual stories but are not counted in the numbers. The rules are tuned to the real figures where data exists. Each simulated year it rolls the dice for each one: promoted or not, quit or not, laid off or not, which company hires them. This is an agent-based simulation.</p></div>
+      <div class="rs"><b>Simulated, different on every restart</b><p>The workers. No record exists of every employee's career, so the model creates fictional ones: a statistical sample (2,400 workers at Standard detail; 1,600 at Light, 3,200 at Full) that behaves like the real US workforce and produces every number on this page, and about 80 visible stick figures (50 at Light, 105 at Full) with six personas (climbers, job hoppers, nepo hires and so on) that tell individual stories but are not counted in the numbers. The rules are tuned to the real figures where data exists. Each simulated year it rolls the dice for each one: promoted or not, quit or not, laid off or not, which company hires them. This is an agent-based simulation.</p></div>
       <div class="rs"><b>What that means</b><p>The model illustrates rather than predicts. It doesn't say "this person at Ford lost their job". It says "a typical worker in a group of jobs like this one would have faced something like this". Pressing Restart replays the same history with a fresh roll of the dice, so individual stories change while the patterns stay. A single run can be skewed by luck; an effect that shows up on every restart is a real effect of the rules.</p></div>
     </div>
   </section>
@@ -380,7 +392,7 @@ td a,.detail a{color:var(--ink)}
   </section>
   <section>
     <h2>The companies in the model</h2>
-    <p class="small" style="max-width:72ch">Every company in the model hires simulated workers and counts in every chart and score. Each industry is represented by its mirror group (the companies whose headcounts together follow the industry), by small firms that stand for its jobs in firms under 1,000 staff, where about half of US private-sector jobs are, and, for government, by public employers. Companies were added only where they fit this; none were added for being well known. The visible stick figures, with their six personas, are not counted: the numbers come from the statistical sample.</p>
+    <p class="small" style="max-width:72ch">Every company in the model hires simulated workers and counts in every chart and score. Each industry is represented by its mirror group (the companies whose headcounts together follow the industry), by small firms that stand for its jobs in firms under 1,000 staff, where about half of US private-sector jobs are, and, for government, by public employers. Companies were added only where they fit this; none were added for being well known. The Detail setting changes how many companies represent each industry: Light keeps the core of each group (about 72 companies), Standard about 98, Full about 124. Each level was checked on its own, so every group mirrors its industry at every setting; the charts below show the level in use. The visible stick figures, with their six personas, are not counted: the numbers come from the statistical sample.</p>
     <div class="realsim" id="sampleList"></div>
   </section>
 
@@ -388,7 +400,7 @@ td a,.detail a{color:var(--ink)}
     <h2>How to read it, and what it can't tell you</h2>
     <div class="notes">
       <p><b>Every company has every career stage.</b> Every ladder starts on the ground floor, L0 Entry level, and reaches L5 Executive, because every company, however small, has someone in charge: in a 40-person firm that is the owner or general manager, who the BLS counts as a top executive. What differs is how many seats each floor has, so the same step can be easy at one company and very hard at another. Rung spacing shows this: dense rungs below a floor mean many seats on it, sparse rungs mean few. A ladder's width shows the company's size. Until version 25, height showed company size and small companies stopped at Junior; once the sample matched real company sizes, that rule left only 0.2% of workers able to reach Executive, against 2.4% in reality.</p>
-      <p><b>Every floor has a limited number of seats.</b> A company can only have so many directors and executives, so nobody, nepo hires included, can move onto a floor unless a seat there is free. Across the whole economy, seats follow the proportions of real US jobs from the BLS Occupational Employment and Wage Statistics (May 2025): top executives and general managers about 2.4% of all jobs, other managers 4.8%, supervisors and team leads about 5% (our estimate), professional roles 25.8%, and the rest split evenly between junior and entry-level work. Each company's own mix differs in three ways. Industry: Senior seats follow the industry's share of professional and business specialist jobs (BLS Current Population Survey, September 2026), and the management floors its share of managers (BLS Occupational Employment and Wage Statistics, May 2023): 58% of jobs in education and health are professional, against 4% in construction, so becoming Senior is far easier in a hospital than on a building site; managers are 13.6% of jobs in finance but 3.9% in transportation. Size: bigger firms have more layers of management (French employer data, Caliendo, Monte and Rossi-Hansberg 2015), so a small firm has an owner but almost no directors, and a large one many directors; the exact factors are our assumption. All companies are then calibrated together so the economy as a whole keeps the BLS proportions. When a seat opens, someone from the floor below usually fills it within about a year, as one departure sets off a chain of promotions; climbers push about 1.5 times as hard for it, and nepo hires 2.6 times as hard where their family controls the company (in the sample, families control Ford, Tyson Foods, Comcast, The New York Times, Dillard's, Marcus Corp and Scholastic through special voting shares) but only 1.4 times elsewhere. Overall, the simulated workforce stays close to the real pyramid: about 33% entry level, 30% junior, 25% senior, 5% leads, 4% directors and 2% executives, against 31, 31, 26, 5, 4.8 and 2.4%.</p>
+      <p><b>Every floor has a limited number of seats.</b> A company can only have so many directors and executives, so nobody, nepo hires included, can move onto a floor unless a seat there is free. Across the whole economy, seats follow the proportions of real US jobs from the BLS Occupational Employment and Wage Statistics (May 2025): top executives and general managers about 2.4% of all jobs, other managers 4.8%, supervisors and team leads about 5% (our estimate), professional roles 25.8%, and the rest split evenly between junior and entry-level work. Each company's own mix differs in three ways. Industry: Professional seats follow the industry's share of professional and business specialist jobs (BLS Current Population Survey, September 2026), and the management floors its share of managers (BLS Occupational Employment and Wage Statistics, May 2023): 58% of jobs in education and health are professional, against 4% in construction, so becoming Professional is far easier in a hospital than on a building site; managers are 13.6% of jobs in finance but 3.9% in transportation. Size: bigger firms have more layers of management (French employer data, Caliendo, Monte and Rossi-Hansberg 2015), so a small firm has an owner but almost no directors, and a large one many directors; the exact factors are our assumption. All companies are then calibrated together so the economy as a whole keeps the BLS proportions. When a seat opens, someone from the floor below usually fills it within about a year, as one departure sets off a chain of promotions; climbers push about 1.5 times as hard for it, and nepo hires 2.6 times as hard where their family controls the company (in the sample, families control Ford, Tyson Foods, Comcast, The New York Times, Dillard's, Marcus Corp and Scholastic through special voting shares) but only 1.4 times elsewhere. Overall, the simulated workforce stays close to the real pyramid: about 33% entry level, 30% junior, 25% senior, 5% leads, 4% directors and 2% executives, against 31, 31, 26, 5, 4.8 and 2.4%.</p>
       <p><b>Staying in the same field.</b> About 37 to 39% of US job-to-job moves stay in the same industry sector (Census Bureau Job-to-Job Flows, as analysed by the Richmond Fed for 2019 to 2022), and the model keeps a similar share. Every industry is now represented by several companies of different sizes, so a worker can stay in their field without returning to the employer they left. Staying in the field also follows the same rebalancing as hiring, so each industry keeps close to its real share of jobs. Workers passed over for promotion usually look for a better-rated company in their own industry. Career changers always start over in a different industry from the one they left.</p>
       <p><b>Colour is the group's prospects, year by year.</b> Each company stands for a group of jobs (its industry and size), so its ladder shows how that group was doing at that moment: how many jobs were open in its industry, how often people there were laid off (adjusted for company size), and how fast jobs grew, its own headcount where the annual reports give it. All three come from BLS data and company reports, month by month from 2001 to 2026, and they are the same numbers that drive the simulated workers on that ladder. In 40-run tests, workers on the reddest fifth of ladder-years were laid off about 2.4 times as often as on the greenest fifth.</p>
       <p><b>The simulation is a set of rules fed by data.</b> A worker may be promoted when a seat on the floor above is free at their company, which happens when someone above leaves (at the real rates of their industry and floor) or the company grows. Seats are usually filled from the floor below within about a year. Ladders appear in the year the company was founded. Where these numbers are not calibrated to data, they are illustrative assumptions chosen to make the dynamics visible.</p>
@@ -419,22 +431,26 @@ td a,.detail a{color:var(--ink)}
       <tbody>
         <tr><td><b>Quits fall with tenure</b></td><td>Quit chance ∝ (years + 0.25)<sup>−0.45</sup></td><td>Shape is ours; fitted so the simulated workforce matches the BLS tenure survey (January 2024: median 3.9 years, 22% one year or less, 26% ten years or more, and median tenure by age). The model gives 3.9, 22% and 26%.</td><td><span class="st st-f">Fitted</span></td></tr>
         <tr><td><b>Layoffs fall with tenure</b></td><td>Workers with 20+ years face about 35% of the first-year rate</td><td>Farber, Displaced Workers Survey.</td><td><span class="st st-d">Data</span></td></tr>
-        <tr><td><b>Quits by age</b></td><td>Ages 18–24, 25–34, 35–44, 45+: 1.0, 0.65, 0.32, 0.19 (relative)</td><td>Fitted (v36), with the movers-and-stayers spread, so new jobs by age come close to the BLS National Longitudinal Surveys of Youth: 0.85, 0.55 and 0.32 a year at 18–23, 24–29 and 30–38 (NLSY97) and 0.19 at 45–56 (NLSY79).</td><td><span class="st st-f">Fitted</span></td></tr>
+        <tr><td><b>Quits by age</b></td><td>Ages 18–24, 25–34, 35–44, 45–54, 55+: 1.36, 0.7, 0.32, 0.12, 0.07 (relative)</td><td>Fitted (v39) with the settings below so new jobs by age (NLSY97, NLSY79), tenure by age (BLS, January 2024) and jobs ending within a year by age come close to the surveys.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>New-job effect</b></td><td>The chance of quitting falls with time in the job: as (years + 0.25) to the power −0.87 under 25 and −0.48 from 25</td><td>Fitted (v39) to the share of jobs that end within a year by age at start: 61% (18–24), 32% (25–38), 21% (45–54), NLSY97 and NLSY79. The form is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>Quits by floor</b></td><td>Entry to Executive: 0.93, 1, 1.2, 1.5, 1.83, 1.95 (relative); executives quit too</td><td>Fitted (v39) to median tenure by occupation (BLS, January 2024): service and production about 3 years, sales and office 3.5, professional 4.5, management 5.7. Until v38 executives never quit; no data supported that.</td><td><span class="st st-f">Fitted</span></td></tr>
         <tr><td><b>Layoffs by age</b></td><td>2, 1.3, 0.85, 0.7 (relative)</td><td>Fitted together with quits so jobs by age and tenure by age come close to the NLSY surveys and the BLS tenure survey. The split between quits and layoffs by age is ours.</td><td><span class="st st-f">Fitted</span></td></tr>
-        <tr><td><b>Movers and stayers</b></td><td>Lasting tendency to move, gamma-distributed (shape 0.5: most moves are made by a minority); layoffs concentrated on movers (power 2); the gap narrows with age</td><td>Fitted (v36) to new jobs by age (NLSY97) and tenure by age (BLS). The distribution's form is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>Downturn layoffs are permanent</b></td><td>Layoffs above an industry's normal level for the month are never followed by a recall</td><td>In downturns temporary layoffs fall as a share of job loss: about 28% of unemployed job losers in 2006–07, 18% in 2009, 13% in 2010 (BLS CPS via FRED).</td><td><span class="st st-d">Data</span></td></tr>
+        <tr><td><b>Movers and stayers</b></td><td>Lasting tendency to move, gamma-distributed (shape 0.42: most moves are made by a minority); layoffs concentrated on movers (power 2); the gap narrows with age to 20% of its size at 55</td><td>Fitted (v39) together with the settings above. The distribution's form is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>How a job ends</b></td><td>Decided before leaving. Quits: 60% straight to a job already lined up, 3% unemployment, 37% a break; layoffs without recall: 25%, 25%, 50%. A person's own tendency to take breaks scales their share (at most 60%), at any age</td><td>The share of breaks one person takes is capped at 60% of their job endings (v43; our assumption, so the time out is not piled on a few people). Fitted (v42) so that, of workers aged 25–55 who leave a job for non-employment, about 85% of quitters and 35% of laid-off workers leave the labour force rather than look for work (CPS, Ellieroth and Michaud, FRED EMSHRNQP and EMSHRNLP; the model gives about 87% and 26%, held back from 35% so time unemployed does not fall further below the NLSY79 figure). Direct moves: employer-to-employer flows (Fujita, Moscarini and Postel-Vinay). Until v41 breaks stopped at 40, our assumption; the spread of break-taking is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>Breaks out of the workforce</b></td><td>Average length by age when the break starts: 2.6 years under 24, 1.6 years at 24–38, 4 years from 39 (exponential). Two in three people come back straight into a job, one in three looks first; after a break of a year or more, about 1 in 4 come back one floor lower</td><td>Lengths fitted (v42) to time out of the workforce by age: 24.5% of weeks at 18–23 and 15.4% at 24–38 (NLSY97), 17% at 45–54 (NLSY79). Coming back: CPS flows 2001–2025, 4.1 million a month from out of the labour force into work against 2.1 million into unemployment. One floor lower: UK evidence (PwC 2016: 23% of professional women returners took a lower-skilled or lower-paid role; Government Equalities Office: high risk of downgrading after a break); no US figure found.</td><td><span class="st st-a">Data + assumption</span></td></tr><tr><td><b>Stepping up by changing employer</b></td><td>Only when moving straight from one job to another</td><td>A higher job elsewhere comes as an offer while still employed; after a break or a search people come back at their floor or lower. Our rule, following the evidence above.</td><td><span class="st st-a">Assumption</span></td></tr><tr><td><b>Personas</b></td><td>A visible "Regular employee" is the norm: their tendency to move is drawn from the middle of the population's spread (30th–70th percentile). A "Settler" sits at the bottom (below the 15th), a "Job hopper" near the top</td><td>Matches what each persona describes. The statistical sample has no personas.</td><td><span class="st st-a">Assumption</span></td></tr><tr><td><b>First jobs</b></td><td>Under 22: Entry 62.5%, Junior 27.3%, Professional 10.2%. From 22: Entry 53.9%, Junior 23.2%, Professional 23.0%. Never in management. If a seat is free</td><td>The jobs held by workers aged 16–19 and 20–24 (BLS CPS Table 11b, 2025), mapped to floors. The 4.2% of 20–24-year-olds in management are left out of first jobs: they mostly have some years of work behind them. Professional and lead are levels in that data; the split between entry (service, production) and junior (sales, office) is our mapping.</td><td><span class="st st-d">Data + mapping</span></td></tr><tr><td><b>Downturn layoffs are permanent</b></td><td>Layoffs above an industry's normal level for the month are never followed by a recall</td><td>In downturns temporary layoffs fall as a share of job loss: about 28% of unemployed job losers in 2006–07, 18% in 2009, 13% in 2010 (BLS CPS via FRED).</td><td><span class="st st-d">Data</span></td></tr>
         <tr><td><b>Turnover by industry and month</b></td><td>Each industry's own quit and layoff rates for every month, January 2001 to August 2026</td><td>BLS JOLTS by industry, not seasonally adjusted (FRED). Construction includes mining, leisure includes other services, trade is wholesale plus retail, weighted by jobs (BLS CES). Layoffs above an industry's usual level for that month hit workers broadly.</td><td><span class="st st-d">Data</span></td></tr>
         <tr><td><b>Firm size and turnover</b></td><td>Quits ×1.05, 1.03, 1.00, 0.93, 0.93 and layoffs ×1.00, 1.03, 1.04, 0.96, 0.96 from the smallest to the largest firms</td><td>BLS JOLTS rates by establishment size (12 months to July 2026), shared out to firm sizes by which firms can own a site that big (our crosswalk); consistent with Census QWI firm-size separations.</td><td><span class="st st-f">Data + crosswalk</span></td></tr>
         <tr><td><b>Companies' own attrition</b></td><td>Washington state 4.5% resignations</td><td>Their own filings and reports, used instead of the industry rate.</td><td><span class="st st-d">Data</span></td></tr>
         <tr><td><b>Recalls</b></td><td>4 in 10 layoffs end in a recall to the same job</td><td>Fujita and Moscarini, American Economic Review, 2017.</td><td><span class="st st-d">Data</span></td></tr>
-        <tr><td><b>Recalls by industry</b></td><td>Construction 1.4, manufacturing 1.3, leisure 1.3, transport 1.15 … finance and information 0.5 (relative)</td><td>Direction from BLS (temporary layoffs are most common in seasonal and order-driven work); the numbers are ours, rescaled so the overall share stays at 40%.</td><td><span class="st st-a">Assumption</span></td></tr>
+        <tr><td><b>Recalls by industry</b></td><td>Leisure 1.4, education and health 1.4, construction 1.3, manufacturing 1.3, transport 1.15, trade 0.9, government 0.8, professional services 0.75, information 0.4, finance 0.12 (relative)</td><td>BLS Mass Layoff Statistics, 2005 and 2006: share of extended mass layoffs where a recall was expected, construction 59–80%, arts and recreation 78–82%, other services 81%, health care 80%, information 18–27%, finance 5–8% (v43). Manufacturing, transport, trade, government and professional services are not published there and keep our values. Rescaled so the overall share stays at 40%.</td><td><span class="st st-a">Data + assumption</span></td></tr>
         <tr><td><b>Recall spell</b></td><td>2 to 12 weeks out of work</td><td>Our estimate; recalled workers are out of work at least a month less than others (Fujita and Moscarini).</td><td><span class="st st-a">Assumption</span></td></tr>
-        <tr><td><b>Temporary jobs ending</b></td><td>Jobs held under a year on the bottom three floors can simply end (60%, 50%, 20% of their layoffs)</td><td>Fitted: about a quarter of non-recall job losses are temporary jobs ending, as among unemployed job losers in the BLS CPS (19 of 74; the model gives 24%).</td><td><span class="st st-f">Fitted</span></td></tr>
+        <tr><td><b>Temporary jobs ending</b></td><td>A job held under a year can simply end; the chance follows how common temporary (contingent) work is for the worker's age, industry and occupation</td><td>BLS Contingent and Alternative Employment Arrangements, July 2023: 12.9% of workers aged 16–24, 3.1% at 25–54, 2.6% at 55+; 2.1% in finance to 7.7% in leisure and hospitality; 5.4% in service, construction and production jobs, about 3.5% elsewhere. The overall level is fitted so about a quarter of non-recall job losses are temporary jobs ending, as among unemployed job losers in the BLS CPS (19 of 74). Until v41 this was an assumed share by floor.</td><td><span class="st st-f">Data + fitted</span></td></tr>
+        <tr><td><b>Public employers have a place</b></td><td>A worker at a state or local government employer takes one in another area only 1 time in 10</td><td>Changing between them means moving home; about 2% of Americans move to another state in a year (Census). The 1 in 10 is our assumption. Fairfax County and Montgomery County count as one area (Washington, DC).</td><td><span class="st st-a">Assumption</span></td></tr>
+        <tr><td><b>Going back to a former employer</b></td><td>Workers look first at employers they have not worked for; about 4–5% of hires are returns</td><td>LinkedIn: rehired former employees were 4.5% of new hires in 2021 and 3.9% in 2019 (via SHRM, 2022). Recalls after a temporary layoff are separate. The model gives about 4.3%.</td><td><span class="st st-f">Fitted</span></td></tr>
+        <tr><td><b>Jobs per floor</b></td><td>Entry 28.2%, Junior 28.2%, Professional 32.2%, Lead 4.7%, Director 4.5%, Executive 2.2%</td><td>Professional: professional plus business and financial specialist jobs, 32.2% (BLS CPS Table 11b, 2025; until v41 professional only, 25.8%). Lead and above: management, split by level as in the OEWS. Entry and junior share the rest equally: our assumption, since occupation groups do not tell these two levels apart.</td><td><span class="st st-a">Data + assumption</span></td></tr>
         <tr><td><b>Search length</b></td><td>Completed searches log-normal, median about 2.4 weeks, spread 1.245, scaled each year by the real median duration</td><td>Fitted to the CPS median (11.5 weeks) and mean (24.8 weeks) duration of unemployment.</td><td><span class="st st-f">Fitted</span></td></tr>
         <tr><td><b>Search length by industry</b></td><td>× (economy-wide openings ÷ industry openings)<sup>0.5</sup>, between ×0.5 and ×2</td><td>Openings: BLS JOLTS by industry. Elasticity of job finding with respect to vacancies about 0.5: Petrongolo and Pissarides (2001).</td><td><span class="st st-d">Data</span></td></tr>
         <tr><td><b>Job-to-job quits</b></td><td>9 in 10 quitters move straight to a new job after 2–6 weeks</td><td>Derived from BLS: 741,000 unemployed quitters against 3.1 million quits a month. The handover length is ours.</td><td><span class="st st-f">Fitted</span></td></tr>
-        <tr><td><b>Taking a lower job</b></td><td>Laid-off searchers above entry level take a job one floor down 40% of the time if one is free; 1 in 20 quitters choose a lower job</td><td>The 40% is ours. The 1 in 20 is our reading of Pew Research's 2022 survey of 2021 quitters.</td><td><span class="st st-a">Assumption</span></td></tr>
-        <tr><td><b>Promotions by age</b></td><td>Under 30, 30s, 40s, 50+: 1.4, 1.1, 0.75, 0.45 (relative)</td><td>Direction from Pergamit and Veum (NLSY) and McCue (PSID); values fitted so median ages by floor match BLS occupation data (managers 46, chief executives 52).</td><td><span class="st st-f">Fitted</span></td></tr>
+        <tr><td><b>Taking a lower job</b></td><td>Laid-off searchers above entry level take a job one floor down 25% of the time if one is free; 1 in 20 quitters choose a lower job</td><td>25%: about 1 in 4 long-tenured displaced workers back in full-time work earned 20% or more below the lost job (BLS Displaced Workers Survey, 2000); a floor down stands for that (v43; was our assumption of 40%). The 1 in 20 is our reading of Pew Research's 2022 survey of 2021 quitters.</td><td><span class="st st-a">Assumption</span></td></tr>
+        <tr><td><b>Promotions by age</b></td><td>Under 30, 30s, 40s, 50+: 1.4, 1.1, 0.75, 0.45 (relative)</td><td>Direction from Pergamit and Veum (NLSY79: about 24% of young workers promoted by their employer in 1989–90) and the NLSY79 at midcareer (BLS Monthly Labor Review, 2014: about 20% every two years in the late 1990s, about 8% by 2010). Values fitted so the share of workers in management by age matches BLS CPS Table 11b (2025); checked again in v42.</td><td><span class="st st-f">Fitted</span></td></tr>
         <tr><td><b>Promotions by switching</b></td><td>About 1 in 5 promotions come with a new employer; 85% of those stay in the same industry</td><td>Fitted to DeVaro et al. and Bidwell and Mollick (2015). Same industry stands in for same job title. Since version 32 the chance moves with the openings rate of the industry being moved into (BLS JOLTS), as job-ladder moves rise and fall with vacancies (Haltiwanger, Hyatt and McEntarfer, 2018).</td><td><span class="st st-f">Fitted</span></td></tr>
+        <tr><td><b>Time between promotions</b></td><td>At least 1 year up to Lead, 2 years from Lead to Director, 3 from Director to Executive</td><td>LinkedIn career histories at 20 large firms: 30.4 months between promotions on average, 10.4 at the fastest (Standout CV, 2024). The longer gaps at the top are our assumption (v44).</td><td><span class="st st-a">Assumption</span></td></tr>
         <tr><td><b>How promotions are filled</b></td><td>An open seat is usually filled from the floor below within about a year; climbers push 1.5×, nepo hires 2.6× at family firms and 1.4× elsewhere</td><td>Ours.</td><td><span class="st st-a">Assumption</span></td></tr>
         <tr><td><b>Ladder colour (prospects)</b></td><td>Average of three measures for the company's group of jobs, each scaled by its spread across industries and years 2001–2026: job openings rate and layoff rate over the last 12 months, and job growth over the last year</td><td>All three are data (BLS JOLTS by industry, BLS JOLTS by establishment size, BLS CES, company annual reports). Equal weights are our choice. The colour has no effect of its own: it shows the numbers that drive the workers there.</td><td><span class="st st-f">Data + assumption</span></td></tr>
         <tr><td><b>Seats by company size</b></td><td>Small firms have an owner but few directors; large firms more management layers</td><td>Direction from Caliendo, Monte and Rossi-Hansberg (2015, French employer data); the factors are ours. The economy-wide pyramid is BLS data.</td><td><span class="st st-a">Assumption</span></td></tr>
@@ -448,7 +464,85 @@ td a,.detail a{color:var(--ink)}
     <h2>Release notes</h2>
     <div class="rel">
       <article class="relv cur">
-        <h3>Version 37 · No more employer ratings <span>21 Oct 2026 · current</span></h3>
+        <h3>Version 44 · Clearer floors, steadier climbs, and bugs from the reviews <span>21 Oct 2026 · current</span></h3>
+        <ul>
+          <li><b>"Senior" is now "Professional".</b> The floor stands for professional and business-specialist jobs (teacher, nurse, accountant), which graduates hold from their first job. All four reviewers read "Senior" as seniority and marked down first jobs there. Nothing in the simulation changed.</li>
+          <li><b>Promotions at the top take longer:</b> at least 2 years from Lead to Director and 3 from Director to Executive (one year below Lead, where young first-line managers are common). Reviewers flagged a climb from Junior to Director in three years. LinkedIn histories average 30 months between promotions.</li>
+          <li><b>Each break has a reason</b>, drawn by age from what people out of the workforce say (CPS): mostly study under 25, family or health from 25.</li>
+          <li><b>A job lined up always starts.</b> If every seat filled during the notice period, the offer still stands; a career no longer shows "job lined up" followed by "keeps looking". If the run ends during the notice period, the journey says the new job is about to start.</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 43 · Fixes from four independent reviews of 40 careers <span>21 Oct 2026</span></h3>
+        <ul>
+          <li><b>Reviewed by four AI models.</b> Gemini, ChatGPT, Grok and Claude each scored 40 followed careers. Their scores agreed broadly (correlations 0.74–0.79). The fixes below are the points they shared that data backs; the points where the data disagrees with them are listed in the release notes too.</li>
+          <li><b>No management first jobs, and first jobs by age.</b> Under 22, first jobs follow what 16–19-year-olds do (10% professional); from 22, what 20–24-year-olds do, without management, since those managers mostly have years of work behind them (CPS). Promotions under 30 were refitted to the share of young managers.</li>
+          <li><b>Breaks are spread more evenly.</b> One person's breaks are capped at 60% of their job endings, so the time out of work, which still matches the surveys, is not piled on a few people.</li>
+          <li><b>Temporary layoffs follow industry data.</b> Recall rates by industry from BLS Mass Layoff Statistics: high in leisure, health care and construction, low in information and very low in finance.</li>
+          <li><b>Fewer step-downs after a layoff:</b> 25%, from the Displaced Workers Survey (about 1 in 4 earned 20% or more less in their new job), instead of our 40%.</li>
+          <li><b>Public employers have a place:</b> moving between state or local governments in different states is now rare.</li>
+          <li><b>The Regular employee is the norm</b> (the middle of the workforce); the Settler now settles much more (the bottom 15%).</li>
+          <li><b>Speed has no effect on careers.</b> At high speed a few days between checks were not counted toward promotions; they are now. The effect was under 2%.</li>
+          <li><b>Months in the journey.</b> When notice and the new job fall either side of New Year, both show the month.</li>
+          <li><b>Where the data disagreed with the reviews:</b> changing industry is normal (about 60–65% of job changes, Census); staying at entry or junior level into your 40s is common (about half of 45–54-year-olds, CPS); and these regular employees change employer less often than the average American at every age (NLSY79).</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 42 · Careers checked as whole careers, against data <span>21 Oct 2026</span></h3>
+        <ul>
+          <li><b>Whole careers are now checked.</b> Followed workers were compared with workers of the same age in the statistical sample, and both with real data: employers by age, promotions, floor reached, breaks, returns to former employers. Followed workers now match their peers in the sample (about 1.3 promotions each since 2000, a quarter with none).</li>
+          <li><b>What the data showed was normal, and was kept.</b> Most moves to a new employer are at the same level (about 83% in linked employer records; 48% of US direct job changers earn less afterwards, SIPP). Only about 35–40% of job changes stay in the same industry (Census). About half of workers aged 45–54 hold service, production, sales or office jobs (CPS).</li>
+          <li><b>Breaks follow the flows.</b> Of prime-age workers leaving a job for non-employment, about 85% of quitters and 35% of laid-off workers step out of the workforce for a while (CPS, Ellieroth and Michaud). The model had 50% and 4%; now 87% and 26%. Breaks no longer stop at 40, which was our assumption: at 45–54 people spend about 17% of their weeks out of the workforce (NLSY79). Break length by age is fitted to that time out.</li>
+          <li><b>Going back to a former employer is rarer.</b> About 4–5% of hires are returns, as in LinkedIn data (4.5% in 2021); recalls are separate. Before, a former employer was as likely as any other, so the same small firms kept coming back.</li>
+          <li><b>Temporary jobs ending</b> now follow BLS data on contingent work by age, industry and occupation, instead of an assumed share by floor.</li>
+          <li><b>Senior seats</b> include business and financial specialists (CPS: 32.2% of jobs, was 25.8%).</li>
+          <li><b>A job lined up is a real offer.</b> Someone only gives notice with a job lined up if an employer has an opening on their floor, and they then start it; they no longer end up "still looking" after giving notice. Found by an independent review of 24 followed careers.</li>
+          <li><b>All followed workers leave a trail.</b> With several workers followed, each one's trail shows in their own colour; the worker shown in the journey is brighter and has the key-moment dots.</li>
+          <li><b>Teenagers' first jobs</b> follow the CPS mix for ages 16–19 (about 10% professional), not the 20–24 mix (22%).</li>
+          <li><b>Dropping a floor after a break</b> now needs a break of a year or more; a few months out no longer costs a floor.</li>
+          <li><b>New checks in the comparator:</b> floor mix by age (CPS), leaving the workforce after a quit or layoff (CPS), returns to a former employer (LinkedIn), and time out of the workforce at 45–54 (NLSY79).</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 41 · Follow up to 10 careers at once, and 5× speed <span>21 Oct 2026</span></h3>
+        <ul>
+          <li><b>Several careers side by side.</b> "How many" lets you follow 1, 2, 3, 5 or 10 workers in the same run, each in its own colour on the map. Use the arrows above the journey to step through each worker's breakdown; each worker leaves their own trail on the map; the worker shown is drawn brighter, with their key moments marked. With "Surprise me", each worker gets their own scenario, shown from the start when following more than one.</li>
+          <li><b>5× speed.</b> A new speed button runs the simulation five times as fast as 1×.</li>
+          <li><b>Summary over the model.</b> When the run ends, a card over the model sums up every followed worker in one row (how they started, where they ended, promotions, employers, quits, layoffs and breaks), with a button to the full journeys.</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 40 · Careers that make sense step by step <span>21 Oct 2026</span></h3>
+        <ul>
+          <li><b>Every step was read and checked.</b> 120 followed careers were read step by step and checked automatically for causal problems: stepping up straight after a break, jumping floors, 4 or more employers in 3 years after 30, many breaks, very long searches, repeated job losses, quitting soon after a promotion. Careers with none of these: about 68% before the fixes below, now about 80% for someone starting out in 2000 and 90% for a typical worker of 2000.</li>
+          <li><b>The reason comes first.</b> Someone leaving a job now decides why before they go: a job lined up elsewhere (they give notice and move), a break, or quitting to look. Before, the reason was drawn after leaving, so a worker could "quit to look for something better" and then take a two-year break.</li>
+          <li><b>No step up after a break or a search.</b> A higher job at another company comes as an offer while still employed. Coming back after a break, about 1 in 4 people now return one floor lower (UK evidence; no US figure found), and two in three go straight into a job (CPS flows).</li>
+          <li><b>Breaks belong to people.</b> A minority (students, parents, carers) take most breaks, and breaks are fewer and longer, about 2 years on average, instead of many short ones.</li>
+          <li><b>A "Regular employee" is typical.</b> The followed regular employee now has a typical tendency to change jobs; frequent movers are the "Job hopper" persona. Promotions also make quitting much less likely for a year, and nobody with a job lined up then "chooses a lower job".</li>
+          <li><b>Comparator.</b> Overall match about 90% over 6 runs.</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 39 · How people really change jobs <span>21 Oct 2026</span></h3>
+        <ul>
+          <li><b>Three ways a job ends.</b> Straight to another job after a short notice period, into unemployment and a search, or a break out of the workforce (study, family, health), in the proportions of the monthly US labour-force flows: about 40% direct moves, 20% unemployment and 40% breaks (Fujita, Moscarini and Postel-Vinay; CPS flows via FRED). Breaks last about a year and are mostly taken before 40; people aged 18–38 now spend about 18% of their weeks out of the workforce, as in the NLSY97 survey. On screen, a direct move is a short walk to the new company, a search is a wander across the floor, and a break is a walk to the edge of the floor.</li>
+          <li><b>First jobs on the right floors.</b> Newcomers no longer all start at entry level: they aim for the mix of jobs held at 20–24 (BLS CPS): 52% entry, 22% junior, 22% senior, 4% lead. Workers now reach management at about the real ages (CPS: 4% of 20–24-year-olds, 15–16% from 35 to 64).</li>
+          <li><b>How long people stay, from data.</b> New checks in the comparator: median tenure by industry and by occupation (BLS, January 2024), jobs ending within a year by age at start (NLSY), time out of the workforce and management by age. How quitting depends on time in the job, age and floor was re-fitted to all of them together over 30 settings; executives now quit too (managers stay a median 5.7 years). Some industries still differ: government workers stay longer than in the survey, transport workers shorter.</li>
+          <li><b>No more jumping figures.</b> A figure that falls behind walks faster to catch up, instead of jumping to its next place.</li>
+          <li><b>Still off.</b> Older workers move a little too often (tenure at 45–54 about 4.5 years against 7), and the frequent movers settle down with age less than real ones do. The comparator lists both.</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 38 · Detail adds companies, and followed careers keep pace <span>21 Oct 2026</span></h3>
+        <ul>
+          <li><b>Detail now changes the companies.</b> Light shows about 72 companies, Standard about 98, Full about 124. Full adds 26 companies chosen because they keep each industry's group mirroring its real employment, such as Illinois Tool Works, Kimberly-Clark, Home Depot, Gap, Comerica, Unum, T. Rowe Price, CSX, Ryder, Southern Company, Kirby, Rollins, TrueBlue, Interpublic, Service Corporation International, Choice Hotels, Domino's, Tenet, DaVita, Verizon and AT&T. Light keeps the 3–5 companies of each group whose combined history follows the industry most closely. Small firms and public employers are in every level. Information (at most 5 companies) and construction (8) could not grow further without drifting from their industry.</li>
+          <li><b>Fewer workers, same accuracy.</b> The statistical sample is 1,600, 2,400 or 3,200 workers and the visible figures about 50, 80 or 105. Each level scores 92–93% against the real data over 6 full runs.</li>
+          <li><b>Fixed: visible and followed workers lost years to animation.</b> A stress test of 40 followed careers (regular employee, first job in 2000) showed they changed jobs about a third as often as the statistical sample, because a figure could not decide anything while still walking or climbing. Decisions now wait at most a quarter of a simulated year. After the fix, the 40 followed careers started 0.83, 0.57 and 0.32 new jobs a year at ages 18–23, 24–29 and 30–38, against 0.85, 0.55 and 0.32 in the NLSY97 survey for people born 1980–84, and the first job search now takes a real search length instead of a fixed 16 weeks.</li>
+          <li><b>What the stress test still shows.</b> Too few jobs end within a year for young workers (about 40% against 61% in NLSY97) and too many for ages 25–38 (about 60% against 32%), and a few careers collect many permanent job losses (up to 8 in 26 years).</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 37 · No more employer ratings <span>21 Oct 2026</span></h3>
         <ul>
           <li><b>Glassdoor scores removed.</b> Career scores and review counts stopped affecting the model in version 32 and are now gone from the company table and cards as well, along with their links. Many small companies had no usable score anyway. A ladder's colour is the prospects of the group of jobs it stands for, from BLS data (job openings and layoffs by industry, adjusted for company size, and job growth, the company's own headcount where known); the company table now shows each company's industry instead.</li>
         </ul>
@@ -635,7 +729,7 @@ td a,.detail a{color:var(--ink)}
           <li><b>Three catastrophes, calibrated to the whole economy.</b> 9/11, the 2008 financial crisis and the COVID-19 pandemic (plus the Great Resignation that followed) now shift quits and layoffs by the same percentages measured across all US employers in the BLS JOLTS survey. Every company follows the average change.</li>
           <li><b>Reference employers instead of extreme cases.</b> Added Walmart, HCA Healthcare, JPMorgan Chase and Marriott to cover retail, health care, finance and hotels. Companies known mainly for one extreme event (General Motors, Citigroup, Boeing) were left out on purpose, so they don't skew the averages.</li>
           <li><b>Outliers kept out of the economy chart.</b> Collapses, bankruptcies, merger cuts and airline cuts after 9/11 still happen in the model and the log, but the chart and impact table count only the economy-wide pattern.</li>
-          <li><b>A large invisible sample, because computers have limits.</b> Drawing more than about 135 animated figures would make the 3D model too slow on ordinary computers, but 135 is too few for reliable statistics. So 2,400 extra workers (1,200 or 4,800 with the Detail setting) follow exactly the same rules without being drawn. The charts and the impact table use all of them; the 3D model shows only the 135. Results are given per 100 workers.</li>
+          <li><b>A large invisible sample, because computers have limits.</b> Drawing more than about 135 animated figures would make the 3D model too slow on ordinary computers, but 135 is too few for reliable statistics. So 2,400 extra workers (1,600 or 3,200 with the Detail setting) follow exactly the same rules without being drawn. The charts and the impact table use all of them; the 3D model shows only the 135. Results are given per 100 workers.</li>
           <li><b>Real economy chart.</b> Official US hires, quits and layoffs from 2001 to 2026 sit next to the simulated results, and the impact table shows the real change beside each simulated one.</li>
           <li><b>Baseline layoffs.</b> Workers now face a small, assumed 4% yearly chance of being laid off in normal years, so crisis changes can be measured against a normal level.</li>
         </ul>
@@ -695,7 +789,7 @@ td a,.detail a{color:var(--ink)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
-const LEVELS=["Junior","Senior","Lead / Manager","Director","Executive"]; // floors L1–L5
+const LEVELS=["Junior","Professional","Lead / Manager","Director","Executive"]; // floors L1–L5 (v44: "Senior" renamed "Professional": the floor stands for professional and business-specialist jobs, which graduates hold from their first job; reviewers read "Senior" as seniority)
 const ENTRY="Entry level"; // the ground floor, L0: no experience needed
 const GD="Glassdoor";
 // [name, employees, note on figure, (unused), (unused), sources, transition or null, founded, collapse or null]
@@ -758,6 +852,33 @@ const DATA=[
   ["Montgomery County Public Schools",24725,"FY2025 budget, full-time equivalent positions",null,null,[["MCPS budget in brief","https://pprd.montgomeryschoolsmd.org/siteassets/district/departments/budget/fy2025/0242.24_fy2025budgetinbrief.pdf"]],null,1860],
   ["Miami-Dade County",31252,"FY2024-25 budget, positions",null,null,[["Miami-Dade budget","https://miamidade.gov/resources/budget/adopted/fy2024-25/executive-summary.pdf"]],null,1836],
   // v33: companies chosen because their own headcount history, together, mirrors their industry's real employment (BLS CES), 2000-2025
+  // v38: companies added at Full detail, chosen because they keep each group mirroring its industry
+  ["Illinois Tool Works",43000,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/itw/employees/"]],null,1912],
+  ["Kimberly-Clark",36000,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/kmb/employees/"]],null,1872],
+  ["Intel",85100,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/intc/employees/"]],null,1968],
+  ["Home Depot",472400,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/hd/employees/"]],null,1978],
+  ["Gap Inc.",85000,"2023, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/gap/employees/"]],null,1969],
+  ["Comerica",7928,"2024, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/cma/employees/"]],null,1849],
+  ["Unum",10910,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/unm/employees/"]],null,1848],
+  ["T. Rowe Price",7773,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/trow/employees/"]],null,1937],
+  ["Erie Indemnity",6667,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/erie/employees/"]],null,1925],
+  ["Ryder System",51600,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/r/employees/"]],null,1933],
+  ["Southern Company",29800,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/so/employees/"]],null,1945],
+  ["Kirby Corp",5233,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/kex/employees/"]],null,1921],
+  ["CSX",23000,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/csx/employees/"]],null,1980],
+  ["Old Dominion",20591,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/odfl/employees/"]],null,1934],
+  ["Interpublic Group",53300,"2024, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/ipg/employees/"]],null,1961],
+  ["Rollins",21946,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/rol/employees/"]],null,1948],
+  ["TrueBlue",5000,"2023, annual report via Macrotrends",null,null,[["Macrotrends","https://www.macrotrends.net/stocks/charts/TBI/tbi/number-of-employees"]],null,1989],
+  ["Starbucks",381000,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/sbux/employees/"]],null,1971],
+  ["Six Flags",1350,"2023, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/six/employees/"]],null,1961],
+  ["Service Corporation International",25187,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/sci/employees/"]],null,1962],
+  ["Choice Hotels",1754,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/chh/employees/"]],null,1939],
+  ["Domino's",10200,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/dpz/employees/"]],null,1960],
+  ["Tenet Healthcare",99000,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/thc/employees/"]],null,1968],
+  ["DaVita",78000,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/dva/employees/"]],null,1994],
+  ["Verizon",89900,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/vz/employees/"]],null,2000],
+  ["AT&T",133030,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/t/employees/"]],null,1983],
   ["NVR",6300,"2025, annual report via Stock Analysis",null,null,[["Stock Analysis","https://stockanalysis.com/stocks/nvr/employees/"]],null,1980],
   ["Sterling Infrastructure",3000,"2024, annual report via Macrotrends",null,null,[["Macrotrends","https://stockanalysis.com/stocks/strl/employees/"]],null,1955],
   ["Beazer Homes",1018,"2025, annual report via Macrotrends + Stock Analysis",null,null,[["Macrotrends + Stock Analysis","https://stockanalysis.com/stocks/bzh/employees/"]],null,1985],
@@ -878,6 +999,32 @@ const HIST={
   "Tandy Leather":[[2009,447],[2012,566],[2016,614],[2018,684],[2020,496],[2022,605],[2023,515],[2025.9,542]],
   "Siebert Financial":[[2009,77],[2012,55],[2016,31],[2018,76],[2019,132],[2022,117],[2025.9,146]],
   // v33: yearly headcount histories (annual reports via Stock Analysis and Macrotrends) for the mirror groups
+  "Illinois Tool Works":[[2000.9, 55300], [2001.9, 52000], [2002.9, 48700], [2003.9, 47500], [2004.9, 49000], [2005.9, 50000], [2006.9, 55000], [2007.9, 60000], [2008.9, 65000], [2009.9, 59000], [2010.9, 61000], [2011.9, 65000], [2012.9, 60000], [2013.9, 51000], [2014.9, 49000], [2015.9, 48000], [2016.9, 50000], [2017.9, 50000], [2018.9, 48000], [2019.9, 45000], [2020.9, 43000], [2021.9, 45000], [2022.9, 46000], [2023.9, 45000], [2024.9, 44000], [2025.9, 43000]],
+  "Kimberly-Clark":[[2000.9, 66300], [2001.9, 64200], [2002.9, 63900], [2003.9, 62000], [2004.9, 60000], [2005.9, 57000], [2006.9, 55000], [2007.9, 53000], [2008.9, 53000], [2009.9, 56000], [2010.9, 57000], [2011.9, 57000], [2012.9, 58000], [2013.9, 57000], [2014.9, 43000], [2015.9, 43000], [2016.9, 42000], [2017.9, 42000], [2018.9, 41000], [2019.9, 40000], [2020.9, 46000], [2021.9, 45000], [2022.9, 44000], [2023.9, 41000], [2024.9, 38000], [2025.9, 36000]],
+  "Intel":[[2000.9, 86100], [2001.9, 83400], [2002.9, 78700], [2003.9, 79700], [2004.9, 85000], [2005.9, 99900], [2006.9, 94100], [2007.9, 86300], [2008.9, 83900], [2009.9, 79800], [2010.9, 82500], [2011.9, 100100], [2012.9, 105000], [2013.9, 107600], [2014.9, 106700], [2015.9, 107300], [2016.9, 106000], [2017.9, 102700], [2018.9, 107400], [2019.9, 110800], [2020.9, 110600], [2021.9, 121100], [2022.9, 131900], [2023.9, 124800], [2024.9, 108900], [2025.9, 85100]],
+  "Home Depot":[[1999.9, 201400], [2000.9, 227300], [2001.9, 256300], [2002.9, 280900], [2003.9, 299000], [2004.9, 325000], [2005.9, 345000], [2006.9, 364000], [2007.9, 331000], [2008.9, 322000], [2009.9, 317000], [2010.9, 321000], [2011.9, 331000], [2012.9, 340000], [2013.9, 365000], [2014.9, 371000], [2015.9, 385000], [2016.9, 406000], [2017.9, 413000], [2018.9, 413000], [2019.9, 415700], [2020.9, 504800], [2021.9, 490600], [2022.9, 471600], [2023.9, 463100], [2024.9, 470100], [2025.9, 472400]],
+  "Gap Inc.":[[2000.9, 166000], [2001.9, 165000], [2002.9, 169000], [2003.9, 153000], [2004.9, 152000], [2005.9, 153000], [2006.9, 154000], [2007.9, 141000], [2008.9, 134000], [2009.9, 135000], [2010.9, 134000], [2011.9, 132000], [2012.9, 136000], [2013.9, 137000], [2014.9, 141000], [2015.9, 141000], [2016.9, 135000], [2017.9, 135000], [2018.9, 135000], [2019.9, 129000], [2020.9, 117000], [2021.9, 97000], [2022.9, 95000], [2023.9, 85000]],
+  "Comerica":[[2000.9, 10361], [2001.9, 11792], [2002.9, 11808], [2003.9, 11854], [2004.9, 11514], [2005.9, 11343], [2006.9, 11270], [2007.9, 11337], [2008.9, 10639], [2009.9, 9720], [2010.9, 9365], [2011.9, 9757], [2012.9, 9306], [2013.9, 9207], [2014.9, 9115], [2015.9, 9103], [2016.9, 8149], [2017.9, 8190], [2018.9, 7573], [2019.9, 8051], [2020.9, 7870], [2021.9, 7611], [2022.9, 7649], [2023.9, 7863], [2024.9, 7928]],
+  "Unum":[[2000.9, 12400], [2001.9, 13100], [2002.9, 13800], [2003.9, 13400], [2004.9, 11600], [2005.9, 11300], [2006.9, 11100], [2007.9, 9700], [2008.9, 9800], [2009.9, 9700], [2010.9, 9500], [2011.9, 9400], [2012.9, 9100], [2013.9, 9200], [2014.9, 9500], [2015.9, 9400], [2016.9, 9400], [2017.9, 9400], [2018.9, 9600], [2019.9, 10300], [2020.9, 10700], [2021.9, 10300], [2022.9, 10937], [2023.9, 10812], [2024.9, 11063], [2025.9, 10910]],
+  "T. Rowe Price":[[2000.9, 4000], [2001.9, 3650], [2002.9, 3710], [2003.9, 3783], [2004.9, 4139], [2005.9, 4372], [2006.9, 4605], [2007.9, 5081], [2008.9, 5385], [2009.9, 4802], [2010.9, 5052], [2011.9, 5255], [2012.9, 5372], [2013.9, 5668], [2014.9, 5870], [2015.9, 5999], [2016.9, 6329], [2017.9, 6881], [2018.9, 7022], [2019.9, 7365], [2020.9, 7678], [2021.9, 7529], [2022.9, 7868], [2023.9, 7906], [2024.9, 8158], [2025.9, 7773]],
+  "Erie Indemnity":[[2000.9, 3440], [2001.9, 3668], [2002.9, 4000], [2003.9, 4300], [2004.9, 4300], [2005.9, 4600], [2006.9, 4300], [2007.9, 4100], [2008.9, 4200], [2009.9, 4200], [2010.9, 4200], [2011.9, 4300], [2012.9, 4400], [2013.9, 4450], [2014.9, 4700], [2015.9, 4800], [2016.9, 5000], [2017.9, 5300], [2018.9, 5500], [2019.9, 5700], [2020.9, 5914], [2021.9, 5876], [2022.9, 6038], [2023.9, 6556], [2024.9, 6801], [2025.9, 6667]],
+  "Ryder System":[[2000.9, 33089], [2001.9, 29500], [2002.9, 27800], [2003.9, 26700], [2004.9, 26300], [2005.9, 27800], [2006.9, 28600], [2007.9, 28800], [2008.9, 28000], [2009.9, 22900], [2010.9, 25900], [2011.9, 27500], [2012.9, 27700], [2013.9, 28900], [2014.9, 30600], [2015.9, 33100], [2016.9, 34500], [2017.9, 36100], [2018.9, 39600], [2019.9, 39900], [2020.9, 39000], [2021.9, 42800], [2022.9, 48300], [2023.9, 47500], [2024.9, 50700], [2025.9, 51600]],
+  "Southern Company":[[2000.9, 26021], [2001.9, 26122], [2002.9, 26178], [2003.9, 25762], [2004.9, 25648], [2005.9, 25554], [2006.9, 26091], [2007.9, 26742], [2008.9, 27276], [2009.9, 26112], [2010.9, 25940], [2011.9, 26377], [2012.9, 26439], [2013.9, 26300], [2014.9, 26369], [2015.9, 26703], [2016.9, 32015], [2017.9, 31344], [2018.9, 29192], [2019.9, 27943], [2020.9, 27700], [2021.9, 27300], [2022.9, 27700], [2023.9, 28100], [2024.9, 28600], [2025.9, 29800]],
+  "Kirby Corp":[[2000.9, 2200], [2001.9, 2200], [2002.9, 2300], [2003.9, 2425], [2004.9, 2375], [2005.9, 2450], [2006.9, 3000], [2007.9, 3100], [2008.9, 3100], [2009.9, 2675], [2010.9, 2615], [2011.9, 4225], [2012.9, 4675], [2013.9, 4575], [2014.9, 4800], [2015.9, 4200], [2016.9, 4000], [2017.9, 5775], [2018.9, 5650], [2019.9, 5700], [2020.9, 5400], [2021.9, 5125], [2022.9, 5200], [2023.9, 5450], [2024.9, 5414], [2025.9, 5233]],
+  "CSX":[[2000.9, 45355], [2001.9, 41393], [2002.9, 39939], [2003.9, 37516], [2004.9, 35892], [2005.9, 35000], [2006.9, 36000], [2007.9, 35000], [2008.9, 34000], [2009.9, 30000], [2010.9, 30000], [2011.9, 31000], [2012.9, 32000], [2013.9, 31000], [2014.9, 32000], [2015.9, 29000], [2016.9, 27000], [2017.9, 24000], [2018.9, 22500], [2019.9, 21000], [2020.9, 19300], [2021.9, 20900], [2022.9, 22500], [2023.9, 23000], [2024.9, 23500], [2025.9, 23000]],
+  "Old Dominion":[[2000.9, 5909], [2001.9, 6106], [2002.9, 6895], [2003.9, 7513], [2004.9, 8497], [2005.9, 9736], [2006.9, 10762], [2007.9, 11573], [2008.9, 10864], [2009.9, 9608], [2010.9, 11179], [2011.9, 12022], [2012.9, 13016], [2013.9, 14073], [2014.9, 16443], [2015.9, 17931], [2016.9, 17543], [2017.9, 19183], [2018.9, 21279], [2019.9, 20105], [2020.9, 19779], [2021.9, 23663], [2022.9, 23471], [2023.9, 22902], [2024.9, 21895], [2025.9, 20591]],
+  "Interpublic Group":[[2000.9, 38600], [2001.9, 48200], [2002.9, 54100], [2003.9, 50800], [2004.9, 43700], [2005.9, 43000], [2006.9, 42000], [2007.9, 43000], [2008.9, 45000], [2009.9, 40000], [2010.9, 41000], [2011.9, 42000], [2012.9, 43300], [2013.9, 45400], [2014.9, 47400], [2015.9, 49200], [2016.9, 49800], [2017.9, 50200], [2018.9, 54000], [2019.9, 54300], [2020.9, 50200], [2021.9, 55600], [2022.9, 58400], [2023.9, 57400], [2024.9, 53300]],
+  "Rollins":[[2000.9, 9000], [2001.9, 8000], [2002.9, 7600], [2003.9, 7300], [2004.9, 7800], [2005.9, 8000], [2006.9, 8400], [2007.9, 8500], [2008.9, 10049], [2009.9, 9949], [2010.9, 10330], [2011.9, 10112], [2012.9, 10470], [2013.9, 10650], [2014.9, 11000], [2015.9, 11268], [2016.9, 12153], [2017.9, 13126], [2018.9, 13734], [2019.9, 14952], [2020.9, 15616], [2021.9, 16482], [2022.9, 17515], [2023.9, 19031], [2024.9, 20265], [2025.9, 21946]],
+  "TrueBlue":[[2009.9, 2500], [2010.9, 2600], [2011.9, 2700], [2012.9, 2900], [2013.9, 3200], [2014.9, 5000], [2015.9, 5500], [2016.9, 6000], [2017.9, 5500], [2018.9, 6700], [2019.9, 6200], [2020.9, 5200], [2021.9, 6400], [2022.9, 6500], [2023.9, 5000]],
+  "Starbucks":[[2000.9, 47000], [2001.9, 54000], [2002.9, 62000], [2003.9, 74000], [2004.9, 96700], [2005.9, 115000], [2006.9, 145800], [2007.9, 172000], [2008.9, 176000], [2009.9, 142000], [2010.9, 137000], [2011.9, 149000], [2012.9, 160000], [2013.9, 182000], [2014.9, 191000], [2015.9, 238000], [2016.9, 254000], [2017.9, 277000], [2018.9, 291000], [2019.9, 346000], [2020.9, 349000], [2021.9, 383000], [2022.9, 402000], [2023.9, 381000], [2024.9, 361000], [2025.9, 381000]],
+  "Six Flags":[[2004.9, 2370], [2005.9, 2500], [2006.9, 2500], [2007.9, 2094], [2008.9, 2040], [2009.9, 2080], [2010.9, 1900], [2011.9, 1900], [2012.9, 1900], [2013.9, 1900], [2014.9, 1900], [2015.9, 1900], [2016.9, 2000], [2017.9, 2000], [2018.9, 2400], [2019.9, 2450], [2020.9, 1950], [2021.9, 1970], [2022.9, 1450], [2023.9, 1350]],
+  "Service Corporation International":[[2000.9, 40016], [2001.9, 33430], [2002.9, 28924], [2003.9, 27813], [2004.9, 20598], [2005.9, 16722], [2006.9, 22623], [2007.9, 20591], [2008.9, 20771], [2009.9, 20176], [2010.9, 20725], [2011.9, 20891], [2012.9, 20567], [2013.9, 25719], [2014.9, 23662], [2015.9, 23785], [2016.9, 23463], [2017.9, 23428], [2018.9, 24082], [2019.9, 24594], [2020.9, 24135], [2021.9, 24658], [2022.9, 25139], [2023.9, 24922], [2024.9, 24953], [2025.9, 25187]],
+  "Choice Hotels":[[2000.9, 1915], [2001.9, 1446], [2002.9, 1600], [2003.9, 1540], [2004.9, 1697], [2005.9, 1728], [2006.9, 1860], [2007.9, 1816], [2008.9, 1789], [2009.9, 1560], [2010.9, 1524], [2011.9, 1431], [2012.9, 1095], [2013.9, 1088], [2014.9, 1331], [2015.9, 1462], [2016.9, 1789], [2017.9, 1987], [2018.9, 1882], [2019.9, 1807], [2020.9, 1498], [2021.9, 1460], [2022.9, 1789], [2023.9, 1836], [2024.9, 1695], [2025.9, 1754]],
+  "Domino's":[[2004.9, 13500], [2005.9, 13500], [2006.9, 13300], [2007.9, 12500], [2008.9, 10500], [2009.9, 10200], [2010.9, 10900], [2011.9, 10000], [2012.9, 10000], [2013.9, 10000], [2014.9, 11000], [2015.9, 11900], [2016.9, 14100], [2017.9, 14100], [2018.9, 14500], [2019.9, 13100], [2020.9, 14400], [2021.9, 13500], [2022.9, 11000], [2023.9, 11200], [2024.9, 10700], [2025.9, 10200]],
+  "Tenet Healthcare":[[2000.9, 106900], [2001.9, 113877], [2002.9, 115129], [2003.9, 109759], [2004.9, 91633], [2005.9, 73434], [2006.9, 68952], [2007.9, 63264], [2008.9, 60297], [2009.9, 57613], [2010.9, 56605], [2011.9, 57705], [2012.9, 59164], [2013.9, 103711], [2014.9, 108989], [2015.9, 134630], [2016.9, 131610], [2017.9, 130000], [2018.9, 115500], [2019.9, 113600], [2020.9, 110000], [2021.9, 101100], [2022.9, 102400], [2023.9, 106500], [2024.9, 98000], [2025.9, 99000]],
+  "DaVita":[[2000.9, 12200], [2001.9, 12700], [2002.9, 13000], [2003.9, 13800], [2004.9, 15300], [2005.9, 28000], [2006.9, 28900], [2007.9, 31000], [2008.9, 32500], [2009.9, 34000], [2010.9, 36500], [2011.9, 41000], [2012.9, 53400], [2013.9, 57400], [2014.9, 57900], [2015.9, 60400], [2016.9, 70300], [2017.9, 74500], [2018.9, 77700], [2019.9, 65000], [2020.9, 67000], [2021.9, 69000], [2022.9, 70000], [2023.9, 70000], [2024.9, 76000], [2025.9, 78000]],
+  "Verizon":[[2000.9, 260000], [2001.9, 247000], [2002.9, 229500], [2003.9, 203100], [2004.9, 210000], [2005.9, 217000], [2006.9, 242000], [2007.9, 235000], [2008.9, 223900], [2009.9, 222900], [2010.9, 194400], [2011.9, 193900], [2012.9, 183400], [2013.9, 176800], [2014.9, 177300], [2015.9, 177700], [2016.9, 160900], [2017.9, 155400], [2018.9, 144500], [2019.9, 135000], [2020.9, 132200], [2021.9, 118400], [2022.9, 117100], [2023.9, 105400], [2024.9, 99600], [2025.9, 89900]],
+  "AT&T":[[2000.9, 215088], [2001.9, 215088], [2002.9, 192550], [2003.9, 175400], [2004.9, 168000], [2005.9, 162000], [2006.9, 189000], [2007.9, 302000], [2008.9, 310000], [2009.9, 301000], [2010.9, 281000], [2011.9, 265410], [2012.9, 256000], [2013.9, 242000], [2014.9, 243000], [2015.9, 253000], [2016.9, 281000], [2017.9, 268000], [2018.9, 252000], [2019.9, 268000], [2020.9, 246000], [2021.9, 230000], [2022.9, 203000], [2023.9, 160700], [2024.9, 149900], [2025.9, 133030]],
   "NVR":[[2000.9, 2752], [2001.9, 3334], [2002.9, 3596], [2003.9, 3852], [2004.9, 4407], [2005.9, 5401], [2006.9, 4548], [2007.9, 4119], [2008.9, 2845], [2009.9, 2688], [2010.9, 2822], [2011.9, 2765], [2012.9, 3291], [2013.9, 3944], [2014.9, 3942], [2015.9, 4300], [2016.9, 4900], [2017.9, 5200], [2018.9, 5600], [2019.9, 5700], [2020.9, 6100], [2021.9, 6600], [2022.9, 6550], [2023.9, 6300], [2024.9, 7000], [2025.9, 6300]],
   "Sterling Infrastructure":[[2011.9, 1606], [2012.9, 1685], [2013.9, 1655], [2014.9, 1799], [2015.9, 1565], [2016.9, 1684], [2017.9, 1740], [2018.9, 1935], [2019.9, 2800], [2020.9, 2600], [2021.9, 2900], [2022.9, 3200], [2023.9, 3000], [2024.9, 3000]],
   "Beazer Homes":[[2009.9, 901], [2010.9, 883], [2011.9, 781], [2012.9, 804], [2013.9, 878], [2014.9, 1027], [2015.9, 1063], [2016.9, 1100], [2017.9, 1100], [2018.9, 1280], [2019.9, 1205], [2020.9, 1063], [2021.9, 1052], [2022.9, 1129], [2023.9, 1067], [2024.9, 1158], [2025.9, 1018]],
@@ -943,13 +1090,19 @@ const HIST_SRC=["Stock Analysis and TickerLeague headcount histories (10-K and a
    US workforce and is placed in the size group of its US workforce, as the Census counts firm size. Sources where available: Siemens
    USA (more than 45,000 of about 318,000), Stellantis (about 50,000 in the US in 2024), Walmart (about 1.6 million US associates);
    the rest are our estimates from company reports and news. Companies with no US operations stay in the model as ladders and events but hire no simulated US workers. */
-const US_SHARE={"Waste Management":0.92,"Resources Connection":0.7,"Omnicom Group":0.35,"Snap-on":0.6,"Ford":0.5,"Texas Instruments":0.5,"Campbell Soup":0.85,"General Motors":0.55,"Tyson Foods":0.9,"Lockheed Martin":0.93,"Hershey":0.7,"Masco":0.8,"Genuine Parts":0.55,"W.W. Grainger":0.8,"Sysco":0.8,"Allstate":0.95,"UPS":0.8,"United Airlines":0.85,"FedEx":0.65,"ABM Industries":0.95,"Exponent":0.95,"Robert Half":0.7,"Marriott":0.7,"HCA Healthcare":0.97,"Quest Diagnostics":0.95,"Bright Horizons":0.75,"The New York Times":0.9,"Comcast":0.85,"Scholastic":0.8,"EMCOR":0.9,"MasTec":0.95,"Siemens":.14,"Stellantis":.19,"Fiat Chrysler":.3,"Volkswagen":.014,"Porsche":.01,"adidas":.14,"Puma":.1,
+const US_SHARE={"Illinois Tool Works":0.45,"Kimberly-Clark":0.35,"Intel":0.5,"Home Depot":0.9,"Gap Inc.":0.75,"Unum":0.8,"T. Rowe Price":0.8,"Ryder System":0.85,"Interpublic Group":0.45,"Rollins":0.8,"TrueBlue":0.95,"Starbucks":0.63,"Six Flags":0.9,"Service Corporation International":0.9,"Choice Hotels":0.9,"Domino's":0.9,"DaVita":0.85,"AT&T":0.9,"Waste Management":0.92,"Resources Connection":0.7,"Omnicom Group":0.35,"Snap-on":0.6,"Ford":0.5,"Texas Instruments":0.5,"Campbell Soup":0.85,"General Motors":0.55,"Tyson Foods":0.9,"Lockheed Martin":0.93,"Hershey":0.7,"Masco":0.8,"Genuine Parts":0.55,"W.W. Grainger":0.8,"Sysco":0.8,"Allstate":0.95,"UPS":0.8,"United Airlines":0.85,"FedEx":0.65,"ABM Industries":0.95,"Exponent":0.95,"Robert Half":0.7,"Marriott":0.7,"HCA Healthcare":0.97,"Quest Diagnostics":0.95,"Bright Horizons":0.75,"The New York Times":0.9,"Comcast":0.85,"Scholastic":0.8,"EMCOR":0.9,"MasTec":0.95,"Siemens":.14,"Stellantis":.19,"Fiat Chrysler":.3,"Volkswagen":.014,"Porsche":.01,"adidas":.14,"Puma":.1,
   "VINCI":.02,"TCS":.06,"Infosys":.08,"Wipro":.065,"Accenture":.08,"Dussmann":.03,"Spotify":.27,"Walmart":.76,"UPS":.8,"General Dynamics":.85,"Lockheed Martin":.93,"Scientific Industries":.45,
   "PSA Group":0,"Zalando":0,"Schlecker":0,"Air Berlin":0,"Thomas Cook":0,"Wirecard":0,"Sabena":0,"Flybe":0,"Arcadia Group":0,"FDJ United":0,"Telegram":0};
 /* v33: the sample keeps only companies whose own headcount history, as a group, mirrors their industry's real employment
    (BLS CES, 2000-2025), plus small stand-ins for firms under 1,000 staff, which rarely publish long histories, and government
    employers. The companies below stay on the map (faded) for their stories, but hire no simulated workers. */
-const NOT_REP={};
+const NOT_REP={}
+/* v38: Detail chooses how many companies represent each industry. Light keeps the core of each mirror group, Standard the groups of
+   versions 33-37, Full adds more companies; every level was checked so each group still mirrors its industry's real employment.
+   Small firms (standing for jobs in firms under 1,000 staff) and public employers are in every level. */
+const CO_LEVEL={"Snap-on": "light", "Ford": "light", "Texas Instruments": "light", "Campbell Soup": "std", "General Motors": "std", "Tyson Foods": "light", "Lockheed Martin": "std", "Hershey": "std", "Masco": "std", "Illinois Tool Works": "full", "Kimberly-Clark": "full", "Intel": "full", "Genuine Parts": "light", "Dillard's": "light", "W.W. Grainger": "light", "Big Lots": "light", "Sysco": "std", "Kroger": "std", "Big 5 Sporting Goods": "std", "Home Depot": "full", "Gap Inc.": "full", "Allstate": "light", "Frost Bank": "std", "Commerce Bancshares": "light", "Cincinnati Financial": "light", "Comerica": "full", "Unum": "full", "T. Rowe Price": "full", "Erie Indemnity": "full", "J.B. Hunt": "light", "Con Edison": "std", "York Water": "light", "UPS": "std", "United Airlines": "std", "FedEx": "light", "Union Pacific": "light", "Southwest Airlines": "std", "Marten Transport": "std", "Ryder System": "full", "Southern Company": "full", "Kirby Corp": "full", "CSX": "full", "Old Dominion": "full", "Robert Half": "light", "ABM Industries": "std", "Exponent": "std", "Kforce": "std", "NRC Health": "light", "Waste Management": "light", "Resources Connection": "std", "Omnicom Group": "light", "Interpublic Group": "full", "Rollins": "full", "TrueBlue": "full", "Cracker Barrel": "light", "Marcus Corp": "light", "Ark Restaurants": "light", "Darden Restaurants": "light", "Marriott": "light", "Starbucks": "full", "Six Flags": "full", "Service Corporation International": "full", "Choice Hotels": "full", "Domino's": "full", "HCA Healthcare": "std", "Chemed": "light", "National HealthCare": "light", "Quest Diagnostics": "std", "Bright Horizons": "light", "Strategic Education": "std", "Lincoln Educational": "std", "Tenet Healthcare": "full", "DaVita": "full", "The New York Times": "light", "Comcast": "light", "Scholastic": "light", "Verizon": "full", "AT&T": "full", "EMCOR": "light", "PulteGroup": "std", "Great Lakes Dredge & Dock": "light", "NVR": "std", "KB Home": "light", "MasTec": "light", "Sterling Infrastructure": "std", "Beazer Homes": "std", "State of Washington": "light", "State of Ohio": "light"};
+const LEVEL_RANK={light:0,std:1,full:2};
+const inDetail=d=>LEVEL_RANK[CO_LEVEL[d[0]]||'light']<=LEVEL_RANK[typeof DETAIL==='undefined'?'std':DETAIL];;
 const usSize=L=>{if(L._uy===year)return L._u;L._uy=year;return L._u=NOT_REP[L.d[0]]?0:sizeNow(L)*(US_SHARE[L.d[0]]??1)}; // cached per moment
 // Ladders grow as companies grow. Nvidia uses its real headcount history. Companies founded after 2000 grow from a
 // small founding team to today's headcount, assuming fast early growth that slows later (an estimate, not data).
@@ -976,7 +1129,7 @@ function build(){
   tagsEl.innerHTML=''; ladders=[]; const placed=[];
   const far=(x,z,dmin,skip)=>!placed.some(p=>p!==skip&&Math.hypot(p[0]-x,p[1]-z)<dmin);
   const lim=SIZE-2.5;
-  for(const d of DATA){
+  for(const d of DATA.filter(inDetail)){
     const mg=d[9]||null, dbl=!!(mg&&mg.from), growth=growthFor(d,dbl), top=5, tr=d[6];
     const n0=growth&&growth.pts?growth.pts[0][1]:growth&&growth.est?growth.n0:d[1], w=widthFor(n0), rungs=rungsFor(d);
     let x,z,t=0;
@@ -1072,7 +1225,7 @@ function standsFor(L){
   return `<dt>Stands for</dt><dd>${what}: ${(100*t/C.tot).toFixed(1)}% of US jobs in ${Math.floor(year)}${mates>1?`, shared with ${mates-1} other ${mates>2?'companies':'company'}`:''}</dd>`;
 }
 function stepsCard(L){
-  countSeats(); const sh=shares(L), names=['Senior','Lead','Director','Executive'], vals=[2,3,4,5].map(i=>100*sh[i]), avg=[2,3,4,5].map(i=>100*SEAT_SHARE[i]);
+  countSeats(); const sh=shares(L), names=['Professional','Lead','Director','Executive'], vals=[2,3,4,5].map(i=>100*sh[i]), avg=[2,3,4,5].map(i=>100*SEAT_SHARE[i]);
   const ratio=vals.map((v,i)=>v/avg[i]), h=ratio.indexOf(Math.min(...ratio));
   return `<dt>Seats per 100</dt><dd>${names.map((n,i)=>`${n} ${vals[i].toFixed(1)}`).join(' · ')} <span class="small">(US: ${avg.map(v=>v.toFixed(1)).join(' · ')})</span></dd>
     <dt>Hardest step</dt><dd>${ratio[h]<.95?`Up to ${names[h]}: ${(1/ratio[h]).toFixed(1)}× fewer seats than average`:'None: every step has at least as many seats as average'}</dd>`;
@@ -1080,7 +1233,7 @@ function stepsCard(L){
 
 /* table */
 function renderTable(){
-  document.querySelector('#table tbody').innerHTML=DATA.slice().sort((a,b)=>b[1]-a[1]).map(d=>{
+  document.querySelector('#table tbody').innerHTML=DATA.filter(inDetail).sort((a,b)=>b[1]-a[1]).map(d=>{
     const [name,emp,note,,,src,tr,,cl]=d, lv=levelFor(emp);
     return `<tr><td><b>${name}</b>${tr?`<span class="trtag">In transition</span><div class="small">${tr.note} <a href="${tr.src[1]}" target="_blank" rel="noopener">${tr.src[0]}</a>${tr.src2?` · <a href="${tr.src2[1]}" target="_blank" rel="noopener">${tr.src2[0]}</a>`:''}</div>`:''}${cl?`<span class="trtag dead">Collapsed</span><div class="small">${cl.label}</div>`:''}${d[9]&&d[9].from?`<span class="trtag">Merger</span><div class="small">Formed by ${d[9].from.join(' and ')}, 16 Jan 2021</div>`:''}</td>
     <td class="num">${fmt(emp)}<div class="small">${note}</div>${d[10]?`<div class="small">Attrition ${(d[10].rate*100).toFixed(1)}%</div>`:''}</td>
@@ -1091,9 +1244,9 @@ function renderTable(){
 
 /* ---------- simulation ---------- */
 const TYPES={
-  regular:{name:"Regular employee",desc:"Does the job and takes promotions when they come. Rarely changes company unless they quit or lose their job.",n:36},
+  regular:{name:"Regular employee",desc:"The norm: a typical US worker. Changes employer, takes breaks and gets promoted about as often as the middle of the workforce does in national surveys.",n:36},
   climber:{name:"Climber",desc:"Wants the top floor. Switches company when promotions stall.",n:24},
-  steady:{name:"Settler",desc:"Happy once they reach a level that suits them, usually Senior or Lead.",n:24},
+  steady:{name:"Settler",desc:"Stays put: among the least likely to change employer, and happy once they reach a level that suits them, usually Professional or Lead.",n:24},
   hopper:{name:"Job hopper",desc:"After each promotion, looks for a better company on the same floor.",n:21},
   changer:{name:"Career changer",desc:"At some point leaves to start over at entry level in a new field.",n:15},
   nepo:{name:"Nepo hire",desc:"Family connections. Skips entry level and rides up without using the rungs. Gets promoted far faster where the family controls the company, a little faster elsewhere, but only into a free seat.",n:12},
@@ -1194,7 +1347,7 @@ const SECTOR_OF={"HCA Healthcare":"edhealth","US Postal Service":"gov",
   // sample employers (v31)
   "Rave Restaurant Group":"leisure","Canterbury Park":"leisure","Ark Restaurants":"leisure","Monarch Casino":"leisure","Dave & Buster's":"leisure","Educational Development":"trade","Tandy Leather":"trade","AMCON Distributing":"trade","O'Reilly Auto Parts":"trade","Burlington":"trade","Kohl's":"trade","Psychemedics":"edhealth","U.S. Physical Therapy":"edhealth","American Public Education":"edhealth","Ensign Group":"edhealth","Select Medical":"edhealth","Universal Health Services":"edhealth","Where Food Comes From":"prof","ABM Industries":"prof","Lockheed Martin":"manuf","General Dynamics":"manuf","Scientific Industries":"manuf","Westwood Holdings":"fin","Siebert Financial":"fin","Glacier Bancorp":"fin","Charles Schwab":"fin","Bank of America":"fin","Smith Douglas Homes":"constr","Quanta Services":"constr","Cadiz":"transport","Artesian Resources":"transport","Marten Transport":"transport","Old Dominion":"transport","UPS":"transport","Intellicheck":"info","Charter Communications":"info","Veterans Affairs":"gov","State of Ohio":"gov","Montgomery County Public Schools":"gov","Miami-Dade County":"gov",
   // v33 mirror groups
-  "NVR":"constr","Sterling Infrastructure":"constr","Beazer Homes":"constr","Waste Management":"prof","Resources Connection":"prof","Omnicom Group":"prof","Snap-on":"manuf","Ford":"manuf","Texas Instruments":"manuf","Campbell Soup":"manuf","General Motors":"manuf","Tyson Foods":"manuf","Hershey":"manuf","Masco":"manuf","Genuine Parts":"trade","Dillard's":"trade","W.W. Grainger":"trade","Big Lots":"trade","Sysco":"trade","Kroger":"trade","Big 5 Sporting Goods":"trade","Allstate":"fin","Commerce Bancshares":"fin","Cincinnati Financial":"fin","Con Edison":"transport","FedEx":"transport","Union Pacific":"transport","Southwest Airlines":"transport","Kforce":"prof","Robert Half":"prof","Cracker Barrel":"leisure","Marcus Corp":"leisure","Darden Restaurants":"leisure","Chemed":"edhealth","National HealthCare":"edhealth","Quest Diagnostics":"edhealth","Bright Horizons":"edhealth","Lincoln Educational":"edhealth","Comcast":"info","Scholastic":"info","PulteGroup":"constr","Great Lakes Dredge & Dock":"constr","KB Home":"constr","MasTec":"constr"};
+  "Illinois Tool Works":"manuf","Kimberly-Clark":"manuf","Intel":"manuf","Home Depot":"trade","Gap Inc.":"trade","Comerica":"fin","Unum":"fin","T. Rowe Price":"fin","Erie Indemnity":"fin","Ryder System":"transport","Southern Company":"transport","Kirby Corp":"transport","CSX":"transport","Old Dominion":"transport","Interpublic Group":"prof","Rollins":"prof","TrueBlue":"prof","Starbucks":"leisure","Six Flags":"leisure","Service Corporation International":"leisure","Choice Hotels":"leisure","Domino's":"leisure","Tenet Healthcare":"edhealth","DaVita":"edhealth","Verizon":"info","AT&T":"info","NVR":"constr","Sterling Infrastructure":"constr","Beazer Homes":"constr","Waste Management":"prof","Resources Connection":"prof","Omnicom Group":"prof","Snap-on":"manuf","Ford":"manuf","Texas Instruments":"manuf","Campbell Soup":"manuf","General Motors":"manuf","Tyson Foods":"manuf","Hershey":"manuf","Masco":"manuf","Genuine Parts":"trade","Dillard's":"trade","W.W. Grainger":"trade","Big Lots":"trade","Sysco":"trade","Kroger":"trade","Big 5 Sporting Goods":"trade","Allstate":"fin","Commerce Bancshares":"fin","Cincinnati Financial":"fin","Con Edison":"transport","FedEx":"transport","Union Pacific":"transport","Southwest Airlines":"transport","Kforce":"prof","Robert Half":"prof","Cracker Barrel":"leisure","Marcus Corp":"leisure","Darden Restaurants":"leisure","Chemed":"edhealth","National HealthCare":"edhealth","Quest Diagnostics":"edhealth","Bright Horizons":"edhealth","Lincoln Educational":"edhealth","Comcast":"info","Scholastic":"info","PulteGroup":"constr","Great Lakes Dredge & Dock":"constr","KB Home":"constr","MasTec":"constr"};
 // Which companies count in the economy graph: every company with US workers, typical or not, because the real economy includes the
 // boomers, the hard-hit and the merged. Only two kinds are left out: companies with no US workforce (they hire no simulated workers),
 // and failed companies, whose collapse is a documented event on top of their industry's normal layoff rate; counting it would add
@@ -1284,7 +1437,12 @@ function cells(pool){
    is about 35% of the first-year rate (Farber, from the Displaced Workers Survey); the layoff curve is fitted to that. Quits fall faster
    with tenure than layoffs; the quit curve is our assumption. Both shapes are rescaled across all employed workers, so every industry keeps its BLS quit and layoff rates. */
 const TEN_L=t=>Math.pow(t+(+globalThis.TL0||.25),-(+globalThis.TL||.32)); // fitted to Farber: 20+ years of tenure gives about 35% of the first-year job-loss rate
-const TEN_Q=t=>Math.pow(t+.25,-(+globalThis.TQ||.45)); // our assumption: quits fall faster with tenure than layoffs
+// v39: how fast the chance of quitting falls with time in the job, fitted separately under and over 25 to the share of jobs that end
+// within a year by age at start (NLSY97: 61% of jobs started at 18-24, 32% at 25-38; NLSY79: 21% at 45-54)
+const TQY=+(globalThis.TQY||.87), TQO=+(globalThis.TQO||.48);
+const TEN_Q=(t,a)=>Math.pow(t+.25,-(a!=null&&a<25?TQY:TQO));
+// v39: quits by floor, fitted so median tenure on each floor matches the BLS tenure survey by occupation (January 2024, Table 6)
+const FQ=globalThis.FQ||[.93,1,1.2,1.5,1.83,1.95];
 /* quitting also falls with age. People born 1980–84 started 5.1 jobs at ages 18–23, 3.3 at 24–29 and 2.9 at 30–38 (BLS NLSY97, 2024
    release), about 0.85, 0.55 and 0.32 a year; people born 1957–64 started 0.19 a year at 45–56 (NLSY79). The age factors below are
    fitted (v36) so the simulated workers start about that many jobs at each age, together with how unevenly job-hopping is spread
@@ -1292,17 +1450,23 @@ const TEN_Q=t=>Math.pow(t+.25,-(+globalThis.TQ||.45)); // our assumption: quits 
    at the BLS quit rate. */
 /* promotions come mostly early in a career: in US survey data the chance of a promotion falls steadily with age (Pergamit and Veum,
    NLSY; McCue, PSID). Our factors, set so the median age on each floor comes close to BLS occupation data (managers 46, chief executives 52). */
-const PA=globalThis.PA||[1.4,1.1,.75,.45];
+const PA=globalThis.PA||[2.2,1.2,.7,.4]; // v43: refitted after first jobs no longer start in management
+/* v44: the least time before the next promotion: 1 year up to Lead, 2 years from Lead to Director, 3 from Director to Executive.
+   LinkedIn career histories at 20 large US firms show 30.4 months between promotions on average and 10.4 at the fastest (Standout CV,
+   2024). The longer gaps at the top are our assumption, so that nobody climbs from Junior to Director in three years; below Lead the
+   gap stays at a year, because young first-line managers are common (4.2% of workers aged 20–24 are managers, CPS 2025). */
+const PROMO_GAP=lv=>lv<3?1:lv-1;
 const PROMO_AGE=p=>{if(p.born==null)return 1;const a=year-p.born;return a<30?PA[0]:a<40?PA[1]:a<50?PA[2]:PA[3]};
-const AQ=globalThis.AQ||[1.0,.65,.32,.19], AL=globalThis.AL||[2,1.3,.85,.7];
-const AGE_Q=a=>a<25?AQ[0]:a<35?AQ[1]:a<45?AQ[2]:AQ[3];
+const AQ=globalThis.AQ||[1.36,.7,.32,.12], AL=globalThis.AL||[2,1.3,.85,.7];
+const AQ55=+(globalThis.AQ55||.6); // v39: quits at 55 and over relative to 45-54, fitted to tenure at 55-64 (BLS: 9.6 years)
+const AGE_Q=a=>a<25?AQ[0]:a<35?AQ[1]:a<45?AQ[2]:a<55?AQ[3]:AQ[3]*AQ55;
 const AGE_L=a=>a<25?AL[0]:a<35?AL[1]:a<45?AL[2]:AL[3];
 let TEN_NORM={q:1,l:1,lv:[1,1,1,1,1,1],sl:{}};
 let mixNow=null, cellNow=null;
 function updateMixNow(){countSeats();const c={},cc={};let n=0;for(const p of people){if(p.comp){const k=sectorOf(p.comp);c[k]=(c[k]||0)+1;const q=cellOf(p.comp);cc[q]=(cc[q]||0)+1;n++}}
   mixNow={};for(const k in SECTORS)mixNow[k]=n?(c[k]||0)/n:0;
   cellNow={};for(const q in cc)cellNow[q]=cc[q]/n;
-  let sq=0,sl=0,m=0;const lvs=[0,0,0,0,0,0],lvn=[0,0,0,0,0,0],cs={},cn={},qs={},qn={};for(const p of people){if(!p.shadow||!p.comp||p.since==null||p.since>year)continue;const t=year-p.since; /* workers placed for 2000 are skipped during the warm-up before it */const z=czQ(p),xq=TEN_Q(t)*(p.born!=null?AGE_Q(year-p.born):.3)*z*(p.level>=5?0:1)*(p.lastUp&&year-p.lastUp<1?.5:1); /* executives don't quit to look around, and quits halve in the year after a promotion; included here so the industry total stays at its BLS rate */sq+=xq;{const sk=sectorOf(p.comp);qs[sk]=(qs[sk]||0)+xq;qn[sk]=(qn[sk]||0)+1}const x=TEN_L(t)*(p.born!=null?AGE_L(year-p.born):1)*czL(p);sl+=x;lvs[p.level]+=x;lvn[p.level]++;const ck=sectorOf(p.comp)+p.level;cs[ck]=(cs[ck]||0)+x;cn[ck]=(cn[ck]||0)+1;m++}
+  let sq=0,sl=0,m=0;const lvs=[0,0,0,0,0,0],lvn=[0,0,0,0,0,0],cs={},cn={},qs={},qn={};for(const p of people){if(!p.shadow||!p.comp||p.since==null||p.since>year)continue;const t=year-p.since; /* workers placed for 2000 are skipped during the warm-up before it */const z=czQ(p),xq=TEN_Q(t,p.born!=null?year-p.born:40)*FQ[p.level]*(p.born!=null?AGE_Q(year-p.born):.3)*z*(p.lastUp&&year-p.lastUp<1?.3:1); /* executives don't quit to look around, and quits fall to 30% in the year after a promotion; included here so the industry total stays at its BLS rate */sq+=xq;{const sk=sectorOf(p.comp);qs[sk]=(qs[sk]||0)+xq;qn[sk]=(qn[sk]||0)+1}const x=TEN_L(t)*(p.born!=null?AGE_L(year-p.born):1)*czL(p);sl+=x;lvs[p.level]+=x;lvn[p.level]++;const ck=sectorOf(p.comp)+p.level;cs[ck]=(cs[ck]||0)+x;cn[ck]=(cn[ck]||0)+1;m++}
   // layoffs: tenure, age and the mover factor only decide who is laid off within a floor; how often each floor is hit comes from the
   // occupation data (layoffFactor), so these factors are averaged out floor by floor instead of across everyone
   // ... and industry by industry, so that frequent movers who land in a stable industry don't push its layoff rate above its BLS level
@@ -1335,15 +1499,70 @@ function addLog(text,cls){
 // queue helpers
 const walkTo=(p,x,z)=>p.q.push({t:'walk',x,z});
 const vert=(p,y,kind)=>p.q.push({t:kind,y});
+/* v42: going back to a former employer. Rehired former employees ("boomerangs") were 4.5% of new hires in 2021 and 3.9% in 2019
+   (LinkedIn, via SHRM 2022); recalls after a temporary layoff are separate. Until v41 a former employer was as likely a pick as any
+   other, so the few small firms that stand for whole groups of businesses kept coming back in the same career. Now a worker looks at
+   employers they have not worked for, and goes back to a former one only at about the LinkedIn rate (BOOM, fitted with the comparator). */
+const BOOM=+(globalThis.BOOM||.06);
+function cmpRehire(p,L){if(!p.shadow||burning||typeof CMP==='undefined'||!CMP||year<2001||p.comp===L)return;CMP.rh[0]++;if(p.past&&p.past.has(L)&&!p.recalling)CMP.rh[1]++}
+/* v43: state and local government employers are in one place, so changing between them in different places means moving home. About
+   2% of Americans move to another state in a year (Census), so a worker whose public employer is in one area rarely takes one in
+   another: 1 in 10 of such picks is allowed (our assumption). Fairfax County and Montgomery County are both in the Washington, DC area. */
+const PLACE={"State of Washington":'WA',"State of Ohio":'OH',"City of Phoenix":'AZ',"Miami-Dade County":'FL',"Fairfax County Public Schools":'DC',"Montgomery County Public Schools":'DC'};
+function notFar(p,opts){if(!p.place)return opts;const near=opts.filter(L=>!PLACE[L.d[0]]||PLACE[L.d[0]]===p.place);return near.length&&near.length<opts.length&&Math.random()>.1?near:opts}
+function notPast(p,opts){if(!p.past||!p.past.size)return opts;const fresh=opts.filter(L=>!p.past.has(L));if(!fresh.length)return opts;const back=opts.filter(L=>p.past.has(L));return back.length&&Math.random()<BOOM?back:fresh}
 function join(p,L,lvl){ // p is on its current floor; go to L, climb to lvl, stand
+  cmpRehire(p,L);(p.past||(p.past=new Set())).add(L);if(PLACE[L.d[0]])p.place=PLACE[L.d[0]];
   takeSeat(p,L,lvl); const s=spot(p,L);
   if(p.type==='nepo'&&lvl!==p.level){walkTo(p,s[0],s[1]);vert(p,lvl*GAP,'lift')}
   else{walkTo(p,L.fx,L.fz); if(lvl!==p.level) vert(p,lvl*GAP,'climb'); walkTo(p,s[0],s[1])}
   if(p.avoid&&sectorOf(L)!==p.avoid) p.avoid=null; // the career changer has found work in a new field
-  p.comp=L; p.level=lvl; setLaidOff(p,false); p.seeking=false; p.notice=false; setSeeker(p,false);
+  p.comp=L; p.level=lvl; setLaidOff(p,false); p.seeking=false; p.notice=false; p.back=false; setSeeker(p,false);
   if(!p.tracked||!p.lockUntil) p.next=Math.min(p.next||Infinity,year+.002); // a new job: the chance of leaving is drawn right away, forward from the start date, because it is highest in the first weeks
 }
 function setSeeker(p,on){p.f.mark.visible=on&&!p.laidOff}
+/* v39: how a job ends. People leave a job by one of three routes, as the monthly US labour-force flows show:
+   straight to another job with no gap (employer-to-employer moves, about 2.5% of workers a month: Fujita, Moscarini and Postel-Vinay,
+   corrected CPS), into unemployment (about 1.3% a month: CPS flows, LNS17400000), or out of the workforce for a while (school, family,
+   health; about 2.9% a month, LNS17800000, which also includes retirement, handled separately here). Of job endings other than
+   retirement that is roughly 40% direct moves, 20% unemployment and 40% a pause. Which route a quit or a layoff takes is fitted so the
+   totals come out at those shares, with layoffs leading mostly to unemployment and quits mostly to another job or a pause. */
+/* v42: of prime-age workers who leave a job for non-employment, about 85% of quitters and 35% of laid-off workers leave the labour
+   force for a while rather than look for work (CPS, Ellieroth and Michaud, FRED EMSHRNQP and EMSHRNLP). The route shares are fitted to
+   those two figures (the comparator measures them); for layoffs the fit stops at about 25%, because more breaks after layoffs would
+   push time spent unemployed further below the NLSY79 figure (4.4% of weeks). */
+const ROUTE={quit:[+(globalThis.RQ_EE||.6),+(globalThis.RQ_EU||.03)],laid:[+(globalThis.RL_EE||.25),+(globalThis.RL_EU||.25)]}; // [direct move, unemployment]; the rest pause
+// a pause out of the workforce lasts about a year on average (exponential), fitted so people aged 18–38 spend about 18% of their weeks out of
+// the workforce, as people born 1980–84 did (BLS NLSY97: 76% employed, 18% out of the labour force, the rest unemployed)
+/* v42: how long a break lasts depends on age, fitted so time out of the workforce matches the surveys at each age: about 24.5% of weeks
+   at 18-23 and 15.4% at 24-38 (NLSY97) and 17% at 45-54 (NLSY79). With breaks starting as often as the CPS flows above say, that
+   needs an average break of about 2.6 years under 24 (college), 1.6 years at 24-38 and 4 years from 39 (longer spells out: health,
+   care). Until v41 breaks stopped at 40, which was our assumption; the surveys show people over 40 spend as much time out. */
+const PAUSE_MEAN=+(globalThis.PAUSE||1.6);
+const PAUSE_AGE=+(globalThis.PAUSE_AGE||999);
+/* v40: breaks are not random per job ending. Each person has a lasting tendency to take breaks (study, children, care), so a minority
+   take most of them, as with job moves; it scales the break share of their job endings (mean 1). */
+function routeOf(p,kind){const R=ROUTE[kind],old=p.born!=null&&year-p.born>=PAUSE_AGE;
+  const pb=old?0:Math.min(+(globalThis.BCAP||.6),(1-R[0]-R[1])*(p.brk==null?1:p.brk)),k=(1-pb)/(R[0]+R[1]),r=Math.random();
+  return r<R[0]*k?'direct':r<(R[0]+R[1])*k?'unemployed':'pause'}
+function cmpRoute(p,kind,route){if(!p.shadow||burning||typeof CMP==='undefined'||!CMP||year<2001||p.born==null)return;const a=year-p.born;if(a<25||a>55||route==='direct')return;const r=CMP.rt[kind==='quit'?'q':'l'];r[0]++;if(route==='pause')r[1]++}
+function jobEnds(p,kind,route){route=route||routeOf(p,kind);cmpRoute(p,kind,route);
+  if(route==='direct'){startSearch(p,true);p.notice=true}
+  else if(route==='unemployed'){startSearch(p);p.notice=false}
+  else{p.notice=false;startPause(p,true)}
+  return route}
+const PAUSE_Y=+(globalThis.PAUSE_Y||2.6), PAUSE_O=+(globalThis.PAUSE_O||4);
+const pauseMean=p=>{const a=p.born==null?40:year-p.born;return a<24?PAUSE_Y:a<39?PAUSE_MEAN:PAUSE_O};
+/* v44: why a break is taken, by age, from what people out of the labour force say is their main reason (BLS Beyond the Numbers,
+   "People who are not in the labor force: why aren't they working?", CPS 2014): ages 16–24 school 82%, home and family 8%, illness or
+   disability 4%, other 6%; ages 25–54 school 10%, home and family 44%, illness or disability 32%, other (retirement included) 14%;
+   55 and over, leaving retirement aside: home and family 21%, illness or disability 74%, other 5%. Only the wording follows it. */
+function breakWhy(p){const a=p.born==null?40:year-p.born,r=Math.random();
+  const W=a<25?[.82,.08,.04]:a<55?[.10,.44,.32]:[0,.21,.74];
+  return r<W[0]?'to study':r<W[0]+W[1]?'to look after family':r<W[0]+W[1]+W[2]?'for health reasons':'for personal reasons'}
+function startPause(p,quiet){p.outFrom=year;p.out=true;p.seeking=false;setSeeker(p,false);p.outUntil=year-pauseMean(p)*Math.log(1-Math.random());p.next=Math.min(p.next||Infinity,p.outUntil);
+  if(!p.shadow){const e=SIZE/2-1.2,ex=Math.abs(p.x)>Math.abs(p.z);walkTo(p,ex?Math.sign(p.x||1)*e:p.x,ex?p.z:Math.sign(p.z||1)*e)} // steps off to the edge of the floor
+  if(p.tracked&&!quiet)note(p,`Takes a break from work ${breakWhy(p)}.`,'pause')}
 // yearly quit chance: the company's own published attrition where it exists, otherwise its industry's real rate
 const quitRate=L=>{const k=sectorOf(L),v=indRate('q',k,year);return L.d[10]?L.d[10].rate*v/(IND_QAVG[k]||v):v*12/100};
 /* turnover over time: every month, quits and layoffs scale with the real economy-wide rates for that month (BLS JOLTS, total nonfarm,
@@ -1409,15 +1628,19 @@ function setLaidOff(p,on){
   p.f.head.position.z=on?.06:0; p.f.head.position.y=on?.6:.66; // head drops forward
 }
 function transfer(p,N){bump('quits'); // a direct move to another employer is a quit in JOLTS too
+  cmpRehire(p,N);(p.past||(p.past=new Set())).add(N);
   takeSeat(p,N,p.level);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;tally.hops++;p.next=Math.min(p.next||Infinity,year+.002)}
 
 /* ---------- seats: every floor has a limited number of jobs ----------
    Share of jobs at each stage, from the BLS Occupational Employment and Wage Statistics (May 2025):
-   top executives and general managers about 2.4%, other managers 4.8%, supervisors about 5% (estimate),
-   professional roles 25.8%, and the rest split between junior and entry-level work.
+   top executives and general managers about 2.4%, other managers 4.8%, supervisors about 5% (estimate).
+   v42: senior follows the BLS Current Population Survey (Table 11b, 2025): professional plus business and financial specialist jobs,
+   32.2% (until v41 professional only, 25.8%). Lead and above: management 11.4%, split as in the OEWS. The rest (56.4%) is split
+   equally between entry and junior, our assumption: occupation groups do not tell these two levels apart (a cashier is not a step
+   above a cook).
    A company gets seats in these proportions, scaled to its current workforce in the simulation; companies with
    shorter ladders spread the same proportions over fewer floors. Nobody can move onto a floor without a free seat. */
-const SEAT_SHARE=[.31,.31,.258,.05,.048,.024];
+const SEAT_SHARE=globalThis.SS||[.282,.282,.322,.047,.045,.022];
 // companies controlled by a founding family, where family connections carry real weight
 const FAMILY={"Ford":"the Ford family, through Class B shares","Tyson Foods":"the Tyson family, through Class B shares","Comcast":"the Roberts family, through Class B shares","The New York Times":"the Ochs-Sulzberger family, through Class B shares","Dillard's":"the Dillard family, through Class B shares","Marcus Corp":"the Marcus family, through Class B shares","Scholastic":"the Robinson family, through Class A shares"};
 const isFamily=L=>!!FAMILY[L.d[0]];
@@ -1490,6 +1713,7 @@ const UP_SAME=.85;
 const backIn=p=>{if(!(p.comp&&p.comp===p.left))return '';if(p._bi)return '';p._bi=true;return ' (it stands for its whole industry in the model)'};
 const fieldOf=p=>p.comp?sectorOf(p.comp):p.left?sectorOf(p.left):null;
 function fieldPick(p,opts,sec,lv){
+  opts=notPast(p,notFar(p,opts));
   if(p.avoid){const o=opts.filter(L=>sectorOf(L)!==p.avoid);if(o.length)opts=o} // a career changer looks outside their old field
   const f=sec||fieldOf(p);
   // an industry that already has more than its real share of workers keeps fewer of its movers, one with less keeps more,
@@ -1597,7 +1821,12 @@ function layoffFactor(L,lv){const R=layoffRel(year),sh=shares(L);let m=0;for(let
 const RECALL=.4;
 /* temporary layoffs with a recall are most common where work is seasonal or follows orders: construction, manufacturing, hotels and
    restaurants, transport (BLS). Relative chances by industry are our assumption, rescaled so the economy-wide share stays at 40%. */
-const RECALL_IND={constr:1.4,manuf:1.3,leisure:1.3,transport:1.15,trade:.9,edhealth:.85,gov:.8,prof:.75,fin:.5,info:.5};
+/* v43: recall expectation by industry, BLS Mass Layoff Statistics, extended mass layoffs 2005 and 2006 (share of layoff events with a
+   recall expected; over half of all events): construction 80% and 59%, arts and recreation 78% and 82%, other services 81%, health
+   care 80%, information 18% and 27%, finance and insurance 8% and 5%. Relative to the overall level: construction 1.3, leisure 1.4,
+   education and health 1.4, information 0.4, finance 0.12. Not published there: manufacturing, transport, trade, professional
+   services and government keep our earlier values. Rescaled so 4 in 10 layoffs still end in a recall overall. */
+const RECALL_IND={constr:1.3,manuf:1.3,leisure:1.4,transport:1.15,trade:.9,edhealth:1.4,gov:.8,prof:.75,fin:.12,info:.4};
 let recallNorm=null;
 function recallP(L){if(!recallNorm){let a=0,n=0;for(const k in SECTORS){a+=SECTORS[k].jobs*SECTORS[k].l*(RECALL_IND[k]||1);n+=SECTORS[k].jobs*SECTORS[k].l}recallNorm=a/n}
   return Math.min(.9,RECALL*(RECALL_IND[sectorOf(L)]||1)/recallNorm)}
@@ -1615,21 +1844,28 @@ function companyCuts(){
       p.shadow?quietly(()=>crisisLayoff(p,t,false,true)):(crisisLayoff(p,t,false,true),k++)}}
     addLog(`${c.text?c.text:`${c.co} cuts about ${fmt(c.n)} jobs ${c.what}`}${k?': '+k+' visible worker'+(k>1?'s':'')+' affected':''}.`,'bad')});
 }
+/* v42: which job losses are the end of a temporary job. Contingent work (jobs not expected to last) by the worker's age, industry and
+   occupation, BLS Contingent and Alternative Employment Arrangements, July 2023 (Tables 1 and 2, sole or main job): 12.9% of workers
+   aged 16-24, 3.1% at 25-54, 2.6% at 55+; by industry from 2.1% (finance) to 7.7% (leisure and hospitality); by occupation 5.4% for
+   service, construction and production jobs (entry floor), 3.5% sales and office (junior), 3.6% management and professional. Until
+   v41 this was an assumed share by floor only. The overall level (TEMP_K) keeps the number of temporary jobs ending as before. */
+const TEMP_AGE=a=>a<25?12.9:a<55?3.1:2.6, TEMP_IND={constr:5.7,manuf:3.1,trade:3.1,transport:3.6,info:3.1,fin:2.1,prof:4.4,edhealth:4.3,leisure:7.7,gov:3.9}, TEMP_OCC=[5.4,3.5,3.6,3.6,3.6,3.6];
+const tempShare=p=>TEMP_AGE(p.born==null?40:year-p.born)*(TEMP_IND[sectorOf(p.comp)]||4.3)/4.3*TEMP_OCC[p.level]/4.3;
+let TEMP_K=+(globalThis.TEMP_K||10);
 function crisisLayoff(p,why,outlier,perm){
   // during a crisis only the extra layoffs above normal are blamed on it: with layoffs 20% above normal, about 1 in 6 is
   const L=p.comp, c0=activeCrisis(), ex=joltsMult(JL,JL_BASE,year,year+1/12), c=c0&&Math.random()<Math.max(0,1-1/ex)?c0:null;
   // what kind of job loss it is. Among unemployed job losers (BLS CPS, September 2026): about 26% on temporary layoff, waiting to be
-  // recalled; 55% permanent job losers; 19% finished a temporary job. Temporary jobs are mostly lower-level, so the end of one is
-  // told only for jobs held less than a year on the bottom three floors (our assumption).
+  // recalled; 55% permanent job losers; 19% finished a temporary job. A job ends as a temporary job only if it was held less than a year.
   /* layoffs above the industry's normal level are permanent: in recessions temporary layoffs fall as a share of job loss
      (unemployed job losers on temporary layoff: about 28% in 2006-07, 18% in 2009 and 13% in 2010; BLS CPS via FRED,
      LNS13023654 / LNS13023622), so the extra layoffs of a downturn are mostly jobs that are gone for good */
-  const recall=!outlier&&!perm&&Math.random()<recallP(L)*(1-(p.exs||0)), tempEnd=!why&&!recall&&!c&&p.since!=null&&year-p.since<1&&Math.random()<[.6,.5,.2,0,0,0][p.level];
+  const recall=!outlier&&!perm&&Math.random()<recallP(L)*(1-(p.exs||0)), tempEnd=!why&&!recall&&!c&&p.since!=null&&year-p.since<1&&Math.random()<Math.min(1,TEMP_K*tempShare(p)/100);
   if(!burning&&!outlier){const K=recall?'temp':tempEnd?'tempEnd':'perm';layoffKinds[K]++}
   note(p,why||(recall?`Temporarily laid off by ${L.d[0]} as ${lvName(p.level)}${c?` during the ${c.name}`:''}.`:tempEnd?`Their temporary job at ${L.d[0]} ends (${lvName(p.level)}).`:c?`${L.d[0]} cuts jobs during the ${c.name}. Laid off as ${lvName(p.level)}.`:`Laid off by ${L.d[0]} as ${lvName(p.level)}.`),'laid');
   p.left=L; p.sinceBefore=p.since; p.comp=null; setLaidOff(p,true);
-  if(recall){p.recall=L;p.seeking=true;p.seekUntil=year+.04+Math.random()*.19;p.next=Math.min(p.next||Infinity,p.seekUntil);setSeeker(p,true)}
-  else{p.recall=null;startSearch(p)}
+  if(recall){cmpRoute(p,'laid','unemployed');p.recall=L;p.seeking=true;p.seekUntil=year+.04+Math.random()*.19;p.next=Math.min(p.next||Infinity,p.seekUntil);setSeeker(p,true)}
+  else{p.recall=null;if(jobEnds(p,'laid')==='pause'&&p.tracked)note(p,`After losing the job, takes a break from work ${breakWhy(p)}.`,'pause')}
   if(c) tally.crisisLaid=(tally.crisisLaid||0)+1; {const c0=curP;curP=p;bump('layoffs',outlier);curP=c0}
 }
 function crisisTick(){
@@ -1676,7 +1912,9 @@ function drawYearly(){
 }
 
 /* ---------- following one career ---------- */
-let follow=null, tracked=null, journey=[];
+let follow=null, tracked=null, journey=[], followed=[], fIdx=0;
+/* v41: up to 10 workers can be followed at once, each with its own colour, journey and trail; the journey panel shows one at a time */
+const FOLLOW_COLS=['#d1495b','#1f8a9a','#e0a030','#7a5195','#3c8d2f','#e0642b','#2e7fd0','#b5446e','#6b8f71','#8c6d31'];
 const lvName=l=>l?LEVELS[l-1]:ENTRY;
 const KIND_COL={start:'--ink',hired:'--ink',promo:'--hi',quit:'--accent',move:'--p-hopper',laid:'--lo',drop:'--lo',merge:'--p-hopper',real:'--p-nepo',end:'--ink'};
 // a firm with fewer than 100 staff stands for a large group of small employers, so a career story names it as an example
@@ -1686,42 +1924,56 @@ function note(p,text,kind){
   if(p&&p.shadow)cmpNote(p,text,kind);
   if(!p||!p.tracked) return;
   text=smallNames(text);
-  journey.push({y:Math.floor(year),text,kind});
+  (p.journey||(p.journey=[])).push({y:Math.floor(year),t:year,text,kind});
   const st=p.st; if(kind==='promo')st.promos++; if(kind==='quit')st.quits++; if(kind==='laid')st.laid++; if(kind==='drop')st.drops++;
   if(p.comp) st.companies.add(p.comp.d[0]); else if(p.def&&p.company) st.companies.add(p.company);
   if(p.comp&&!st.first) st.first={co:p.comp.d[0],lvl:p.level,y:Math.floor(year)};
-  p.markKind=kind; renderJourney();
+  p.markKind=kind; if(p===tracked)renderJourney();
 }
 function renderJourney(){
+  journey=tracked&&tracked.journey?tracked.journey:[];
   if(follow&&follow.mystery&&!revealed){const n=journey.filter(j=>j.kind!=='start').length;
     document.getElementById('jlog').innerHTML=`<li><time>${Math.floor(year)}</time><span class="hiddenstep">The scenario is a surprise. ${n?n+' key moment'+(n>1?'s':'')+' so far, ':''}all revealed when the run ends in ${Math.floor(END)}.</span></li>`;return}
-  document.getElementById('jlog').innerHTML=journey.map(j=>`<li><time>${j.y}</time><span><span class="k" style="--kc:var(${KIND_COL[j.kind]||'--ink'})"></span>${j.text}</span></li>`).join('');
+  const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],mo=t=>MON[Math.min(11,Math.floor((t-Math.floor(t))*12))]+' ';
+  // v43: when two steps a few weeks apart fall either side of New Year, both show the month, so a notice in December and a start in January don't look a year apart
+  const lab=(j,i)=>{const a=journey[i-1],b=journey[i+1],near=x=>x&&x.t!=null&&j.t!=null&&x.y!==j.y&&Math.abs(x.t-j.t)<.25;return (near(a)||near(b)?mo(j.t):'')+j.y};
+  document.getElementById('jlog').innerHTML=journey.map((j,i)=>`<li><time>${lab(j,i)}</time><span><span class="k" style="--kc:var(${KIND_COL[j.kind]||'--ink'})"></span>${j.text}</span></li>`).join('');
   const el=document.getElementById('jlog'); el.scrollTop=el.scrollHeight;
 }
 const trailGroup=new THREE.Group(); scene.add(trailGroup);
-const TRAIL_MAX=60000;
-let trailGeo=null, trailN=0, lastPt=null, trailMat=null, trailLineMat=null;
-function resetTrail(){
-  trailGroup.clear(); trailN=0; lastPt=null;
-  trailGeo=new THREE.BufferGeometry(); trailGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(TRAIL_MAX*3),3)); trailGeo.setDrawRange(0,0);
-  trailMat=new THREE.PointsMaterial({size:4,sizeAttenuation:false}); trailLineMat=new THREE.LineBasicMaterial({transparent:true,opacity:.55});
-  trailGroup.add(new THREE.Points(trailGeo,trailMat)); trailGroup.add(new THREE.Line(trailGeo,trailLineMat));
-}
-function trailColor(){return tracked?col('--p-'+tracked.type):col('--ink')}
-function addTrailPoint(x,y,z){
-  if(trailN>=TRAIL_MAX) return;
-  const a=trailGeo.attributes.position; a.setXYZ(trailN,x,y+.05,z); trailN++; a.needsUpdate=true; trailGeo.setDrawRange(0,trailN);
-}
+const TRAIL_MAX=30000;
+/* v42: every followed worker draws their own trail in their own colour; the worker shown in the journey panel is drawn on top,
+   brighter, with the big dots marking their key moments */
+function resetTrail(){trailGroup.clear();for(const p of followed)p.tg=null}
+function trailOf(p){if(p.tg)return p.tg;
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(TRAIL_MAX*3),3));geo.setDrawRange(0,0);
+  const c=p.fcol?new THREE.Color(p.fcol):col('--p-'+p.type),on=p===tracked;
+  const pts=new THREE.Points(geo,new THREE.PointsMaterial({color:c,size:on?4:2.5,sizeAttenuation:false,transparent:true,opacity:on?1:.7}));
+  const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:c,transparent:true,opacity:on?.8:.4}));
+  if(on){pts.renderOrder=line.renderOrder=2}
+  trailGroup.add(pts);trailGroup.add(line);return p.tg={geo,n:0}}
+function addTrailPoint(p,x,y,z){const t=trailOf(p);if(t.n>=TRAIL_MAX)return;
+  const a=t.geo.attributes.position;a.setXYZ(t.n,x,y+.05,z);t.n++;a.needsUpdate=true;t.geo.setDrawRange(0,t.n)}
+function drawTrails(){resetTrail();
+  for(const p of followed){for(const q of p.trail||[])addTrailPoint(p,q[0],q[1],q[2])}
+  if(tracked)for(const m of tracked.marks||[])dropMarker({x:m[0],y:m[1],z:m[2]},m[3])}
 function dropMarker(p,kind){
   const m=new THREE.Mesh(headGeo,new THREE.MeshBasicMaterial({color:col(KIND_COL[kind]||'--ink')}));
   m.scale.setScalar(1.9); m.position.set(p.x,p.y+.12,p.z); trailGroup.add(m);
 }
 function updateTrail(){
-  if(!tracked) return;
-  const x=tracked.x,y=tracked.y,z=tracked.z;
-  if(!lastPt||Math.hypot(x-lastPt[0],y-lastPt[1],z-lastPt[2])>.22){addTrailPoint(x,y,z);lastPt=[x,y,z]}
-  if(tracked.markKind&&!tracked.q.length){dropMarker(tracked,tracked.markKind);tracked.markKind=null}
+  for(const p of followed){if(p.retired&&!p.q.length&&!p.markKind)continue;
+    const x=p.x,y=p.y,z=p.z,t=p.trail||(p.trail=[]),l=t[t.length-1];
+    if(!l||Math.hypot(x-l[0],y-l[1],z-l[2])>.22){t.push([x,y,z]);addTrailPoint(p,x,y,z)}
+    if(p.markKind&&!p.q.length){(p.marks||(p.marks=[])).push([p.x,p.y,p.z,p.markKind]);if(p===tracked)dropMarker(p,p.markKind);p.markKind=null}}
 }
+function showFollowed(i){if(!followed.length)return;fIdx=(i+followed.length)%followed.length;tracked=followed[fIdx];
+  const nav=document.getElementById('jnav');nav.hidden=followed.length<2;document.getElementById('jpos').textContent=`Worker ${fIdx+1} of ${followed.length}`;
+  const real=!!tracked.def,typeName=real?CASES.find(c=>c.key===follow.type).name:TYPES[tracked.type].name;
+  document.getElementById('jhead').innerHTML=`<i style="--c:${tracked.fcol||'var(--p-'+tracked.type+')'}"></i>${followed.length>1?'Worker '+(fIdx+1)+': ':'Following: '}${typeName}${real?' · real career':follow.mystery&&!revealed?' · scenario hidden until the end':' · '+SCEN[tracked.scen||follow.scen].label}`;
+  drawTrails();renderJourney();if(year>=END)journeySummary(tracked)}
+document.getElementById('jprev').onclick=()=>showFollowed(fIdx-1);
+document.getElementById('jnext').onclick=()=>showFollowed(fIdx+1);
 function dimOthers(on){
   for(const k in typeMats){const m=typeMats[k];m.transparent=on;m.opacity=on?.16:1;m.depthWrite=!on}
 }
@@ -1751,43 +2003,67 @@ const SCEN_ODDS={typical:.9,ordinary:.1};
 function surpriseScen(){let r=Math.random();for(const k in SCEN_ODDS){if((r-=SCEN_ODDS[k])<0)return k}return 'typical'}
 function setupTracked(){
   revealed=false; {const rv=document.getElementById('reveal'); if(rv) rv.classList.remove('show');}
-  journey=[]; tracked=null; resetTrail();
+  journey=[]; tracked=null; followed=[]; fIdx=0; resetTrail();
   const jb=document.getElementById('journey'); jb.hidden=!follow; document.getElementById('jsum').hidden=true;
   document.getElementById('fstop').hidden=!follow;
   dimOthers(!!follow);
   if(!follow){renderJourney();return}
   const real=['case','nepoCase','founderCase','beastCase'].includes(follow.type);
+  const N=real?1:Math.max(1,Math.min(10,follow.n||1)); if(N>1)follow.mystery=false;
+  for(let fi=0;fi<N;fi++){
   let p;
   if(real){
     p=caseFigs.find(c=>c.type===follow.type); p.tracked=true; p.st={promos:0,quits:0,laid:0,drops:0,companies:new Set([p.company])};
     p.ownMat=new THREE.MeshBasicMaterial({color:col('--p-'+p.type)}); p.f.meshes.forEach(x=>x.material=p.ownMat); p.f.g.scale.setScalar(1.75);
   }else{
-    const sc=SCEN[follow.scen], f=makeFigure(follow.type);
-    p={type:follow.type,f,q:[],level:0,comp:null,ang:Math.random()*Math.PI*2,next:START+.3,stuck:0,wantHop:false,laidOff:false,seeking:false,seekUntil:0,left:null,
+    const scen=follow.random&&N>1?surpriseScen():follow.scen, sc=SCEN[scen], f=makeFigure(follow.type);
+    p={type:follow.type,f,q:[],level:0,comp:null,ang:Math.random()*Math.PI*2,next:START+searchLength(),stuck:0,wantHop:false,laidOff:false,seeking:false,seekUntil:0,left:null,
       target:2+(Math.random()<.45?1:0),changeYear:2006+Math.random()*12,changed:false,reachedTop:false,x:0,y:0,z:0,walkT:0,tracked:true,
-      lockUntil:sc.lock||0,st:{promos:0,quits:0,laid:0,drops:0,companies:new Set()}};
-    ownMaterials(p);
+      lockUntil:sc.lock||0,scen,st:{promos:0,quits:0,laid:0,drops:0,companies:new Set()}};
+    ownMaterials(p); if(N>1){p.fcol=FOLLOW_COLS[fi];p.ownMat.color=new THREE.Color(p.fcol)}
     const L=sc.company&&ladders.find(l=>l.d[0]===sc.company&&l.alive);
     if(L){const lvl=Math.min(L.top,follow.type==='nepo'?Math.max(isFamily(L)?2:1,sc.lvl):sc.lvl);p.comp=L;p.level=lvl;const s2=spot(p,L);p.x=s2[0];p.z=s2[1];p.y=lvl*GAP;p.st.companies.add(L.d[0])}
     else if(sc.typical&&Math.random()<.9){ // drawn like the rest of the workforce: 9 in 10 already have a job, on a floor in real proportions
       const T=pick(alive(),true),lvl=startLevel(T,follow.type);p.comp=T;p.level=lvl;const s2=spot(p,T);p.x=s2[0];p.z=s2[1];p.y=lvl*GAP;p.st.companies.add(T.d[0])}
     else{p.x=(Math.random()-.5)*8;p.z=(Math.random()-.5)*8}
+    if(sc.typical&&!p.comp)p.scenNote='typicalNoJob';
     f.g.position.set(p.x,p.y,p.z);
     // age: like everyone else, from the starting floor; someone looking for a first job is a newcomer.
     // In the collapse and merger scenarios they are young enough to still be working when the event comes.
     setAge(p,p.level,START,!p.comp); if(sc.lock&&p.born+p.retireAt<sc.lock+1) p.born=sc.lock+1-p.retireAt;
     people.push(p);
   }
-  tracked=p; trailMat.color=trailColor(); trailLineMat.color=trailColor();
+  tracked=p; followed.push(p);
   const typeName=real?CASES.find(c=>c.key===follow.type).name:TYPES[follow.type].name;
-  document.getElementById('jhead').innerHTML=`<i style="--c:var(--p-${follow.type})"></i>Following: ${typeName}${real?' · real career':follow.mystery?' · scenario hidden until the end':' · '+SCEN[follow.scen].label}`;
+  if(false) document.getElementById('jhead').innerHTML=`<i style="--c:var(--p-${follow.type})"></i>Following: ${typeName}${real?' · real career':follow.mystery?' · scenario hidden until the end':' · '+SCEN[follow.scen].label}`;
   if(!real) note(p,p.comp?`Starts as ${lvName(p.level)} at ${p.comp.d[0]}${follow.type==='nepo'&&p.level>=1?(isFamily(p.comp)?', placed there by family connections: the company is controlled by '+FAMILY[p.comp.d[0]]:', helped by family connections'):''}.`:'Starts out on the ground, looking for a first job.','start');
   else note(p,`Replaying ${typeName}'s real career, step by step.`,'start');
+  }
+  showFollowed(0);
 }
 function finishJourney(){
   if(!tracked||!follow) return;
+  for(const q of followed) if(!q.retired&&!q.ended){q.ended=true;note(q,`The run ends in ${Math.floor(END)} with them at ${lvName(q.level)}${q.comp?' at '+q.comp.d[0]:q.out?', taking a break from work':q.seeking&&q.notice?', about to start the new job they have lined up':q.seeking?', still job hunting':''}${q.def||q.born==null?'':`, aged ${ageOf(q)}`}.`,'end')}
+  journeySummary(tracked);
+  if(followed.length>1){renderJourney();revealMany();return}
   const p=tracked, st=p.st, real=!!p.def;
-  if(!p.retired) note(p,`The run ends in ${Math.floor(END)} with them at ${lvName(p.level)}${p.comp?' at '+p.comp.d[0]:p.seeking?', still job hunting':''}${real||p.born==null?'':`, aged ${ageOf(p)}`}.`,'end');
+  revealOne(p,st,real);
+}
+// v41: when several careers were followed, the end-of-run card over the model sums up each of them, one row per worker
+function revealMany(){const rv=document.getElementById('reveal');if(!rv)return;
+  const lv=l=>l?LEVELS[l-1].split(' /')[0]:'Entry';
+  const rows=followed.map((p,i)=>{const st=p.st,first=st.first,brk=(p.journey||[]).filter(j=>j.kind==='pause'||(j.kind==='quit'&&/break/.test(j.text))).length;
+    const end=p.retired?`retired at ${p.retiredAge}`:p.comp?lv(p.level):p.out?'on a break':'job hunting';
+    return `<tr><td><i style="background:${p.fcol}"></i>${i+1}</td><td>${SCEN[p.scen||follow.scen].label}</td><td>${first?lv(first.lvl):'–'}</td><td>${end}</td><td class="num">${st.promos}</td><td class="num">${st.companies.size}</td><td class="num">${st.quits}</td><td class="num">${st.laid}</td><td class="num">${brk}</td></tr>`}).join('');
+  rv.classList.add('wide');
+  rv.innerHTML=`<div class="cap">The run reached ${Math.floor(END)} · ${followed.length} careers followed</div><h3>${TYPES[follow.type].name}s, 2000–${Math.floor(END)}</h3>
+    <div class="tablewrap" style="border:0"><table class="rvt"><thead><tr><th>#</th><th>Scenario</th><th>Started as</th><th>In ${Math.floor(END)}</th><th class="num">Promoted</th><th class="num">Employers</th><th class="num">Quit</th><th class="num">Laid off</th><th class="num">Breaks</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="row"><button id="revealJourney">See the full journeys</button><button id="revealClose">Close</button></div>`;
+  rv.querySelector('#revealClose').onclick=()=>rv.classList.remove('show');
+  rv.querySelector('#revealJourney').onclick=()=>{rv.classList.remove('show');document.getElementById('followBox').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})};
+  rv.addEventListener('pointerdown',e=>e.stopPropagation());
+  requestAnimationFrame(()=>rv.classList.add('show'))}
+function journeySummary(p){const st=p.st, real=!!p.def;
   const sum=document.getElementById('jsum');
   sum.innerHTML=`<b>Journey summary</b><dl>
     <dt>Final floor</dt><dd>L${p.level} ${lvName(p.level)}</dd>
@@ -1797,6 +2073,8 @@ function finishJourney(){
     ${real?'':`<dt>Times quit</dt><dd>${st.quits}</dd><dt>Laid off</dt><dd>${st.laid}</dd><dt>Dropped a floor</dt><dd>${st.drops}</dd>`}
   </dl><span class="small">The trail in the model shows the full route. Big dots mark the key moments, coloured like the steps above.</span>`;
   sum.hidden=false;
+}
+function revealOne(p,st,real){
   if(!real&&!revealed){
     revealed=true; renderJourney();
     document.getElementById('jhead').innerHTML=`<i style="--c:var(--p-${follow.type})"></i>Following: ${TYPES[follow.type].name} · ${SCEN[follow.scen].label}`;
@@ -1808,7 +2086,7 @@ function finishJourney(){
     else if(follow.type==='nepo'&&follow.scen!=='ordinary'&&follow.scen!=='typical') start=start.replace('They started at','Through family connections, they started above entry level at');
     const end=p.retired?`retired: they retired in ${p.retiredIn} at ${p.retiredAge}, as <b>${p.retiredAs?lvName(p.retiredAs):'entry level'}</b>${p.retiredFrom?' at '+p.retiredFrom:''}`:p.comp?`working as <b>${p.level?lvName(p.level):'entry level'}</b> at ${p.comp.d[0]}`:p.laidOff?`at <b>${lvName(p.level)}</b> level, laid off and looking for work`:`at <b>${lvName(p.level)}</b> level, between jobs after quitting`;
     const parts=[`${st.promos} promotion${st.promos===1?'':'s'}`,st.quits?`quit ${st.quits} time${st.quits===1?'':'s'}`:'never quit',st.laid?`laid off ${st.laid} time${st.laid===1?'':'s'}`:'never laid off'];
-    rv.innerHTML=`<div class="cap">${an} ${tn.toLowerCase()} · the scenario was</div><h3>${SCEN[follow.scen].label}</h3><p>${start}</p>
+    rv.classList.remove('wide');rv.innerHTML=`<div class="cap">${an} ${tn.toLowerCase()} · the scenario was</div><h3>${SCEN[follow.scen].label}</h3><p>${start}</p>
       <p>${TYPE_REVEAL[follow.type](p)}</p>
       <p>${p.retired?'By 2026 they had':'By 2026 they were'} ${p.retired?end.replace('retired: they retired','retired. They retired'):end}${p.retired?'. Over the career':''}: ${parts[0]}, ${parts[1]}, ${parts[2]}.</p>
       <div class="row"><button id="revealJourney">See the full journey</button><button id="revealClose">Close</button></div>`;
@@ -1824,8 +2102,8 @@ function finishJourney(){
    so the charts rest on a large sample without slowing the 3D model down. */
 /* detail setting: a bigger statistical sample makes the charts steadier, a smaller one runs faster on slow devices.
    The companies stay the same at every setting, because they were chosen together to mirror their industries. */
-const DETAILS={light:{crowd:1200,figs:.5},std:{crowd:2400,figs:1},full:{crowd:4800,figs:1.6}};
-let DETAIL='std'; try{const d=localStorage.getItem('lf-detail');if(DETAILS[d])DETAIL=d}catch(e){}
+const DETAILS={light:{crowd:+(globalThis.CRL||1600),figs:.4},std:{crowd:+(globalThis.CRS||2400),figs:.6},full:{crowd:+(globalThis.CRF||3200),figs:.8}};
+let DETAIL=globalThis.DET||'std'; try{const d=localStorage.getItem('lf-detail');if(DETAILS[d]&&!globalThis.DET)DETAIL=d}catch(e){}
 let CROWD_N=DETAILS[DETAIL].crowd;
 const stubFig=()=>({g:{parent:true,position:{set(){}},scale:{setScalar(){}},rotation:{}},legs:[{rotation:{}},{rotation:{}}],meshes:[],head:{position:{}},mark:{}});
 let crowdTally={};
@@ -1926,14 +2204,14 @@ function settleAges(){
 }
 /* people differ in how often they change jobs: a minority moves and is let go again and again (short, seasonal and temporary jobs),
    while most stay put for years. Each worker gets a lasting churn factor, gamma-distributed with mean 1 (shape CHURN_K). */
-let CHURN_K=+(globalThis.CHURN_K||.5); // v36: fitted together with the age factors so new jobs by age match NLSY97 and tenure by age the BLS survey
+let CHURN_K=+(globalThis.CHURN_K||.42); // v36: fitted together with the age factors so new jobs by age match NLSY97 and tenure by age the BLS survey
 /* layoffs are even more concentrated than quits: of about 13 layoffs and discharges per 100 workers a year (JOLTS), only about 3 per 100
    workers end a job the worker had settled into (the Displaced Workers Survey finds 7–10% of workers lose a job over three normal years and
    about 16% in 2007–09; Farber). The rest are recalls, dismissals and the end of short, seasonal or temporary jobs, which keep hitting
    the same people. So the layoff factor is the churn factor raised to the power CHURN_L, rescaled to a mean of 1. */
 // the gap between frequent movers and stayers in quitting narrows with age, as people settle into careers (our assumption, set so tenure by age
 // matches the BLS tenure survey): full strength up to 30, about a third of it from 55
-const CA55=+(globalThis.CA55||.35), churnAge=a=>a<30?1:a>=55?CA55:1-(a-30)/25*(1-CA55);
+const CA55=+(globalThis.CA55||.2), churnAge=a=>a<30?1:a>=55?CA55:1-(a-30)/25*(1-CA55);
 // the most frequent movers are capped, lower with age (our assumption), so no one cycles through a new job every few weeks for years
 const czCap=a=>a<30?4:a<45?3:2;
 /* company size: within an industry, how often people quit or are laid off depends a little on how big the employer is. BLS JOLTS
@@ -1975,7 +2253,16 @@ let CHURN_L=+(globalThis.CHURN_L||2), CHURN_LM=(()=>{let s=0;for(let i=0;i<20000
 function gammaDraw(k){if(k<1)return gammaDraw(k+1)*Math.pow(Math.random(),1/k);const d=k-1/3,c=1/Math.sqrt(9*d);
   for(;;){let x,v;do{x=Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();
     if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
-function setAge(p,lv,at,newcomer){p.retireAt=retireAge();p.churn=gammaDraw(CHURN_K)/CHURN_K;p.churnL=Math.pow(p.churn,CHURN_L)/CHURN_LM;const [a,b]=newcomer?[18,26]:AGE0[lv||0];
+const BRK_K=+(globalThis.BRK_K||.8); // spread of the tendency to take breaks (gamma shape; fitted with the break length to NLSY97)
+function setAge(p,lv,at,newcomer){p.past=null;p.place=null;if(newcomer)p.fresh=true;p.retireAt=retireAge();p.churn=gammaDraw(CHURN_K)/CHURN_K;p.brk=gammaDraw(BRK_K)/BRK_K;
+  /* v40: the visible "Regular employee" persona is a typical worker: their tendency to move sits in the middle of the population's
+     spread (between about the 35th and 70th percentile), as the persona's description says. Job hoppers are the frequent movers.
+     The statistical sample has no personas. */
+  /* v43: the Regular employee is the norm: their tendency to move is drawn from the middle of the population's spread (30th to 70th
+     percentile), keeping its shape. The Settler sits at the bottom (below the 15th percentile). */
+  if(!p.shadow&&p.type==='regular'){let c;do c=gammaDraw(CHURN_K)/CHURN_K;while(c<.105||c>1.0);p.churn=c}
+  if(!p.shadow&&p.type==='steady')p.churn=.003+.017*Math.random();
+  if(!p.shadow&&p.type==='hopper')p.churn=Math.max(p.churn,1.5+Math.random());p.churnL=Math.pow(p.churn,CHURN_L)/CHURN_LM;const [a,b]=newcomer?[18,26]:AGE0[lv||0];
   const pool=!newcomer&&AGE_POOL&&AGE_POOL[lv||0]&&AGE_POOL[lv||0].length?AGE_POOL[lv||0]:null;
   if(pool){const ag=pool[Math.floor(Math.random()*pool.length)];if(p.retireAt<=ag)p.retireAt=Math.min(72,ag+.5+Math.random()*4);p.born=at-ag}
   else p.born=at-Math.min(p.retireAt-1,a+Math.random()*(b-a));
@@ -1989,6 +2276,7 @@ function retireTracked(p){
   if(p.f&&p.f.g&&p.f.g.visible!==undefined) p.f.g.visible=false;
 }
 function retire(p){
+  p.out=false; p.fresh=true;
   p._gen=(p._gen||0)+1; // a newcomer takes their place
   p.q.length=0; if(p.comp||p.left){} p.comp=null; p.left=null; p.level=0; p.y=0; p.seeking=false; p.laidOff=false; setSeeker(p,false);
   p.avoid=null; p.reachedTop=false; p.changed=false; p.stuck=0; p.wantHop=false; p.changeYear=year+4+Math.random()*16; p.target=2+(Math.random()<.45?1:0);
@@ -2013,10 +2301,21 @@ function decide(p){
       if((jn>1.5||jn<.67||qn>1.3||qn<.77)&&tb<p.next)p.next=tb+Math.random()*.01}
     if(r*(p.next-year)>.06)p.next=year+Math.max(.01,.06/r)}
   // chance that something with a yearly rate r happens before the next decision, dtn years away
-  const dtn=p.next-year, hz=r=>1-Math.exp(-r*dtn), ten=p.comp&&p.since!=null?year-p.since:0;
+  /* v43: the chance of a promotion (and the other yearly chances here) covers the whole time since the last check, including the few
+     days a frame can overshoot it at high speed, so the speed setting has no effect on careers */
+  const h0=p.hzTo!=null&&p.hzTo<year&&year-p.hzTo<2?p.hzTo:year, dtn=p.next-h0, hz=r=>1-Math.exp(-r*dtn), ten=p.comp&&p.since!=null?year-p.since:0;
   const jq=joltsMult(JQ,JQ_BASE,year,year+.01);
   if(p.born!=null&&year-p.born>=p.retireAt){p.tracked?retireTracked(p):retire(p);return}
   const open=alive(), lock=p.lockUntil&&year<p.lockUntil;
+  if(p.out){if(year<p.outUntil){p.next=p.outUntil;return}p.out=false;p.back=true;
+    /* v42: only after a break of a year or more (career breaks in the PwC study are long ones; a few months out is not a career break,
+       our reading). Coming back after a break carries a high risk of taking a lower job (UK Government Equalities Office, employment pathways after
+       childbirth); about 23% of professional women returning after a career break went into a lower-skilled or lower-paid role
+       (PwC, 2016). No US figure was found, so the UK share is used: about 1 in 4 come back one floor lower. */
+    if(p.level>0&&year-(p.outFrom==null?year-1:p.outFrom)>=1&&Math.random()<.23){p.level--;if(p.tracked)note(p,`After the break, aims one floor lower: ${lvName(p.level)}.`,'drop')}
+    // two in three people coming back from a break go straight into a job (CPS flows 2001-2025: 4.1 million a month from out of the
+    // labour force into work against 2.1 million into unemployment); the rest look for one first
+    const direct=Math.random()<.66;if(p.tracked)note(p,direct?'Comes back to work after the break.':'Comes back to the workforce and looks for a job.','move');startSearch(p,direct);return}
   if(!p.comp&&p.laidOff&&!p.seeking) startSearch(p);
   if(p.seeking){
     if(year<p.seekUntil){wander(p);p.next=Math.min(p.next,p.seekUntil);return}
@@ -2024,12 +2323,12 @@ function decide(p){
     const up=open.filter(L=>L!==p.left&&hasSeat(L,p.level+1,p)), same=open.filter(L=>L!==p.left&&L.top>=p.level);
     p.seeking=false; setSeeker(p,false);
     if(p.recall){const R=p.recall;p.recall=null;
-      if(R.alive&&R.top>=p.level){p.tries=0;join(p,R,p.level);p.since=R===p.left&&p.sinceBefore!=null?p.sinceBefore:p.since;tally.recalled=(tally.recalled||0)+1;note(p,`Recalled by ${R.d[0]} to the same job, ${lvName(p.level)}.`,'hired');return}
+      if(R.alive&&R.top>=p.level){p.tries=0;p.recalling=true;join(p,R,p.level);p.recalling=false;p.since=R===p.left&&p.sinceBefore!=null?p.sinceBefore:p.since;tally.recalled=(tally.recalled||0)+1;note(p,`Recalled by ${R.d[0]} to the same job, ${lvName(p.level)}.`,'hired');return}
       startSearch(p);return} // the recall fell through: a normal search starts
     // people who quit chose to leave, so they rarely accept a lower job: about 1 in 20 of those above entry level do, by choice
     // (our estimate; Pew Research found 9–18% of 2021 quitters had fewer chances to advance in their new job, and a lower floor is a
     // bigger step down than that). Everyone else waits for their own floor, looking in short rounds until a seat opens.
-    if(!p.laidOff&&p.level>0&&Math.random()<QUIT_DOWN){const low=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));
+    if(!p.laidOff&&!p.notice&&p.level>0&&Math.random()<QUIT_DOWN){const low=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));
       if(low.length){const lv0=p.level;p.tries=0;join(p,fieldPick(p,low,null,lv0-1),lv0-1);note(p,`Chooses a lower job: ${lvName(p.level)} at ${p.comp.d[0]}.`,'drop');return}}
     // a step up by changing employer: most promotions happen inside the company, and most moves between companies are sideways.
     // In Finnish employer records, promotions into a job from another firm are 4.3% of job entries against 24.5% for internal
@@ -2037,10 +2336,15 @@ function decide(p){
     // UP_SWITCH is set so that about 1 in 5 promotions come from switching. Most of these stay in the same field: about 85% of
     // hires between firms keep the same job title (DeVaro et al.); the model has no occupations, so the industry stands in for it.
     const f0=fieldOf(p), upSame=up.filter(L=>sectorOf(L)===f0), upPool=Math.random()<UP_SAME?upSame:up;
-    const upTo=year-(p.lastUp||-99)>=1&&upPool.length&&pick(upPool);
-    if(!p.laidOff&&upTo&&Math.random()<Math.min(.9,UP_SWITCH*cm('upMult')*edgeOf(p,upTo)*PROMO_AGE(p)*TRAIL('o',sectorOf(upTo),year)/Math.exp(PROS_STATS.o[0]))){ /* stepping up by changing employer follows the openings in the industry being moved into (BLS JOLTS): job-ladder moves between employers rise and fall with vacancies (Haltiwanger, Hyatt and McEntarfer, AEJ: Macroeconomics, 2018) */bump('promos');join(p,upTo,p.level+1);p.lastUp=year;tally.upSwitch=(tally.upSwitch||0)+1;note(p,`After job hunting, lands a role one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
-    if(p.laidOff&&p.level>0&&Math.random()<.4){const lower=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));if(lower.length){const lv=p.level;join(p,fieldPick(p,lower,null,lv-1),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'drop');return}}
-    const land=same.length&&landing(p,same,p.level);
+    const upTo=year-(p.lastUp||-99)>=PROMO_GAP(p.level)&&upPool.length&&pick(upPool);
+    if(!p.laidOff&&p.notice&&!p.back&&upTo&&Math.random()<Math.min(.9,UP_SWITCH*cm('upMult')*edgeOf(p,upTo)*PROMO_AGE(p)*TRAIL('o',sectorOf(upTo),year)/Math.exp(PROS_STATS.o[0]))){ /* stepping up by changing employer follows the openings in the industry being moved into (BLS JOLTS): job-ladder moves between employers rise and fall with vacancies (Haltiwanger, Hyatt and McEntarfer, AEJ: Macroeconomics, 2018) */bump('promos');join(p,upTo,p.level+1);p.lastUp=year;tally.upSwitch=(tally.upSwitch||0)+1;note(p,`Starts the new job one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
+    /* v43: about 1 in 4 long-tenured displaced workers back in full-time work earned 20% or more below the lost job (BLS Displaced
+       Workers Survey, February 2000: 396,000 of 1.6 million); a floor lower stands for that. Until v42 this was our assumption of 40%. */
+    if(p.laidOff&&p.level>0&&Math.random()<.25){const lower=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));if(lower.length){const lv=p.level;join(p,fieldPick(p,lower,null,lv-1),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'drop');return}}
+    let land=same.length&&landing(p,same,p.level);
+    /* v42: someone who gave notice already has the new job: they never end up "still looking". If the seats they aimed at filled up
+       during the notice period, they take the same floor at any employer that has one */
+    if(p.notice&&!p.laidOff&&(!land||land[1]<p.level)){const any=open.filter(L=>L!==p.left&&hasSeat(L,p.level,p)),ok=open.filter(L=>L!==p.left&&L.top>=p.level);if(any.length)land=[pick(any),p.level];else if(ok.length)land=[pick(ok),p.level]} // v44: if every seat filled during the notice, the offer still stands
     if(land&&land[1]<p.level&&!p.laidOff){if(!p.tries)note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');p.tries=1;startSearch(p,true);return}
     if(land&&land[1]<p.level&&p.laidOff&&!p.tries){p.tries=1;startSearch(p,true);note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');return}
     if(land){const wasLaid=p.laidOff,lv0=p.level;p.tries=0;join(p,land[0],land[1]);
@@ -2059,7 +2363,7 @@ function decide(p){
         const ind=TEN_L(ten)*czL(p)*(p.born!=null?AGE_L(year-p.born):1)/lnorm(p);
         // a firm in its first two years is still growing and rarely cuts jobs (our assumption)
         const sk=sectorOf(p.comp), bl=lock?0:layoffFactor(p.comp,p.level)*12/100; /* v31: no extra multipliers for firms in transition or in their first two years (they were assumptions); documented cuts come from CUTS */
-        const bq=lock||p.level>=5?0:(p.comp.d[10]?p.comp.d[10].rate/(IND_QAVG[sk]*12/100):1)*12/100*TEN_Q(ten)*czQ(p)*(p.lastUp&&year-p.lastUp<1?.5:1)*(p.born!=null?AGE_Q(year-p.born):.3)/qnorm(p)*(p.type==='hopper'?1.6:p.type==='nepo'?.3:p.type==='steady'&&p.level>=p.target?.4:1);
+        const bq=lock?0:(p.comp.d[10]?p.comp.d[10].rate/(IND_QAVG[sk]*12/100):1)*12/100*TEN_Q(ten,p.born!=null?year-p.born:40)*FQ[p.level]*czQ(p)*(p.lastUp&&year-p.lastUp<1?.3:1)*(p.born!=null?AGE_Q(year-p.born):.3)/qnorm(p)*(p.type==='hopper'?1.6:p.type==='nepo'?.3:p.type==='steady'&&p.level>=p.target?.4:1);
         const seg=[];let t=w0,Hl=0,Hq=0,exS=0;
         while(t<w1-1e-9){const mi=Math.floor((t-2001)*12+1e-9),te=Math.min(w1,2001+(mi+1)/12),d=te-t;
           // this industry's real rates for this month; layoffs above the industry's normal level for that calendar month hit workers
@@ -2074,21 +2378,33 @@ function decide(p){
   }
   if(doLay){crisisLayoff(p);return}
   if(doQuit){
-    note(p,`Quits ${p.comp.d[0]} as ${lvName(p.level)} to look for something better.`,'quit');
+    // the reason comes first: someone with a job lined up gives notice; someone leaving for a break says so
+    const route=routeOf(p,'quit'), co=p.comp.d[0], lv=lvName(p.level);
+    // v42: a job lined up needs an opening on their floor at another employer; with none anywhere, there is no offer and they stay
+    if(route==='direct'&&!open.some(L=>L!==p.comp&&hasSeat(L,p.level,p)))return;
+    note(p,route==='direct'?`Has a job lined up elsewhere and gives notice at ${co} (${lv}).`:route==='pause'?`Leaves ${co} as ${lv} to take a break from work ${breakWhy(p)}.`:`Quits ${co} as ${lv} and looks for another job.`,'quit');
     p.left=p.comp; p.comp=null; tally.quit=(tally.quit||0)+1; bump('quits');
-    walkTo(p,p.x+(Math.random()-.5)*2,p.z+(Math.random()-.5)*2); {const ln=Math.random()<.9; startSearch(p,ln); p.notice=ln} return;
+    walkTo(p,p.x+(Math.random()-.5)*2,p.z+(Math.random()-.5)*2); jobEnds(p,'quit',route); return;
   }
   if(!p.comp){
+    /* v39: a first job is not always at entry level. Workers aged 20–24 hold service, construction, maintenance, production and
+       transport jobs (entry) 52%, sales and office jobs (junior) 22%, professional and business jobs (senior) 22% and management jobs
+       (lead) 4% (BLS CPS Table 11b, 2025); a newcomer aims for a first job in those proportions, if a seat is free there */
+    /* v43: a first job follows the jobs young people hold, with no management first job. Under 22 (before most graduate): the 16–19
+       mix (CPS Table 11b, 2025: service, production and construction 62.5%, sales and office 27.3%, professional and business/financial
+       10.2%). From 22: the 20–24 mix without its management share (4.2%), which is held by people who already have some years of work
+       behind them: entry 53.9%, junior 23.2%, senior 23.0%. Until v42 the 20–24 mix, management included, applied to every first job. */
+    const first=!!p.fresh;if(p.fresh){p.fresh=false;const r=Math.random(),a0=p.born!=null?year-p.born:22;p.level=a0<22?(r<.625?0:r<.898?1:2):(r<.539?0:r<.771?1:2)}
     if(p.type==='nepo'&&p.level===0){ // family connections open a door above entry level: two floors up where the family controls the company, one elsewhere
       const opts=open.filter(L=>hasSeat(L,isFamily(L)?2:1,p));
       if(opts.length){const L=pick(opts),fam=isFamily(L);join(p,L,fam?2:1);
-        note(p,fam?`Family connections: skips entry level and starts as Senior at ${L.d[0]}, which is controlled by ${FAMILY[L.d[0]]}.`:`Connections help: skips entry level and starts as Junior at ${L.d[0]}.`,'hired');
-        if(fam) addLog(`A nepo hire skips entry level and starts as a Senior at ${L.d[0]}.`,'nepo');return}
+        note(p,fam?`Family connections: skips entry level and starts as Professional at ${L.d[0]}, which is controlled by ${FAMILY[L.d[0]]}.`:`Connections help: skips entry level and starts as Junior at ${L.d[0]}.`,'hired');
+        if(fam) addLog(`A nepo hire skips entry level and starts as a Professional at ${L.d[0]}.`,'nepo');return}
     }
     const land=landing(p,open,p.level);
     if(!land) return;
     const lv0=p.level; join(p,land[0],land[1]);
-    note(p,p.level<lv0?`No ${lvName(lv0)} seat free; hired at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Hired at ${p.comp.d[0]} as ${lvName(p.level)}.`,p.level<lv0?'drop':'hired'); return;
+    note(p,p.level<lv0&&!first?`No ${lvName(lv0)} seat free; hired at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Hired at ${p.comp.d[0]} as ${lvName(p.level)}.`,p.level<lv0&&!first?'drop':'hired'); return;
   }
   const L=p.comp;
   if(!lock&&p.type==='changer'&&!p.changed&&year>=p.changeYear&&p.level>=1&&(p.born==null||ageOf(p)<50)){ // restarting at entry level: under 50 only (our assumption)
@@ -2107,7 +2423,7 @@ function decide(p){
     const edge=edgeOf(p,L);
     // nobody is promoted twice within a year, or within their first year at a company (our rule; LinkedIn career histories at 20 large firms show 30.4 months between promotions
     // on average, and 10.4 months at the fastest, Tesla; Standout CV, 2024)
-    if(year-Math.max(p.lastUp||-99,p.since!=null?p.since:-99)>=1&&Math.random()<hz(BASE[p.level]*sf(L)*edge*cm('promoMult')*PROMO_AGE(p))&&hasSeat(L,p.level+1,p)){bump('promos');takeSeat(p,L,p.level+1);
+    if(year-Math.max(p.lastUp||-99,p.since!=null?p.since:-99)>=PROMO_GAP(p.level)&&Math.random()<hz(BASE[p.level]*sf(L)*edge*cm('promoMult')*PROMO_AGE(p))&&hasSeat(L,p.level+1,p)){bump('promos');takeSeat(p,L,p.level+1);
       const s=spot(p,L);
       if(p.type==='nepo'){walkTo(p,s[0],s[1]);vert(p,(p.level+1)*GAP,'lift')}
       else{walkTo(p,L.fx,L.fz); vert(p,(p.level+1)*GAP,'climb'); walkTo(p,s[0],s[1])}
@@ -2116,7 +2432,7 @@ function decide(p){
     }else if(year-Math.max(p.lastUp||0,p.since||0)>=4&&Math.random()<hz(.15*jq*(p.born!=null?AGE_Q(year-p.born)/AGE_Q(40):1))&&!lock&&p.type!=='steady'&&p.type!=='regular'){
       // passed over: usually look for a better-rated company in the same industry, otherwise any company with a free seat
       const cand=open.filter(o=>o!==L&&o.top>p.level&&hasSeat(o,p.level,p)), better=cand.filter(o=>sectorOf(o)===sectorOf(L)&&prospects(o).score>prospects(L).score+.1);
-      p.stuck=0; if(cand.length){const N=better.length&&Math.random()<.7?pick(better):fieldPick(p,cand);transfer(p,N);
+      p.stuck=0; if(cand.length){const nb=notPast(p,better),N=better.length&&Math.random()<.7?pick(nb):fieldPick(p,cand);transfer(p,N);
         const rated=prospects(N).score>prospects(L).score+.1;
         note(p,`Passed over for promotion at ${L.d[0]}; moves to ${N.d[0]}${rated?', where prospects are better':''}.`,'move')}
     }
@@ -2191,6 +2507,7 @@ function collapse(L){
   addLog(`${L.d[0]} collapsed. ${hit.length?hit.length+' simulated worker'+(hit.length>1?'s':'')+' affected'+(parts.length?': '+parts.join(', '):'')+'.':'No simulated workers were there at the time.'}`,'bad');
 }
 
+function finishMoves(p){for(const a of p.q){if(a.t==='walk'){p.x=a.x;p.z=a.z}else p.y=a.y}p.q.length=0;p.f.g.position.set(p.x,p.y,p.z)}
 function stepPerson(p,dt){
   let moving=false;
   while(p.q.length&&dt>0){
@@ -2227,7 +2544,13 @@ function simulate(dt){
   if(!sampleHist.length||year-sampleHist[sampleHist.length-1][0]>=.05) sampleHist.push([year,sampleCount()]);
   for(const p of people){
     if(p.shadow){p.q.length=0;crowdDecide(p,yPrev);p.y=p.level*GAP;continue}
-    if(!p.q.length&&year>=p.next){curP=p;decide(p);curP=null} stepPerson(p,sdt) }
+    // v38: a decision waits for the figure to finish walking or climbing, but never more than a quarter of a simulated year
+    // (well under a second on screen); after that the move completes at once. Visible and followed workers then keep the same
+    // pace as the statistical sample instead of losing years to animation
+    // v39: a figure that is behind its next decision walks faster to catch up (up to about 8 times, at a quarter of a year behind),
+    // so moves stay visible; only a figure a whole simulated year behind finishes its move at once
+    if(year>=p.next&&(!p.q.length||year>=p.next+(+globalThis.LAG||1))){if(p.q.length)finishMoves(p);curP=p;decide(p);curP=null;p.hzTo=p.next}
+    stepPerson(p,sdt*(p.q.length&&year>p.next?Math.min(12,1+(year-p.next)*28):1)) }
   stepCases(sdt);
   cmpSample(yPrev); if(CMP&&(year-(CMP.r||0)>=.5||year>=END)){CMP.r=year;renderCmp()} if(year>=END)cmpSaveRun();
   if(year>=END){playing=false;setPlay();finishJourney();if(!follow)runSummary();addLog(`The simulation reached ${Math.floor(END)}. ${tally.top} worker${tally.top===1?'':'s'} reached Executive; ${tally.hit} were hit by a collapse.`)}
@@ -2244,7 +2567,7 @@ function runSummary(){
   const failed=ladders.filter(L=>L.failed).map(L=>L.d[0]);
   const g=CRISES.find(c=>c.id==='gfc'), w=WIN.gfc, gb=rate('layoffs',...w.before), gd=rate('layoffs',g.from,g.to);
   const gch=gb&&gd?Math.round((gd/gb-1)*100):null, greal=realChange('layoffs',w,g.from,g.to);
-  rv.innerHTML=`<div class="cap">The run reached ${Math.floor(END)} · summary</div><h3>${n.toLocaleString('en-US')} simulated workers, 26 years</h3>
+  rv.classList.remove('wide');rv.innerHTML=`<div class="cap">The run reached ${Math.floor(END)} · summary</div><h3>${n.toLocaleString('en-US')} simulated workers, 26 years</h3>
     <p><b>Where they are now:</b> ${Math.round(100*emp.length/n)}% in work. By floor: ${fl.map((x,i)=>`${i?LEVELS[i-1].split(' /')[0]:'Entry'} ${Math.round(100*x/(emp.length||1))}%`).join(' · ')}.</p>
     <p><b>Each year, per 100 workers:</b> ${per('promos')} promotions, ${per('quits')} quits and ${per('layoffs')} layoffs. Of the layoffs, ${pc(lk.temp)}% were temporary, with a recall to the same job; ${pc(lk.tempEnd)}% were short temporary jobs ending; ${pc(lk.perm)}% were permanent.</p>
     <p><b>Crises:</b> in the 2008 financial crisis layoffs rose ${gch==null?'–':(gch>0?'+':'')+gch+'%'} in the model against ${greal==null?'–':(greal>0?'+':'')+greal+'%'} in reality.${failed.length?` ${failed.length} companies collapsed along the way, including ${failed.slice(0,3).join(', ')}.`:''}</p>
@@ -2286,7 +2609,7 @@ function renderSampleList(){
   // every company in the model, by the industry it stands for: the group chosen to mirror the industry, then the small firms
   // that stand for the industry's under-1,000-staff jobs, and other employers (government)
   const mem=new Set(Object.values(MIRROR).flatMap(m=>m.members)), by={};
-  for(const d of DATA){const k=SECTOR_OF[d[0]]||'prof',b=by[k]||(by[k]={m:[],s:[],o:[]});
+  for(const d of DATA.filter(inDetail)){const k=SECTOR_OF[d[0]]||'prof',b=by[k]||(by[k]={m:[],s:[],o:[]});
     if(mem.has(d[0]))b.m.push(d[0]);else if(d[1]<1000)b.s.push(d[0]);else b.o.push(d[0])}
   el.innerHTML=Object.keys(SECTORS).filter(k=>by[k]).map(k=>{const b=by[k];
     return `<div class="rs"><b>${SECTORS[k].name} (${b.m.length+b.s.length+b.o.length})</b>
@@ -2380,7 +2703,8 @@ document.getElementById('play').onclick=()=>{if(year>=END)return;playing=!playin
 const ftype=document.getElementById('ftype'), fscen=document.getElementById('fscen');
 ftype.onchange=()=>{fscen.disabled=['case','nepoCase','founderCase','beastCase'].includes(ftype.value)};
 document.getElementById('fstart').onclick=()=>{const keys=Object.keys(SCEN),myst=fscen.value==='random'&&!fscen.disabled;
-  follow={type:ftype.value,scen:myst?surpriseScen():(fscen.value==='random'?'typical':fscen.value),mystery:myst};reset();playing=true;setPlay();document.getElementById('stage').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})};
+  const n=+document.getElementById('fcount').value||1;
+  follow={type:ftype.value,scen:myst?surpriseScen():(fscen.value==='random'?'typical':fscen.value),mystery:myst&&n===1,random:myst,n};reset();playing=true;setPlay();document.getElementById('stage').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})};
 document.getElementById('fstop').onclick=()=>{follow=null;reset();playing=true;setPlay()};
 document.getElementById('restart').onclick=()=>{reset();playing=true;setPlay()};
 const DBTN={light:'dLight',std:'dStd',full:'dFull'};
@@ -2389,10 +2713,11 @@ for(const k in DBTN)document.getElementById(DBTN[k]).onclick=()=>{if(k===DETAIL)
   try{localStorage.setItem('lf-detail',k)}catch(e){} setDetailBtns();
   // restarting builds a new sample and lets it settle for 20 quiet years, which takes a few seconds; show that before the work starts
   const b=document.getElementById(DBTN[k]),t=b.textContent;b.textContent='Preparing…';
-  setTimeout(()=>{reset();b.textContent=t;playing=true;setPlay()},40)};
+  // a new detail level means a different set of companies: the map is rebuilt, then the run restarts
+  setTimeout(()=>{MIRROR=MIRROR_L[DETAIL];CMP_REF=CMP_REF_L[DETAIL];build();applyTheme();renderSampleList();reset();b.textContent=t;playing=true;setPlay()},40)};
 setDetailBtns();
-document.getElementById('s1').onclick=()=>{speed=1;s1.setAttribute('aria-pressed','true');s3.setAttribute('aria-pressed','false')};
-document.getElementById('s3').onclick=()=>{speed=3;s3.setAttribute('aria-pressed','true');s1.setAttribute('aria-pressed','false')};
+const SPEEDS={s1:1,s3:3,s5:5};
+for(const id in SPEEDS)document.getElementById(id).onclick=()=>{speed=SPEEDS[id];for(const k in SPEEDS)document.getElementById(k).setAttribute('aria-pressed',String(k===id))};
 const s1=document.getElementById('s1'), s3=document.getElementById('s3');
 document.getElementById('vModel').onclick=()=>setView('model');
 document.getElementById('vSide').onclick=()=>setView('side');
@@ -2403,12 +2728,12 @@ new MutationObserver(applyTheme).observe(document.documentElement,{attributes:tr
 
 
 // the mirror test: each industry's group of companies against the industry's real jobs (BLS CES), 2000 = 100
-const MIRROR={"manuf": {"name": "Manufacturing", "members": ["Snap-on", "Ford", "Texas Instruments", "Campbell Soup", "General Motors", "Tyson Foods", "Lockheed Martin", "Hershey", "Masco"], "g": [100, 99.5, 99.1, 97.0, 96.5, 94.6, 91.4, 85.2, 80.5, 76.4, 73.5, 74.3, 74.3, 76.2, 79.8, 77.1, 74.0, 73.5, 75.2, 71.5, 68.9, 70.9, 72.3, 72.6, 71.8, 70.4], "j": [100, 93.8, 88.0, 85.3, 84.8, 84.3, 83.3, 81.0, 74.2, 68.9, 69.1, 70.3, 71.0, 71.6, 72.7, 73.2, 73.4, 74.4, 75.6, 73.5, 72.1, 74.5, 76.2, 76.2, 75.5, 75.0], "path": 7.3, "r": 0.58, "cg": -1.39, "ci": -1.14}, "trade": {"name": "Wholesale and retail trade", "members": ["Genuine Parts", "Dillard's", "W.W. Grainger", "Big Lots", "Sysco", "Kroger", "Big 5 Sporting Goods"], "g": [100, 96.7, 97.5, 96.9, 98.0, 101.4, 101.7, 104.2, 99.4, 96.2, 97.1, 99.5, 102.9, 108.0, 109.4, 112.6, 112.8, 119.6, 119.2, 116.0, 112.4, 110.5, 116.8, 114.6, 115.8, 114.8], "j": [100, 98.8, 97.6, 97.6, 99.1, 100.3, 101.3, 101.3, 97.7, 94.5, 95.0, 96.4, 97.7, 99.4, 101.0, 102.2, 102.7, 102.6, 102.2, 99.0, 97.9, 101.0, 102.6, 102.9, 102.4, 102.4], "path": 8.8, "r": 0.64, "cg": 0.55, "ci": 0.09}, "fin": {"name": "Finance and insurance", "members": ["Allstate", "Frost Bank", "Commerce Bancshares", "Cincinnati Financial"], "g": [100, 101.2, 100.4, 101.6, 102.3, 104.0, 105.7, 107.9, 110.0, 107.5, 104.4, 105.5, 106.5, 108.5, 111.0, 113.5, 116.5, 117.3, 120.5, 123.5, 119.9, 126.1, 129.2, 133.2, 138.8, 138.0], "j": [100, 101.1, 102.5, 103.5, 104.0, 105.7, 106.9, 105.9, 102.3, 98.9, 98.2, 98.8, 100.2, 101.4, 102.9, 105.0, 107.1, 109.0, 110.9, 111.1, 111.3, 114.2, 116.7, 117.2, 117.2, 116.8], "path": 8.3, "r": 0.43, "cg": 1.3, "ci": 0.62}, "transport": {"name": "Transport and utilities", "members": ["J.B. Hunt", "Con Edison", "York Water", "UPS", "United Airlines", "FedEx", "Union Pacific", "Southwest Airlines", "Marten Transport"], "g": [100, 99.8, 97.9, 91.5, 93.4, 95.5, 97.0, 97.5, 96.6, 92.3, 99.1, 102.3, 103.9, 106.2, 109.1, 113.0, 116.6, 119.2, 124.6, 127.3, 123.3, 127.4, 136.4, 137.9, 134.8, 131.3], "j": [100, 98.2, 95.6, 95.4, 97.3, 99.3, 101.1, 101.7, 98.4, 95.1, 96.1, 98.2, 99.8, 102.4, 106.6, 110.1, 113.2, 117.3, 122.3, 122.8, 127.2, 139.0, 143.9, 144.1, 145.1, 145.0], "path": 4.4, "r": 0.55, "cg": 1.09, "ci": 1.5}, "prof": {"name": "Professional and business services", "members": ["Robert Half", "ABM Industries", "Exponent", "Kforce", "NRC Health", "Waste Management", "Resources Connection", "Omnicom Group"], "g": [100, 91.8, 92.6, 94.1, 102.6, 108.8, 117.0, 124.2, 116.1, 100.7, 103.1, 111.2, 112.9, 116.6, 119.5, 125.0, 126.6, 132.1, 136.1, 134.1, 123.2, 131.1, 137.0, 130.5, 130.5, 127.5], "j": [100, 97.7, 96.3, 97.8, 100.9, 104.5, 107.4, 107.9, 103.3, 100.2, 102.9, 106.6, 110.5, 113.9, 117.2, 120.2, 122.7, 125.3, 127.6, 124.2, 124.2, 132.3, 136.5, 136.2, 135.1, 134.8], "path": 5.5, "r": 0.78, "cg": 0.98, "ci": 1.2}, "leisure": {"name": "Leisure and hospitality", "members": ["Cracker Barrel", "Marcus Corp", "Ark Restaurants", "Darden Restaurants", "Marriott"], "g": [100, 98.2, 101.2, 98.1, 100.2, 101.3, 109.6, 112.2, 117.9, 114.4, 114.9, 112.9, 113.1, 118.1, 120.6, 115.8, 135.6, 131.1, 132.8, 141.1, 112.0, 137.6, 151.5, 157.6, 156.7, 150.4], "j": [100, 100.6, 101.1, 102.9, 105.0, 106.9, 108.8, 110.1, 108.7, 106.9, 107.7, 110.0, 113.1, 116.3, 119.2, 122.4, 125.6, 127.9, 129.4, 115.5, 109.1, 120.8, 128.0, 131.2, 132.3, 133.1], "path": 8.9, "r": 0.49, "cg": 1.65, "ci": 1.15}, "edhealth": {"name": "Education and health", "members": ["HCA Healthcare", "Chemed", "National HealthCare", "Quest Diagnostics", "Bright Horizons", "Strategic Education", "Lincoln Educational"], "g": [100, 106.8, 115.9, 125.7, 129.2, 133.8, 131.2, 135.2, 135.9, 135.8, 141.8, 139.9, 137.6, 141.6, 132.2, 131.4, 137.2, 136.1, 154.7, 159.1, 154.8, 153.5, 157.6, 163.9, 176.0, 178.2], "j": [100, 103.9, 107.1, 109.6, 112.5, 115.3, 118.5, 122.2, 125.2, 127.4, 129.7, 132.3, 134.7, 136.8, 140.0, 143.9, 147.7, 150.8, 153.9, 151.5, 149.9, 154.7, 160.3, 167.1, 173.5, 178.3], "path": 7.6, "r": 0.25, "cg": 2.34, "ci": 2.34}, "info": {"name": "Information", "members": ["The New York Times", "Comcast", "Scholastic"], "g": [100, 86.1, 86.8, 79.8, 83.0, 85.1, 88.8, 87.9, 84.1, 78.7, 75.6, 83.2, 72.3, 64.9, 66.0, 66.0, 67.8, 69.3, 75.2, 76.8, 73.0, 72.5, 76.1, 76.1, 75.2, 76.8], "j": [100, 96.1, 90.1, 86.6, 85.0, 83.7, 83.4, 82.8, 79.2, 75.3, 73.9, 73.6, 74.2, 74.8, 75.3, 76.3, 77.1, 77.6, 78.4, 75.3, 75.5, 82.1, 83.7, 81.3, 79.4, 76.9], "path": 8.3, "r": 0.19, "cg": -1.05, "ci": -1.04}, "constr": {"name": "Construction", "members": ["EMCOR", "PulteGroup", "Great Lakes Dredge & Dock", "NVR", "KB Home", "MasTec", "Sterling Infrastructure", "Beazer Homes"], "g": [100, 99.4, 107.2, 105.6, 114.6, 128.9, 121.9, 103.8, 79.9, 74.5, 76.3, 76.7, 80.6, 91.4, 99.6, 105.3, 109.1, 107.1, 112.3, 120.7, 113.3, 128.8, 137.3, 132.7, 138.9, 134.6], "j": [100, 99.1, 98.1, 100.2, 104.7, 110.3, 113.1, 109.8, 97.5, 86.3, 84.6, 86.4, 88.9, 92.9, 96.7, 98.8, 101.2, 105.7, 109.8, 107.8, 106.1, 110.3, 114.9, 117.8, 119.2, 120.1], "path": 10.6, "r": 0.72, "cg": 1.19, "ci": 0.74}, "state": {"name": "State government", "members": ["State of Washington", "State of Ohio"], "g": [100, 101.9, 102.0, 102.9, 103.7, 104.6, 103.9, 105.2, 106.7, 106.0, 106.6, 104.9, 105.1, 103.9, 106.5, 109.7, 111.3, 112.1, 109.3, 109.9, 103.6, 105.3, 104.2, 106.9, 113.8, 114.3], "j": [100, 102.9, 103.6, 102.7, 103.3, 104.3, 105.1, 106.3, 106.3, 105.7, 105.1, 104.2, 103.9, 103.7, 104.2, 105.0, 106.1, 106.7, 106.8, 105.9, 105.7, 106.3, 107.5, 110.7, 112.8, 113.2], "path": 2.3, "r": 0.49, "cg": 0.54, "ci": 0.5}};
+const MIRROR_L={"light": {"manuf": {"name": "Manufacturing", "members": ["Snap-on", "Ford", "Texas Instruments", "Tyson Foods"], "g": [100, 93.1, 91.0, 88.3, 86.2, 84.1, 80.7, 75.6, 72.9, 70.5, 68.6, 72.4, 72.4, 72.5, 74.0, 72.9, 74.1, 76.2, 75.8, 78.1, 76.8, 77.6, 78.6, 79.7, 78.5, 77.0], "j": [100, 93.8, 88.0, 85.3, 84.8, 84.3, 83.3, 81.0, 74.2, 68.9, 69.1, 70.3, 71.0, 71.6, 72.7, 73.2, 73.4, 74.4, 75.6, 73.5, 72.1, 74.5, 76.2, 76.2, 75.5, 75.0], "path": 3.3, "r": 0.62, "cg": -1.04, "ci": -1.14}, "trade": {"name": "Wholesale and retail trade", "members": ["Genuine Parts", "Dillard's", "W.W. Grainger", "Big Lots"], "g": [100, 95.1, 93.6, 92.2, 93.8, 99.3, 96.3, 98.0, 90.9, 87.3, 88.3, 92.4, 96.2, 102.1, 101.6, 104.2, 103.6, 107.7, 107.5, 102.4, 101.1, 102.3, 103.6, 103.9, 105.9, 105.5], "j": [100, 98.8, 97.6, 97.6, 99.1, 100.3, 101.3, 101.3, 97.7, 94.5, 95.0, 96.4, 97.7, 99.4, 101.0, 102.2, 102.7, 102.6, 102.2, 99.0, 97.9, 101.0, 102.6, 102.9, 102.4, 102.4], "path": 4.1, "r": 0.74, "cg": 0.21, "ci": 0.09}, "fin": {"name": "Finance and insurance", "members": ["Allstate", "Commerce Bancshares", "Cincinnati Financial"], "g": [100, 101.7, 102.8, 103.4, 104.7, 105.4, 105.1, 106.8, 108.5, 105.8, 102.2, 103.0, 104.0, 105.7, 107.4, 110.2, 114.1, 114.6, 117.9, 119.3, 114.5, 123.6, 123.8, 124.8, 129.1, 127.0], "j": [100, 101.1, 102.5, 103.5, 104.0, 105.7, 106.9, 105.9, 102.3, 98.9, 98.2, 98.8, 100.2, 101.4, 102.9, 105.0, 107.1, 109.0, 110.9, 111.1, 111.3, 114.2, 116.7, 117.2, 117.2, 116.8], "path": 5.1, "r": 0.46, "cg": 0.96, "ci": 0.62}, "transport": {"name": "Transport and utilities", "members": ["J.B. Hunt", "York Water", "FedEx", "Union Pacific"], "g": [100, 103.6, 102.2, 93.1, 97.8, 101.5, 104.7, 104.2, 101.1, 94.9, 96.5, 96.3, 98.6, 103.5, 106.0, 108.9, 113.5, 115.8, 123.7, 123.1, 122.8, 131.1, 136.5, 136.7, 132.5, 126.0], "j": [100, 98.2, 95.6, 95.4, 97.3, 99.3, 101.1, 101.7, 98.4, 95.1, 96.1, 98.2, 99.8, 102.4, 106.6, 110.1, 113.2, 117.3, 122.3, 122.8, 127.2, 139.0, 143.9, 144.1, 145.1, 145.0], "path": 4.5, "r": 0.66, "cg": 0.93, "ci": 1.5}, "prof": {"name": "Professional and business services", "members": ["Robert Half", "NRC Health", "Waste Management", "Omnicom Group"], "g": [100, 91.8, 92.6, 94.1, 102.6, 108.8, 117.0, 124.2, 116.1, 100.7, 102.9, 113.7, 112.9, 115.3, 117.2, 123.3, 128.2, 132.1, 133.5, 130.9, 125.2, 134.4, 138.7, 131.5, 133.2, 131.0], "j": [100, 97.7, 96.3, 97.8, 100.9, 104.5, 107.4, 107.9, 103.3, 100.2, 102.9, 106.6, 110.5, 113.9, 117.2, 120.2, 122.7, 125.3, 127.6, 124.2, 124.2, 132.3, 136.5, 136.2, 135.1, 134.8], "path": 5.2, "r": 0.77, "cg": 1.09, "ci": 1.2}, "leisure": {"name": "Leisure and hospitality", "members": ["Cracker Barrel", "Marcus Corp", "Ark Restaurants", "Darden Restaurants", "Marriott"], "g": [100, 98.2, 101.2, 98.1, 100.2, 101.3, 109.6, 112.2, 117.9, 114.4, 114.9, 112.9, 113.1, 118.1, 120.6, 115.8, 135.6, 131.1, 132.8, 141.1, 112.0, 137.6, 151.5, 157.6, 156.7, 150.4], "j": [100, 100.6, 101.1, 102.9, 105.0, 106.9, 108.8, 110.1, 108.7, 106.9, 107.7, 110.0, 113.1, 116.3, 119.2, 122.4, 125.6, 127.9, 129.4, 115.5, 109.1, 120.8, 128.0, 131.2, 132.3, 133.1], "path": 8.9, "r": 0.49, "cg": 1.65, "ci": 1.15}, "edhealth": {"name": "Education and health", "members": ["Chemed", "National HealthCare", "Bright Horizons"], "g": [100, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 102.8, 105.1, 106.1, 107.1, 112.9, 114.9, 126.3, 128.6, 133.6, 136.8, 119.6, 113.1, 115.9, 123.9, 128.9, 129.9], "j": [100, 103.9, 107.1, 109.6, 112.5, 115.3, 118.5, 122.2, 125.2, 127.4, 129.7, 132.3, 134.7, 136.8, 140.0, 143.9, 147.7, 150.8, 153.9, 151.5, 149.9, 154.7, 160.3, 167.1, 173.5, 178.3], "path": 6.6, "r": 0.48, "cg": 1.65, "ci": 2.12}, "info": {"name": "Information", "members": ["The New York Times", "Comcast", "Scholastic"], "g": [100, 86.1, 86.8, 79.8, 83.0, 85.1, 88.8, 87.9, 84.1, 78.7, 75.6, 83.2, 72.3, 64.9, 66.0, 66.0, 67.8, 69.3, 75.2, 76.8, 73.0, 72.5, 76.1, 76.1, 75.2, 76.8], "j": [100, 96.1, 90.1, 86.6, 85.0, 83.7, 83.4, 82.8, 79.2, 75.3, 73.9, 73.6, 74.2, 74.8, 75.3, 76.3, 77.1, 77.6, 78.4, 75.3, 75.5, 82.1, 83.7, 81.3, 79.4, 76.9], "path": 8.3, "r": 0.19, "cg": -1.05, "ci": -1.04}, "constr": {"name": "Construction", "members": ["EMCOR", "Great Lakes Dredge & Dock", "KB Home", "MasTec"], "g": [100, 93.1, 100.4, 96.2, 102.5, 112.0, 110.1, 91.9, 73.3, 68.1, 70.0, 73.2, 75.6, 90.0, 98.7, 108.4, 109.1, 101.7, 101.6, 107.3, 97.6, 116.0, 124.9, 122.1, 125.0, 128.6], "j": [100, 99.1, 98.1, 100.2, 104.7, 110.3, 113.1, 109.8, 97.5, 86.3, 84.6, 86.4, 88.9, 92.9, 96.7, 98.8, 101.2, 105.7, 109.8, 107.8, 106.1, 110.3, 114.9, 117.8, 119.2, 120.1], "path": 11.2, "r": 0.66, "cg": 1.01, "ci": 0.74}, "state": {"name": "State government", "members": ["State of Washington", "State of Ohio"], "g": [100, 101.9, 102.0, 102.9, 103.7, 104.6, 103.9, 105.2, 106.7, 106.0, 106.6, 104.9, 105.1, 103.9, 106.5, 109.7, 111.3, 112.1, 109.3, 109.9, 103.6, 105.3, 104.2, 106.9, 113.8, 114.3], "j": [100, 102.9, 103.6, 102.7, 103.3, 104.3, 105.1, 106.3, 106.3, 105.7, 105.1, 104.2, 103.9, 103.7, 104.2, 105.0, 106.1, 106.7, 106.8, 105.9, 105.7, 106.3, 107.5, 110.7, 112.8, 113.2], "path": 2.3, "r": 0.49, "cg": 0.54, "ci": 0.5}}, "std": {"manuf": {"name": "Manufacturing", "members": ["Snap-on", "Ford", "Texas Instruments", "Campbell Soup", "General Motors", "Tyson Foods", "Lockheed Martin", "Hershey", "Masco"], "g": [100, 99.5, 99.1, 97.0, 96.5, 94.6, 91.4, 85.2, 80.5, 76.4, 73.5, 74.3, 74.3, 76.2, 79.8, 77.1, 74.0, 73.5, 75.2, 71.5, 68.9, 70.9, 72.3, 72.6, 71.8, 70.4], "j": [100, 93.8, 88.0, 85.3, 84.8, 84.3, 83.3, 81.0, 74.2, 68.9, 69.1, 70.3, 71.0, 71.6, 72.7, 73.2, 73.4, 74.4, 75.6, 73.5, 72.1, 74.5, 76.2, 76.2, 75.5, 75.0], "path": 7.3, "r": 0.58, "cg": -1.39, "ci": -1.14}, "trade": {"name": "Wholesale and retail trade", "members": ["Genuine Parts", "Dillard's", "W.W. Grainger", "Big Lots", "Sysco", "Kroger", "Big 5 Sporting Goods"], "g": [100, 96.7, 97.5, 96.9, 98.0, 101.4, 101.7, 104.2, 99.4, 96.2, 97.1, 99.5, 102.9, 108.0, 109.4, 112.6, 112.8, 119.6, 119.2, 116.0, 112.4, 110.5, 116.8, 114.6, 115.8, 114.8], "j": [100, 98.8, 97.6, 97.6, 99.1, 100.3, 101.3, 101.3, 97.7, 94.5, 95.0, 96.4, 97.7, 99.4, 101.0, 102.2, 102.7, 102.6, 102.2, 99.0, 97.9, 101.0, 102.6, 102.9, 102.4, 102.4], "path": 8.8, "r": 0.64, "cg": 0.55, "ci": 0.09}, "fin": {"name": "Finance and insurance", "members": ["Allstate", "Frost Bank", "Commerce Bancshares", "Cincinnati Financial"], "g": [100, 101.2, 100.4, 101.6, 102.3, 104.0, 105.7, 107.9, 110.0, 107.5, 104.4, 105.5, 106.5, 108.5, 111.0, 113.5, 116.5, 117.3, 120.5, 123.5, 119.9, 126.1, 129.2, 133.2, 138.8, 138.0], "j": [100, 101.1, 102.5, 103.5, 104.0, 105.7, 106.9, 105.9, 102.3, 98.9, 98.2, 98.8, 100.2, 101.4, 102.9, 105.0, 107.1, 109.0, 110.9, 111.1, 111.3, 114.2, 116.7, 117.2, 117.2, 116.8], "path": 8.3, "r": 0.43, "cg": 1.3, "ci": 0.62}, "transport": {"name": "Transport and utilities", "members": ["J.B. Hunt", "Con Edison", "York Water", "UPS", "United Airlines", "FedEx", "Union Pacific", "Southwest Airlines", "Marten Transport"], "g": [100, 99.8, 97.9, 91.5, 93.4, 95.5, 97.0, 97.5, 96.6, 92.3, 99.1, 102.3, 103.9, 106.2, 109.1, 113.0, 116.6, 119.2, 124.6, 127.3, 123.3, 127.4, 136.4, 137.9, 134.8, 131.3], "j": [100, 98.2, 95.6, 95.4, 97.3, 99.3, 101.1, 101.7, 98.4, 95.1, 96.1, 98.2, 99.8, 102.4, 106.6, 110.1, 113.2, 117.3, 122.3, 122.8, 127.2, 139.0, 143.9, 144.1, 145.1, 145.0], "path": 4.4, "r": 0.55, "cg": 1.09, "ci": 1.5}, "prof": {"name": "Professional and business services", "members": ["Robert Half", "ABM Industries", "Exponent", "Kforce", "NRC Health", "Waste Management", "Resources Connection", "Omnicom Group"], "g": [100, 91.8, 92.6, 94.1, 102.6, 108.8, 117.0, 124.2, 116.1, 100.7, 103.1, 111.2, 112.9, 116.6, 119.5, 125.0, 126.6, 132.1, 136.1, 134.1, 123.2, 131.1, 137.0, 130.5, 130.5, 127.5], "j": [100, 97.7, 96.3, 97.8, 100.9, 104.5, 107.4, 107.9, 103.3, 100.2, 102.9, 106.6, 110.5, 113.9, 117.2, 120.2, 122.7, 125.3, 127.6, 124.2, 124.2, 132.3, 136.5, 136.2, 135.1, 134.8], "path": 5.5, "r": 0.78, "cg": 0.98, "ci": 1.2}, "leisure": {"name": "Leisure and hospitality", "members": ["Cracker Barrel", "Marcus Corp", "Ark Restaurants", "Darden Restaurants", "Marriott"], "g": [100, 98.2, 101.2, 98.1, 100.2, 101.3, 109.6, 112.2, 117.9, 114.4, 114.9, 112.9, 113.1, 118.1, 120.6, 115.8, 135.6, 131.1, 132.8, 141.1, 112.0, 137.6, 151.5, 157.6, 156.7, 150.4], "j": [100, 100.6, 101.1, 102.9, 105.0, 106.9, 108.8, 110.1, 108.7, 106.9, 107.7, 110.0, 113.1, 116.3, 119.2, 122.4, 125.6, 127.9, 129.4, 115.5, 109.1, 120.8, 128.0, 131.2, 132.3, 133.1], "path": 8.9, "r": 0.49, "cg": 1.65, "ci": 1.15}, "edhealth": {"name": "Education and health", "members": ["HCA Healthcare", "Chemed", "National HealthCare", "Quest Diagnostics", "Bright Horizons", "Strategic Education", "Lincoln Educational"], "g": [100, 106.8, 115.9, 125.7, 129.2, 133.8, 131.2, 135.2, 135.9, 135.8, 141.8, 139.9, 137.6, 141.6, 132.2, 131.4, 137.2, 136.1, 154.7, 159.1, 154.8, 153.5, 157.6, 163.9, 176.0, 178.2], "j": [100, 103.9, 107.1, 109.6, 112.5, 115.3, 118.5, 122.2, 125.2, 127.4, 129.7, 132.3, 134.7, 136.8, 140.0, 143.9, 147.7, 150.8, 153.9, 151.5, 149.9, 154.7, 160.3, 167.1, 173.5, 178.3], "path": 7.6, "r": 0.25, "cg": 2.34, "ci": 2.34}, "info": {"name": "Information", "members": ["The New York Times", "Comcast", "Scholastic"], "g": [100, 86.1, 86.8, 79.8, 83.0, 85.1, 88.8, 87.9, 84.1, 78.7, 75.6, 83.2, 72.3, 64.9, 66.0, 66.0, 67.8, 69.3, 75.2, 76.8, 73.0, 72.5, 76.1, 76.1, 75.2, 76.8], "j": [100, 96.1, 90.1, 86.6, 85.0, 83.7, 83.4, 82.8, 79.2, 75.3, 73.9, 73.6, 74.2, 74.8, 75.3, 76.3, 77.1, 77.6, 78.4, 75.3, 75.5, 82.1, 83.7, 81.3, 79.4, 76.9], "path": 8.3, "r": 0.19, "cg": -1.05, "ci": -1.04}, "constr": {"name": "Construction", "members": ["EMCOR", "PulteGroup", "Great Lakes Dredge & Dock", "NVR", "KB Home", "MasTec", "Sterling Infrastructure", "Beazer Homes"], "g": [100, 99.4, 107.2, 105.6, 114.6, 128.9, 121.9, 103.8, 79.9, 74.5, 76.3, 76.7, 80.6, 91.4, 99.6, 105.3, 109.1, 107.1, 112.3, 120.7, 113.3, 128.8, 137.3, 132.7, 138.9, 134.6], "j": [100, 99.1, 98.1, 100.2, 104.7, 110.3, 113.1, 109.8, 97.5, 86.3, 84.6, 86.4, 88.9, 92.9, 96.7, 98.8, 101.2, 105.7, 109.8, 107.8, 106.1, 110.3, 114.9, 117.8, 119.2, 120.1], "path": 10.6, "r": 0.72, "cg": 1.19, "ci": 0.74}, "state": {"name": "State government", "members": ["State of Washington", "State of Ohio"], "g": [100, 101.9, 102.0, 102.9, 103.7, 104.6, 103.9, 105.2, 106.7, 106.0, 106.6, 104.9, 105.1, 103.9, 106.5, 109.7, 111.3, 112.1, 109.3, 109.9, 103.6, 105.3, 104.2, 106.9, 113.8, 114.3], "j": [100, 102.9, 103.6, 102.7, 103.3, 104.3, 105.1, 106.3, 106.3, 105.7, 105.1, 104.2, 103.9, 103.7, 104.2, 105.0, 106.1, 106.7, 106.8, 105.9, 105.7, 106.3, 107.5, 110.7, 112.8, 113.2], "path": 2.3, "r": 0.49, "cg": 0.54, "ci": 0.5}}, "full": {"manuf": {"name": "Manufacturing", "members": ["Snap-on", "Ford", "Texas Instruments", "Campbell Soup", "General Motors", "Tyson Foods", "Lockheed Martin", "Hershey", "Masco", "Illinois Tool Works", "Kimberly-Clark", "Intel"], "g": [100, 98.5, 97.2, 95.3, 95.4, 95.0, 92.6, 87.6, 84.3, 80.5, 78.7, 81.0, 81.0, 81.4, 82.0, 79.8, 77.4, 76.9, 78.1, 74.7, 73.3, 75.6, 77.2, 76.6, 74.4, 71.4], "j": [100, 93.8, 88.0, 85.3, 84.8, 84.3, 83.3, 81.0, 74.2, 68.9, 69.1, 70.3, 71.0, 71.6, 72.7, 73.2, 73.4, 74.4, 75.6, 73.5, 72.1, 74.5, 76.2, 76.2, 75.5, 75.0], "path": 9.2, "r": 0.63, "cg": -1.34, "ci": -1.14}, "trade": {"name": "Wholesale and retail trade", "members": ["Genuine Parts", "Dillard's", "W.W. Grainger", "Big Lots", "Sysco", "Kroger", "Big 5 Sporting Goods", "Home Depot", "Gap Inc."], "g": [100, 99.2, 101.5, 100.5, 102.4, 105.9, 107.1, 106.2, 101.5, 98.9, 99.7, 101.8, 105.2, 110.1, 111.8, 114.8, 115.1, 120.7, 120.4, 117.3, 115.7, 111.5, 115.7, 112.2, 113.5, 112.8], "j": [100, 98.8, 97.6, 97.6, 99.1, 100.3, 101.3, 101.3, 97.7, 94.5, 95.0, 96.4, 97.7, 99.4, 101.0, 102.2, 102.7, 102.6, 102.2, 99.0, 97.9, 101.0, 102.6, 102.9, 102.4, 102.4], "path": 9.7, "r": 0.52, "cg": 0.48, "ci": 0.09}, "fin": {"name": "Finance and insurance", "members": ["Allstate", "Frost Bank", "Commerce Bancshares", "Cincinnati Financial", "Comerica", "Unum", "T. Rowe Price", "Erie Indemnity"], "g": [100, 102.6, 104.2, 105.7, 104.9, 106.9, 107.3, 107.3, 108.7, 104.6, 103.0, 104.8, 104.8, 106.6, 109.4, 111.0, 112.3, 114.7, 116.3, 121.0, 120.6, 122.2, 125.8, 129.4, 133.7, 131.7], "j": [100, 101.1, 102.5, 103.5, 104.0, 105.7, 106.9, 105.9, 102.3, 98.9, 98.2, 98.8, 100.2, 101.4, 102.9, 105.0, 107.1, 109.0, 110.9, 111.1, 111.3, 114.2, 116.7, 117.2, 117.2, 116.8], "path": 6.3, "r": 0.51, "cg": 1.11, "ci": 0.62}, "transport": {"name": "Transport and utilities", "members": ["J.B. Hunt", "Con Edison", "York Water", "UPS", "United Airlines", "FedEx", "Union Pacific", "Southwest Airlines", "Marten Transport", "Ryder System", "Southern Company", "Kirby Corp", "CSX", "Old Dominion"], "g": [100, 98.5, 98.0, 94.4, 95.8, 98.6, 102.8, 104.0, 102.6, 94.7, 100.8, 107.9, 110.8, 112.8, 117.2, 119.4, 122.6, 127.6, 131.7, 132.0, 127.7, 133.0, 141.2, 142.6, 141.1, 138.2], "j": [100, 98.2, 95.6, 95.4, 97.3, 99.3, 101.1, 101.7, 98.4, 95.1, 96.1, 98.2, 99.8, 102.4, 106.6, 110.1, 113.2, 117.3, 122.3, 122.8, 127.2, 139.0, 143.9, 144.1, 145.1, 145.0], "path": 5.7, "r": 0.61, "cg": 1.3, "ci": 1.5}, "prof": {"name": "Professional and business services", "members": ["Robert Half", "ABM Industries", "Exponent", "Kforce", "NRC Health", "Waste Management", "Resources Connection", "Omnicom Group", "Interpublic Group", "Rollins", "TrueBlue"], "g": [100, 97.0, 98.8, 97.7, 101.2, 105.0, 110.2, 115.1, 115.3, 103.2, 105.9, 112.3, 115.0, 119.5, 127.6, 133.7, 137.1, 141.4, 148.7, 147.3, 135.8, 146.9, 153.4, 145.4, 145.2, 145.6], "j": [100, 97.7, 96.3, 97.8, 100.9, 104.5, 107.4, 107.9, 103.3, 100.2, 102.9, 106.6, 110.5, 113.9, 117.2, 120.2, 122.7, 125.3, 127.6, 124.2, 124.2, 132.3, 136.5, 136.2, 135.1, 134.8], "path": 8.3, "r": 0.7, "cg": 1.51, "ci": 1.2}, "leisure": {"name": "Leisure and hospitality", "members": ["Cracker Barrel", "Marcus Corp", "Ark Restaurants", "Darden Restaurants", "Marriott", "Starbucks", "Six Flags", "Service Corporation International", "Choice Hotels", "Domino's"], "g": [100, 93.1, 96.0, 96.7, 98.8, 99.7, 111.0, 108.7, 107.4, 100.7, 100.3, 98.9, 96.9, 102.5, 106.3, 108.4, 123.0, 123.2, 126.9, 131.8, 113.6, 126.3, 129.4, 130.8, 127.6, 125.8], "j": [100, 100.6, 101.1, 102.9, 105.0, 106.9, 108.8, 110.1, 108.7, 106.9, 107.7, 110.0, 113.1, 116.3, 119.2, 122.4, 125.6, 127.9, 129.4, 115.5, 109.1, 120.8, 128.0, 131.2, 132.3, 133.1], "path": 7.4, "r": 0.44, "cg": 0.92, "ci": 1.15}, "edhealth": {"name": "Education and health", "members": ["HCA Healthcare", "Chemed", "National HealthCare", "Quest Diagnostics", "Bright Horizons", "Strategic Education", "Lincoln Educational", "Tenet Healthcare", "DaVita"], "g": [100, 106.0, 111.4, 116.4, 115.7, 129.6, 127.4, 128.7, 129.1, 129.0, 134.1, 135.1, 138.3, 151.8, 144.8, 148.2, 155.5, 155.3, 170.1, 170.2, 166.5, 164.4, 168.3, 174.4, 181.9, 184.6], "j": [100, 103.9, 107.1, 109.6, 112.5, 115.3, 118.5, 122.2, 125.2, 127.4, 129.7, 132.3, 134.7, 136.8, 140.0, 143.9, 147.7, 150.8, 153.9, 151.5, 149.9, 154.7, 160.3, 167.1, 173.5, 178.3], "path": 6.1, "r": 0.23, "cg": 2.48, "ci": 2.34}, "info": {"name": "Information", "members": ["The New York Times", "Comcast", "Scholastic", "Verizon", "AT&T"], "g": [100, 93.5, 88.2, 80.1, 81.5, 82.5, 90.0, 99.9, 97.2, 93.2, 86.8, 89.7, 81.7, 75.2, 76.0, 76.7, 78.1, 77.8, 79.5, 80.4, 76.4, 73.4, 73.6, 68.7, 66.5, 64.4], "j": [100, 96.1, 90.1, 86.6, 85.0, 83.7, 83.4, 82.8, 79.2, 75.3, 73.9, 73.6, 74.2, 74.8, 75.3, 76.3, 77.1, 77.6, 78.4, 75.3, 75.5, 82.1, 83.7, 81.3, 79.4, 76.9], "path": 11.6, "r": 0.2, "cg": -1.74, "ci": -1.04}, "constr": {"name": "Construction", "members": ["EMCOR", "PulteGroup", "Great Lakes Dredge & Dock", "NVR", "KB Home", "MasTec", "Sterling Infrastructure", "Beazer Homes"], "g": [100, 99.4, 107.2, 105.6, 114.6, 128.9, 121.9, 103.8, 79.9, 74.5, 76.3, 76.7, 80.6, 91.4, 99.6, 105.3, 109.1, 107.1, 112.3, 120.7, 113.3, 128.8, 137.3, 132.7, 138.9, 134.6], "j": [100, 99.1, 98.1, 100.2, 104.7, 110.3, 113.1, 109.8, 97.5, 86.3, 84.6, 86.4, 88.9, 92.9, 96.7, 98.8, 101.2, 105.7, 109.8, 107.8, 106.1, 110.3, 114.9, 117.8, 119.2, 120.1], "path": 10.6, "r": 0.72, "cg": 1.19, "ci": 0.74}, "state": {"name": "State government", "members": ["State of Washington", "State of Ohio"], "g": [100, 101.9, 102.0, 102.9, 103.7, 104.6, 103.9, 105.2, 106.7, 106.0, 106.6, 104.9, 105.1, 103.9, 106.5, 109.7, 111.3, 112.1, 109.3, 109.9, 103.6, 105.3, 104.2, 106.9, 113.8, 114.3], "j": [100, 102.9, 103.6, 102.7, 103.3, 104.3, 105.1, 106.3, 106.3, 105.7, 105.1, 104.2, 103.9, 103.7, 104.2, 105.0, 106.1, 106.7, 106.8, 105.9, 105.7, 106.3, 107.5, 110.7, 112.8, 113.2], "path": 2.3, "r": 0.49, "cg": 0.54, "ci": 0.5}}}; let MIRROR=MIRROR_L[DETAIL];
 const SHARE_CHECK={"years": ["2001", "2009", "2017", "2025"], "rows": [["Manufacturing", [13.1, 12.4], [10.4, 8.9], [8.6, 8.4], [8.5, 8]], ["Wholesale and retail trade", [15.2, 15.8], [15.2, 15.3], [14.8, 14.7], [13.5, 13.5]], ["Finance and insurance", [5.8, 6], [6.0, 6], [5.7, 5.8], [5.8, 5.8]], ["Transport and utilities", [3.6, 3.8], [3.7, 3.6], [3.9, 3.9], [4.8, 4.6]], ["Professional and business services", [13.4, 12.5], [13.2, 12.6], [14.4, 14.1], [15.1, 14.1]], ["Leisure and hospitality", [13.5, 13.1], [13.7, 14.1], [14.8, 14.9], [14.1, 14.4]], ["Education and health", [12.0, 12], [14.2, 15], [15.0, 15.8], [16.8, 17.3]], ["Information", [2.7, 2.7], [2.2, 2.1], [2.1, 1.9], [2.2, 1.8]], ["Construction", [6.1, 5.6], [5.8, 5.1], [5.8, 5.2], [6.0, 5.6]], ["Government", [14.6, 16], [15.6, 17.2], [15.1, 15.2], [13.3, 14.9]]]};
 function renderShare(){const el=document.getElementById('shareTable');if(!el)return;
   el.innerHTML='<thead><tr><th>Industry</th>'+SHARE_CHECK.years.map(y=>`<th>${y}<br><span>model / real</span></th>`).join('')+'</tr></thead><tbody>'+
   SHARE_CHECK.rows.map(r=>'<tr><td>'+r[0]+'</td>'+r.slice(1).map(c=>`<td>${c[0].toFixed(1)}% / ${c[1].toFixed(1)}%</td>`).join('')+'</tr>').join('')+'</tbody>'}
-const CMP_REF={"runs": 8, "overall": 92.9, "s": {"quitsY": 93.6, "laysY": 93.2, "sep11": 95.3, "gfcQ": 94.3, "gfcL": 96.3, "covidL": 86.7, "greatQ": 96.3, "indQ": 93.8, "indL": 94.8, "mix": 97.7, "size": 93.5, "mirror": 92.8, "floors": 98.7, "age": 95.1, "tenure": 89.6, "tenAge": 85.3, "le1": 97.0, "ten10": 94.8, "jobsAge": 79.6, "oow": 95.1, "jobLoss": 74.3, "swP": 97.8, "cross": 100}}; // typical scores: average of full runs at Standard detail (version 36)
+const CMP_REF_L={"light": {"runs": 6, "overall": 86.9, "s": {"quitsY": 92.5, "laysY": 89.7, "sep11": 94.0, "gfcQ": 94.3, "gfcL": 96.3, "covidL": 82.1, "greatQ": 96.5, "indQ": 92.4, "indL": 87.6, "mix": 96.0, "size": 79.9, "mirror": 94.0, "floors": 98.6, "age": 93.5, "tenure": 90.2, "tenAge": 81.2, "tenInd": 81.3, "tenFloor": 65.2, "le1": 92.5, "ten10": 93.4, "jobsAge": 87.9, "shortJobs": 60.2, "mgmtAge": 72.3, "floorAge": 82.1, "outLF": 91.2, "toNILF": 80.8, "rehire": 92.4, "oow": 71.8, "jobLoss": 70.0, "swP": 98.2, "cross": 95.8}}, "std": {"runs": 6, "overall": 88.1, "s": {"quitsY": 93.8, "laysY": 90.9, "sep11": 96.9, "gfcQ": 96.4, "gfcL": 95.7, "covidL": 85.3, "greatQ": 97.2, "indQ": 94.4, "indL": 92.6, "mix": 96.2, "size": 92.1, "mirror": 92.8, "floors": 98.8, "age": 93.5, "tenure": 89.5, "tenAge": 84.8, "tenInd": 83.7, "tenFloor": 70.9, "le1": 93.6, "ten10": 93.1, "jobsAge": 88.0, "shortJobs": 60.2, "mgmtAge": 70.0, "floorAge": 80.4, "outLF": 91.5, "toNILF": 81.4, "rehire": 98.0, "oow": 71.7, "jobLoss": 69.8, "swP": 89.2, "cross": 100}}, "full": {"runs": 6, "overall": 87.7, "s": {"quitsY": 93.9, "laysY": 90.8, "sep11": 96.2, "gfcQ": 97.0, "gfcL": 97.6, "covidL": 83.6, "greatQ": 97.5, "indQ": 94.0, "indL": 92.5, "mix": 96.4, "size": 91.6, "mirror": 92.3, "floors": 98.8, "age": 93.9, "tenure": 90.3, "tenAge": 83.6, "tenInd": 85.8, "tenFloor": 71.1, "le1": 90.3, "ten10": 93.8, "jobsAge": 87.4, "shortJobs": 60.3, "mgmtAge": 68.2, "floorAge": 80.6, "outLF": 92.7, "toNILF": 80.3, "rehire": 93.5, "oow": 72.7, "jobLoss": 72.3, "swP": 78.3, "cross": 100}}}; let CMP_REF=CMP_REF_L[typeof DETAIL==='undefined'?'std':DETAIL]; // typical scores: average of 6 full runs at each detail level (version 44)
 /* ---------- model vs real world: the comparator ----------
    Every metric the model can be checked on, measured live in this run from the statistical sample and set against the real US
    figure for the same years. Each gets a match score from 0 to 100; the overall score is their plain average. Metrics that need
@@ -2421,10 +2746,29 @@ const CMP_REAL={
   tenure10_25p_2024:30.2,                   // % with 10 years or more, ages 25+ (BLS tenure Table 2, January 2024)
   age:{2000:39.3,2005:40.8,2010:41.7,2015:42.0,2025:41.6}, // median age of the labor force (BLS Employment Projections)
   jobsByAge:[.85,.55,.32,.19],              // new employers per year at ages 18-23, 24-29, 30-38 (BLS NLSY97, born 1980-84: 5.1, 3.3 and 2.9 jobs) and 45-56 (NLSY79, born 1957-64)
-  outOfWork:4.4,                            // % of weeks unemployed, ages 18-56 (BLS NLSY79)
+  outOfWork:4.4,
+  outLF:[24.5,15.4,17],                    // v42: ages 45-54 added: 17% (NLSY79, people born 1957-64: women 22%, men 12% of weeks out of the labour force)
+                        // % of weeks out of the labour force at ages 18-23 and 24-38 (NLSY97, born 1980-84: 18% over 18-38, about 24.5% at 18-23)
+  mgmtAge:[4.2,10.1,14.6,16.4,15.2],        // % of workers in management occupations at ages 20-24, 25-34, 35-44, 45-54, 55-64 (BLS CPS Table 11b, 2025) = floors Lead to Executive                            // % of weeks unemployed, ages 18-56 (BLS NLSY79)
   jobLoss:{'2001–03':[2001,2004,11.8],'2005–07':[2005,2008,8.5],'2007–09':[2007,2010,16.0]}, // 3-year job loss rate, % (Farber 2011, DWS)
   // the survey undercounts job loss (recall bias: Flaaen, Shapiro and Sorkin), but the bias is similar in every survey, so what is scored is
   // how job loss in 2001-03 and 2007-09 compares with the normal years 2005-07: 1.39 and 1.88 times
+  // median years with the current employer, January 2024 (BLS Employee Tenure, Table 5), combined with the model's job weights:
+  // construction 4.2 and mining 5.7; wholesale 4.6 and retail 2.9; leisure and hospitality 2.1 and other services 3.8
+  tenInd:{constr:4.3,manuf:4.9,trade:3.4,transport:3.7,info:4.2,fin:4.7,prof:3.5,edhealth:3.6,leisure:2.6,gov:6.2},
+  // by occupation (Table 6), mapped to floors as for layoffs: entry = service 2.7 and production/transport 3.4; junior = sales 3.3 and
+  // office 3.6; senior = professional 4.5; lead = management, business and financial 5.2; director and executive = management 5.7
+  tenFloor:[3.05,3.45,4.5,5.2,5.7,5.7],
+  shortJobs:[61,32,21],                     // % of jobs ending within a year, average worker, by age at start: 18-24 and 25-38 (NLSY97), 45-54 (NLSY79)
+  /* v42: floor mix by age, BLS CPS Table 11b (2025 annual averages). Occupation groups show the level of a job only in part:
+     management (lead and above) and professional plus business and financial specialist jobs (senior) are levels, but service,
+     production, sales and office jobs are not steps of one ladder, so entry and junior are scored together.
+     Rows: ages 20-24, 25-34, 35-44, 45-54, 55-64; columns: entry + junior, senior, lead+ */
+  floorAge:[[73.7,22.1,4.2],[55.0,34.9,10.1],[51.2,34.2,14.6],[51.2,32.4,16.4],[55.7,29.0,15.2]],
+  /* v42: of prime-age workers (25-55) who leave a job for non-employment, the share who leave the labour force rather than look for
+     work: about 85% after a quit and 35% after a layoff (CPS, Ellieroth and Michaud, FRED EMSHRNQP and EMSHRNLP, 1978-2026 averages) */
+  toNILF:[85,35],
+  rehire:4.5,                               // % of new hires who are former employees, not recalls (LinkedIn, 2021; 3.9% in 2019)
   switchPromo:[15,23],                      // % of promotions that come with a change of employer (DeVaro et al.; Bidwell & Mollick 2015)
   crossInd:[35,50]                          // % of employer changes that cross industry (supersector) lines
 };
@@ -2445,24 +2789,40 @@ const CMP_INFO={
   age:['Median age of workers, over time','BLS, labor force, 2000–2025'],
   tenure:['Median tenure, over time','BLS Employee Tenure surveys, every 2 years'],
   tenAge:['Median tenure by age, 2024','BLS Employee Tenure, January 2024'],
+  tenInd:['Median tenure by industry, 2024','BLS Employee Tenure, January 2024, Table 5'],
+  tenFloor:['Median tenure by floor (occupation), 2024','BLS Employee Tenure, January 2024, Table 6, mapped to floors'],
   le1:['New in the job (1 year or less), 2024','BLS Employee Tenure, January 2024'],
   ten10:['10+ years with the employer, ages 25+, 2024','BLS Employee Tenure, January 2024'],
   jobsAge:['New employers per year, by age','BLS National Longitudinal Surveys of Youth: 1997 cohort (ages 18–38), 1979 cohort (45–56)'],
+  shortJobs:['Jobs that end within a year, by age at start','BLS National Longitudinal Surveys of Youth: 18–24 and 25–38 (1997 cohort), 45–54 (1979 cohort); average worker'],
+  outLF:['Time out of the workforce, by age','BLS NLSY97 (ages 18–38, born 1980–84) and NLSY79 (ages 45–54, born 1957–64): weeks out of the labour force (study, family, health)'],
+  mgmtAge:['Reaching Lead or higher, by age','BLS CPS Table 11b, 2025: share of workers in management occupations, by age'],
   oow:['Time out of work','BLS NLSY79, share of weeks unemployed'],
   jobLoss:['Job loss in downturns vs normal years','Farber 2011, Displaced Workers Survey: share losing a job in 3 years (not recalled; ends of temporary jobs not counted)'],
   swP:['Promotions that come with a new employer','DeVaro et al.; Bidwell & Mollick 2015'],
-  cross:['Employer changes that cross industries','Job-to-job flow studies (supersector)']
+  cross:['Employer changes that cross industries','Job-to-job flow studies (supersector)'],
+  floorAge:['Floor mix by age (entry or junior / senior / lead+)','BLS CPS Table 11b, 2025, occupations mapped to floors'],
+  rehire:['Hires who go back to a former employer','LinkedIn, 2021: 4.5% of new hires (recalls after temporary layoffs not included)'],
+  toNILF:['Leaving the workforce after a quit or a layoff','CPS, ages 25–55 (Ellieroth and Michaud, FRED EMSHRNQP and EMSHRNLP)']
 };
 const CMP_GROUPS=[['Turnover over time',['quitsY','laysY','sep11','gfcQ','gfcL','covidL','greatQ']],
   ['Industries and companies',['indQ','indL','mix','size','mirror']],
-  ['Workers and careers',['floors','age','tenure','tenAge','le1','ten10','jobsAge','oow','jobLoss','swP','cross']]];
+  ['Workers and careers',['floors','age','tenure','tenAge','tenInd','tenFloor','le1','ten10','jobsAge','shortJobs','mgmtAge','floorAge','outLF','toNILF','rehire','oow','jobLoss','swP','cross']]];
 // what we know about the gaps that remain, and what would fix them
 const CMP_NOTES={
+  shortJobs:'Too few jobs started young end within a year (about 50% against 61%) and too many started at 25–38 (about 48% against 32%). The model\'s frequent movers settle down with age, but not as much as real ones.',
+  tenFloor:'Tenure by floor is close at junior and senior level; entry-level workers stay a little short (about 2.5 years against 3).',
+  tenInd:'Government and finance workers stay a little longer than in the survey, transport and professional services a little shorter.',
+  mgmtAge:'Workers aged 25–34 reach management a little less often than in the CPS (about 6–10% against 10%).',
+  outLF:'Close at 18–23; a little high at 24–38 and 45–54 (about 19% against 15–17%).',
+  toNILF:'After a quit the share matches. After a layoff about 26% leave the workforce against 35%: more breaks there would push time unemployed further below the NLSY79 figure, so the two are balanced.',
+  floorAge:'Workers aged 20–24 are less often at entry or junior level than in the CPS; from 25 senior jobs are a little over-represented.',
+  rehire:'Close to the LinkedIn figure.',
   jobLoss:'In the survey, job loss in 2007–09 was 1.9 times its 2005–07 level; in the model it rises less. Most normal-times layoffs in the model are spread across all workers over 30, so a downturn adds proportionally less. The survey\'s own levels are lower than the model\'s, but they are known to undercount (people forget job losses), so the levels are shown, not scored.',
   jobsAge:'Young workers start about 1.06 new jobs a year at 18–23 against 0.85 in the survey, and 0.41 at 30–38 against 0.32. Total quits are fixed by JOLTS, so moving quits away from the young raises them at other ages; the current setting is the best balance found.',
   indQ:'In a single run one or two industries can be 15–30% off their real quit rate; averaged over many runs every industry is within about 10%.',
   covidL:'The March–April 2020 layoff wave comes out smaller than the real one in most runs.',
-  tenAge:'Workers aged 45–64 have shorter tenure than in the BLS survey (about 7–8 years against 9.6 at 55–64): older workers still move a little too often.',
+  tenAge:'Workers aged 45–64 have shorter tenure than in the BLS survey (about 4.5 years against 7 at 45–54, 6–8 against 9.6 at 55–64): older workers still move a little too often.',
   tenure:'BLS median tenure rose to 4.6 years in 2012–14 as people held on to jobs after the crisis; the model rises less, and starts a little low in 2000.',
   swP:'Slightly more promotions come with a new employer than the studies find.',
   gfcL:'In some runs the 2008 layoff rise overshoots.',
@@ -2470,21 +2830,28 @@ const CMP_NOTES={
 };
 let CMP=null, CMP_LAST=null;
 function cmpReset(){CMP={t:0,e:{},q:{},l:{},ay:[0,0,0,0],aj:[0,0,0,0],U:0,T:0,pro:0,swp:0,chg:0,cross:0,
-  mixD:[],sizeD:[],flD:[],ageS:{},tenS:{},t24:null,jw:{},jl:{},done:false}}
+  mixD:[],sizeD:[],flD:[],ageS:{},tenS:{},t24:null,jw:{},jl:{},sj:[],N:[0,0,0],NT:[0,0,0],rt:{q:[0,0],l:[0,0]},rh:[0,0],done:false}}
 const cmpBand=a=>a<18?-1:a<24?0:a<30?1:a<39?2:a<45?-1:a<57?3:-1;
 function cmpNote(p,text,kind){if(!CMP||burning)return;
-  if(kind==='promo'){CMP.pro++;if(text&&text.startsWith('After job hunting'))CMP.swp++}
+  if(kind==='promo'){CMP.pro++;if(text&&text.startsWith('Starts the new job one floor higher'))CMP.swp++}
   if(kind==='laid'&&!(text&&text.startsWith('Their temporary job'))){(p._nr||(p._nr=[])).push(year)} // the survey doesn't count the end of a temporary job
   if(text&&text.startsWith('Recalled')&&p._nr&&p._nr.length)p._nr.pop()}
 // called after every simulation step: exposure, employer changes and time out of work for each worker in the sample
 function cmpSample(y0){if(!CMP)return;const dy=year-y0;if(dy<=0)return;const yr=Math.floor(year);
   for(const p of people){if(!p.shadow)continue;
-    if(p._gen!==p._g0){p._g0=p._gen;p._lc=null;p._nr=null}
+    if(p._gen!==p._g0){p._g0=p._gen;p._lc=null;p._nr=null;if(p._sj)CMP.sj.push(p._sj);p._sj=null;p._st=null}
     const a=p.born!=null?year-p.born:null,b=a==null?-1:cmpBand(a);
     if(p.comp){
-      if(p.comp!==p._lc){if(b>=0&&year>=2001)CMP.aj[b]++;if(p._lc){CMP.chg++;if(sectorOf(p._lc)!==sectorOf(p.comp))CMP.cross++}p._lc=p.comp}
+      if(p.comp!==p._lc){if(b>=0&&year>=2001)CMP.aj[b]++;
+        // a job (time with one employer, a recall included) ends when the next employer starts; it is scored by the age it began at
+        if(p._st&&p._st[0]>=2001){const sb=p._st[1]<25?0:p._st[1]<39?1:p._st[1]>=45&&p._st[1]<55?2:-1;
+          if(sb>=0){const J=p._sj||(p._sj={n:[0,0,0],s:[0,0,0]});J.n[sb]++;if(p._la-p._st[0]<1)J.s[sb]++}}
+        p._st=a!=null?[year,a]:null;if(p._lc){CMP.chg++;if(sectorOf(p._lc)!==sectorOf(p.comp))CMP.cross++}p._lc=p.comp}
+      p._la=year;
       if(year>=2001&&sampleStatus(p.comp).ok){const k=sectorOf(p.comp),E=CMP.e[k]||(CMP.e[k]={});E[yr]=(E[yr]||0)+dy}
-    }else if(year>=2002&&!(p.notice&&p.seeking)&&a!=null&&a>=18&&a<57)CMP.U+=dy; // from 2002, after the start-up months when many newcomers look for a first job at once
+    }else if(p.out){if(year>=2002&&a!=null&&(a>=18&&a<39||a>=45&&a<55))CMP.N[a<24?0:a<39?1:2]+=dy}
+    else if(year>=2002&&!(p.notice&&p.seeking)&&a!=null&&a>=18&&a<57)CMP.U+=dy;
+    if(year>=2002&&a!=null&&(a>=18&&a<39||a>=45&&a<55))CMP.NT[a<24?0:a<39?1:2]+=dy; // from 2002, after the start-up months when many newcomers look for a first job at once
     if(year>=2001&&a!=null&&a>=18&&a<57){if(year>=2002)CMP.T+=dy;if(b>=0)CMP.ay[b]+=dy}
   }
   // snapshots at fixed moments: tenure surveys in January, ages mid-year, the job-loss windows
@@ -2492,7 +2859,12 @@ function cmpSample(y0){if(!CMP)return;const dy=year-y0;if(dy<=0)return;const yr=
   for(const y in CMP_REAL.age){const t=+y===2000?2000.05:+y+.5;if(!CMP.ageS[y]&&year>=t&&y0<t+.5)CMP.ageS[y]=cmpMedian(people.filter(p=>p.shadow&&p.comp&&p.born!=null).map(p=>year-p.born))}
   if(!CMP.t24&&year>=2024.05){const w=people.filter(p=>p.shadow&&p.comp&&p.since!=null&&p.born!=null).map(p=>[year-p.born,year-p.since]);
     CMP.t24={le1:100*w.filter(x=>x[1]<=1).length/w.length,ten10:100*w.filter(x=>x[0]>=25&&x[1]>=10).length/Math.max(1,w.filter(x=>x[0]>=25).length),
-      byAge:[[25,35],[35,45],[45,55],[55,65]].map(([lo,hi])=>cmpMedian(w.filter(x=>x[0]>=lo&&x[0]<hi).map(x=>x[1])))}}
+      byAge:[[25,35],[35,45],[45,55],[55,65]].map(([lo,hi])=>cmpMedian(w.filter(x=>x[0]>=lo&&x[0]<hi).map(x=>x[1])))};
+    const e=people.filter(p=>p.shadow&&p.comp&&p.since!=null);
+    CMP.t24.ind={};for(const k in CMP_REAL.tenInd)CMP.t24.ind[k]=cmpMedian(e.filter(p=>sectorOf(p.comp)===k).map(p=>year-p.since));
+    CMP.t24.fl=[0,1,2,3,4,5].map(l=>cmpMedian(e.filter(p=>p.level===l).map(p=>year-p.since)));
+    CMP.t24.mg=[[20,25],[25,35],[35,45],[45,55],[55,65]].map(([lo,hi])=>{const g=e.filter(p=>p.born!=null&&year-p.born>=lo&&year-p.born<hi);return g.length>=30?100*g.filter(p=>p.level>=3).length/g.length:null});
+    CMP.t24.fa=[[20,25],[25,35],[35,45],[45,55],[55,65]].map(([lo,hi])=>{const g=e.filter(p=>p.born!=null&&year-p.born>=lo&&year-p.born<hi);return g.length>=30?[0,1,2].map(l=>100*g.filter(p=>l===0?p.level<=1:l===1?p.level===2:p.level>=3).length/g.length):null})}
   for(const [nm,[w0,w1]] of Object.entries(CMP_REAL.jobLoss)){
     if(!CMP.jw[nm]&&year>=w0){CMP.jw[nm]=new Map();for(const p of people)if(p.shadow&&p.born!=null&&year-p.born>=20&&year-p.born<=64)CMP.jw[nm].set(p,p._gen)}
     if(CMP.jw[nm]&&CMP.jl[nm]==null&&year>=w1){let n=0,h=0;for(const [p,g] of CMP.jw[nm]){if(p._gen!==g)continue;n++;if(p._nr&&p._nr.some(t=>t>=w0&&t<w1))h++}CMP.jl[nm]=n?100*h/n:null}
@@ -2539,6 +2911,14 @@ function cmpCompute(){if(!CMP)return null;const R={},yNow=Math.floor(year);
   {const ys=Object.keys(CMP.tenS);R.tenure=ys.length?{m:mAvg(ys.map(y=>CMP.tenS[y])),r:mAvg(ys.map(y=>CMP_REAL.tenure[y])),fmt:v=>v.toFixed(1)+' yrs',s:mAvg(ys.map(y=>mRel(CMP.tenS[y],CMP_REAL.tenure[y]))),det:ys.map(y=>`${y}: ${CMP.tenS[y].toFixed(1)} vs ${CMP_REAL.tenure[y]}`).join(' · ')}:null}
   const t=CMP.t24;
   R.tenAge=t?{m:mAvg(t.byAge),r:mAvg(CMP_REAL.tenureAge2024),fmt:v=>v.toFixed(1)+' yrs avg',s:mAvg(t.byAge.map((v,i)=>mRel(v,CMP_REAL.tenureAge2024[i]))),det:'25–34 / 35–44 / 45–54 / 55–64: '+t.byAge.map(v=>v==null?'–':v.toFixed(1)).join(' / ')+' vs '+CMP_REAL.tenureAge2024.join(' / ')}:null;
+  R.tenInd=t&&t.ind?{m:mAvg(Object.keys(CMP_REAL.tenInd).map(k=>t.ind[k]/CMP_REAL.tenInd[k])),r:1,fmt:v=>v.toFixed(2)+'× real',s:mAvg(Object.keys(CMP_REAL.tenInd).map(k=>mRel(t.ind[k],CMP_REAL.tenInd[k]))),det:Object.keys(CMP_REAL.tenInd).map(k=>`${SECTORS[k].name.split(/[ ,(]/)[0]} ${t.ind[k]==null?'–':t.ind[k].toFixed(1)} vs ${CMP_REAL.tenInd[k]}`).join(' · ')}:null;
+  R.tenFloor=t&&t.fl?{m:mAvg(t.fl.map((v,i)=>v/CMP_REAL.tenFloor[i])),r:1,fmt:v=>v.toFixed(2)+'× real',s:mAvg(t.fl.map((v,i)=>mRel(v,CMP_REAL.tenFloor[i]))),det:'Entry … Executive: '+t.fl.map(v=>v==null?'–':v.toFixed(1)).join(' / ')+' vs '+CMP_REAL.tenFloor.join(' / ')}:null;
+  R.floorAge=t&&t.fa?(()=>{const sc=[],dt=[];t.fa.forEach((r,i)=>{if(!r)return;r.forEach((v,j)=>sc.push(mRel(v,CMP_REAL.floorAge[i][j])));dt.push(['20–24','25–34','35–44','45–54','55–64'][i]+': '+r.map(v=>v.toFixed(0)).join('/')+' vs '+CMP_REAL.floorAge[i].map(v=>v.toFixed(0)).join('/'))});
+    return {m:t.fa[3]?t.fa[3][0]:null,r:CMP_REAL.floorAge[3][0],fmt:v=>v.toFixed(0)+'% entry or junior at 45–54',s:mAvg(sc),det:dt.join('; ')}})():null;
+  R.toNILF=CMP.rt&&CMP.rt.q[0]>=30&&CMP.rt.l[0]>=30?(()=>{const q=100*CMP.rt.q[1]/CMP.rt.q[0],l=100*CMP.rt.l[1]/CMP.rt.l[0];return {m:q,r:85,fmt:v=>v.toFixed(0)+'% after quits',s:mAvg([mRel(q,85),mRel(l,35)]),det:'after a quit / a layoff: '+q.toFixed(0)+'% / '+l.toFixed(0)+'% vs 85% / 35%'}})():null;
+  R.rehire=CMP.rh&&CMP.rh[0]>=200?{m:100*CMP.rh[1]/CMP.rh[0],r:4.5,fmt:v=>v.toFixed(1)+'%',s:mRel(100*CMP.rh[1]/CMP.rh[0],4.5)}:null;
+  R.mgmtAge=t&&t.mg?{m:mAvg(t.mg),r:mAvg(CMP_REAL.mgmtAge),fmt:v=>v.toFixed(1)+'% avg',s:mAvg(t.mg.map((v,i)=>v==null?null:mRel(v,CMP_REAL.mgmtAge[i]))),det:'20–24 / 25–34 / 35–44 / 45–54 / 55–64: '+t.mg.map(v=>v==null?'–':v.toFixed(1)).join(' / ')+' vs '+CMP_REAL.mgmtAge.join(' / ')}:null;
+  R.outLF=CMP.NT[1]>50?{m:100*(CMP.N[0]+CMP.N[1])/(CMP.NT[0]+CMP.NT[1]),r:18,fmt:v=>v.toFixed(1)+'% at 18–38',s:mAvg([0,1,2].map(i=>CMP.NT[i]>50?mRel(100*CMP.N[i]/CMP.NT[i],CMP_REAL.outLF[i]):null)),det:'18–23 / 24–38 / 45–54: '+[0,1,2].map(i=>CMP.NT[i]>50?(100*CMP.N[i]/CMP.NT[i]).toFixed(1)+'%':'–').join(' / ')+' vs '+CMP_REAL.outLF.join('% / ')+'%'}:null;
   R.le1=t?{m:t.le1,r:CMP_REAL.tenureLe1_2024,fmt:v=>v.toFixed(1)+'%',s:mRel(t.le1,CMP_REAL.tenureLe1_2024)}:null;
   R.ten10=t?{m:t.ten10,r:CMP_REAL.tenure10_25p_2024,fmt:v=>v.toFixed(1)+'%',s:mRel(t.ten10,CMP_REAL.tenure10_25p_2024)}:null;
   {const j=CMP.aj.map((x,i)=>CMP.ay[i]>50?x/CMP.ay[i]:null);R.jobsAge=j.every(x=>x!=null)&&year>=2003?{m:mAvg(j.map((v,i)=>v/CMP_REAL.jobsByAge[i])),r:1,fmt:v=>v.toFixed(2)+'× real',s:mAvg(j.map((v,i)=>mRel(v,CMP_REAL.jobsByAge[i]))),det:'18–23 / 24–29 / 30–38 / 45–56: '+j.map(v=>v.toFixed(2)).join(' / ')+' vs '+CMP_REAL.jobsByAge.join(' / ')}:null}
@@ -2546,6 +2926,12 @@ function cmpCompute(){if(!CMP)return null;const R={},yNow=Math.floor(year);
   {const J=CMP.jl,RJ=CMP_REAL.jobLoss,b='2005–07',pr=['2001–03','2007–09'].filter(k=>J[k]!=null&&J[b]!=null);
    R.jobLoss=pr.length?{m:mAvg(pr.map(k=>J[k]/J[b])),r:mAvg(pr.map(k=>RJ[k][2]/RJ[b][2])),fmt:v=>v.toFixed(2)+'× normal',s:mAvg(pr.map(k=>mRel(J[k]/J[b],RJ[k][2]/RJ[b][2]))),
      det:pr.map(k=>`${k} vs ${b}: ${(J[k]/J[b]).toFixed(2)}× vs ${(RJ[k][2]/RJ[b][2]).toFixed(2)}×`).join(' · ')+' · levels (the survey undercounts): '+Object.keys(J).map(k=>`${k} ${J[k].toFixed(1)}% vs ${RJ[k][2]}%`).join(', ')}:null}
+  {// jobs still running count too: one held for a year or more did not end within a year (the survey counts it the same way); one
+   // started less than a year ago can't be judged yet and is left out
+   const cur=people.filter(p=>p.shadow&&(p._sj||(p.comp&&p._st))).map(p=>{const J=p._sj?{n:p._sj.n.slice(),s:p._sj.s.slice()}:{n:[0,0,0],s:[0,0,0]};
+     if(p.comp&&p._st&&p._st[0]>=2001&&year-p._st[0]>=1){const sb=p._st[1]<25?0:p._st[1]<39?1:p._st[1]>=45&&p._st[1]<55?2:-1;if(sb>=0)J.n[sb]++}return J});
+   const all=CMP.sj.concat(cur),sh=[0,1,2].map(i=>{const v=all.filter(J=>J.n[i]>0).map(J=>100*J.s[i]/J.n[i]);return v.length>=20?mAvg(v):null});
+   R.shortJobs=sh[0]!=null&&sh[1]!=null?{m:mAvg(sh.filter(x=>x!=null)),r:mAvg(CMP_REAL.shortJobs.filter((x,i)=>sh[i]!=null)),fmt:v=>v.toFixed(0)+'%',s:mAvg(sh.map((v,i)=>v==null?null:mRel(v,CMP_REAL.shortJobs[i]))),det:'started at 18–24 / 25–38 / 45–54: '+sh.map(v=>v==null?'–':v.toFixed(0)+'%').join(' / ')+' vs '+CMP_REAL.shortJobs.map(x=>x+'%').join(' / ')}:null}
   {const [lo,hi]=CMP_REAL.switchPromo;R.swP=CMP.pro>100?{m:100*CMP.swp/CMP.pro,r:null,rt:lo+'–'+hi+'%',fmt:v=>v.toFixed(1)+'%',s:mRange(100*CMP.swp/CMP.pro,lo,hi)}:null}
   {const [lo,hi]=CMP_REAL.crossInd;R.cross=CMP.chg>100?{m:100*CMP.cross/CMP.chg,r:null,rt:lo+'–'+hi+'%',fmt:v=>v.toFixed(1)+'%',s:mRange(100*CMP.cross/CMP.chg,lo,hi)}:null}
   const ids=CMP_GROUPS.flatMap(g=>g[1]),got=ids.filter(id=>R[id]&&R[id].s!=null);
@@ -2571,7 +2957,7 @@ function renderCmp(force){const el=document.getElementById('cmp');if(!el)return;
 }
 // a short record of finished runs, kept in this browser only
 function cmpSaveRun(){if(!CMP||CMP.done||!CMP_LAST||CMP_LAST.overall==null)return;CMP.done=true;
-  try{const h=JSON.parse(localStorage.getItem('lf-cmp')||'[]');h.unshift({d:new Date().toISOString().slice(0,10),v:'37',det:DETAIL,o:Math.round(CMP_LAST.overall),n:CMP_LAST.got.length});localStorage.setItem('lf-cmp',JSON.stringify(h.slice(0,8)))}catch(e){}}
+  try{const h=JSON.parse(localStorage.getItem('lf-cmp')||'[]');h.unshift({d:new Date().toISOString().slice(0,10),v:'44',det:DETAIL,o:Math.round(CMP_LAST.overall),n:CMP_LAST.got.length});localStorage.setItem('lf-cmp',JSON.stringify(h.slice(0,8)))}catch(e){}}
 function cmpHistory(){const el=document.getElementById('cmpHist');if(!el)return;let h=[];try{h=JSON.parse(localStorage.getItem('lf-cmp')||'[]')}catch(e){}
   el.innerHTML=h.length?`<p class="small"><b>Your finished runs in this browser:</b> ${h.map(x=>`${x.o}% (${x.d}, ${({light:'Light',std:'Standard',full:'Full'})[x.det]||x.det})`).join(' · ')}</p>`:''}
 
