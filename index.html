@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ladders and Floors</title>
+<title>Career Ladder</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -117,9 +117,14 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .rvt .num{text-align:right;font-variant-numeric:tabular-nums}
 .rvt td i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
 .jnav{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.jtools{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.jcopied{font-size:13px;color:var(--muted)}
+.jcopybox{display:grid;gap:8px;margin-top:8px}
+.jcopybox textarea{width:100%;box-sizing:border-box;font-family:var(--mono);font-size:12px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px}
 .jnav button{min-width:36px;font-size:16px;line-height:1}
 .jnav span{font-variant-numeric:tabular-nums}
 .jlog{max-height:300px}
+.jlog li{grid-template-columns:66px 1fr}
 .jlog .k{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--kc);vertical-align:0}
 .jsum{border-top:1px solid var(--line);padding-top:10px;font-size:14px;display:grid;gap:6px}
 .jsum b{font-family:var(--display);font-weight:500;font-size:1.05rem}
@@ -233,7 +238,7 @@ td a,.detail a{color:var(--ink)}
 
 <div class="wrap">
   <header>
-    <h1>Ladders and Floors <span class="poc">Proof of concept</span></h1>
+    <h1>Career Ladder <span class="poc">Proof of concept</span></h1>
     <p class="disclaimer"><b>Proof of concept.</b> The companies, events and dates are real and sourced. The stick figures are fictional workers whose careers are simulated: they illustrate what typically happened to people like them, not what happened to any real person. Don't use it for real career or investment decisions.</p>
     <p class="disclaimer vibe"><b>Vibe-coded.</b> Designed and directed by Zolyx, and built with Claude (Anthropic) in a single conversation, without writing code by hand. Sources are cited throughout, but the model hasn't been reviewed by a labour economist.</p>
     <p class="sub">Each ladder is a real company. Every company has all six career stages, from entry level to executive, but not the same number of seats on each: rung spacing shows how hard each step is there (dense rungs, many seats above; sparse rungs, few). Width is company size. Colour shows, year by year, the prospects of the group of jobs the company stands for (its industry and size): job openings, layoff risk and growth, from BLS and company data. Those same numbers drive the simulated workers there, so a red ladder really is a riskier place to be. The companies are a sample chosen to match the real US economy by industry and company size. The stick figures are simulated workers who climb, switch companies, start over, or lose their job and look for another.</p>
@@ -309,7 +314,8 @@ td a,.detail a{color:var(--ink)}
       <button id="fstop" hidden>Stop following</button>
     </div>
     <div id="journey" hidden>
-      <div class="jnav" id="jnav" hidden><button id="jprev" aria-label="Previous worker">‹</button><span id="jpos"></span><button id="jnext" aria-label="Next worker">›</button></div>
+      <div class="jtools"><div class="jnav" id="jnav" hidden><button id="jprev" aria-label="Previous worker">‹</button><span id="jpos"></span><button id="jnext" aria-label="Next worker">›</button></div><button id="jcopy" class="jcopy" hidden>Copy all journeys</button><span id="jcopied" class="jcopied" role="status"></span></div>
+      <div id="jcopybox" class="jcopybox" hidden><p class="small">Copying was blocked by the browser. The text below is selected: press Ctrl+C (or ⌘C) to copy it.</p><textarea id="jcopytext" readonly rows="8"></textarea><button id="jcopyclose">Close</button></div>
       <div class="jhead" id="jhead"></div>
       <ol class="log jlog" id="jlog"></ol>
       <div class="jsum" id="jsum" hidden></div>
@@ -431,9 +437,9 @@ td a,.detail a{color:var(--ink)}
       <tbody>
         <tr><td><b>Quits fall with tenure</b></td><td>Quit chance ∝ (years + 0.25)<sup>−0.45</sup></td><td>Shape is ours; fitted so the simulated workforce matches the BLS tenure survey (January 2024: median 3.9 years, 22% one year or less, 26% ten years or more, and median tenure by age). The model gives 3.9, 22% and 26%.</td><td><span class="st st-f">Fitted</span></td></tr>
         <tr><td><b>Layoffs fall with tenure</b></td><td>Workers with 20+ years face about 35% of the first-year rate</td><td>Farber, Displaced Workers Survey.</td><td><span class="st st-d">Data</span></td></tr>
-        <tr><td><b>Quits by age</b></td><td>Ages 18–24, 25–34, 35–44, 45–54, 55+: 1.36, 0.7, 0.32, 0.12, 0.07 (relative)</td><td>Fitted (v39) with the settings below so new jobs by age (NLSY97, NLSY79), tenure by age (BLS, January 2024) and jobs ending within a year by age come close to the surveys.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>New-job effect</b></td><td>The chance of quitting falls with time in the job: as (years + 0.25) to the power −0.87 under 25 and −0.48 from 25</td><td>Fitted (v39) to the share of jobs that end within a year by age at start: 61% (18–24), 32% (25–38), 21% (45–54), NLSY97 and NLSY79. The form is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>Quits by floor</b></td><td>Entry to Executive: 0.93, 1, 1.2, 1.5, 1.83, 1.95 (relative); executives quit too</td><td>Fitted (v39) to median tenure by occupation (BLS, January 2024): service and production about 3 years, sales and office 3.5, professional 4.5, management 5.7. Until v38 executives never quit; no data supported that.</td><td><span class="st st-f">Fitted</span></td></tr>
+        <tr><td><b>Quits by age</b></td><td>Ages 18–24, 25–34, 35–44, 45–54, 55+: 1.36, 0.7, 0.32, 0.12, 0.07 (relative)</td><td>Fitted (v39) with the settings below so new jobs by age (NLSY97, NLSY79), tenure by age (BLS, January 2024) and jobs ending within a year by age come close to the surveys.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>New-job effect</b></td><td>The chance of quitting falls with time in the job: as (years + 0.25) to the power −0.87 under 25 and −0.48 from 25</td><td>Fitted (v39) to the share of jobs that end within a year by age at start: 61% (18–24), 32% (25–38), 21% (45–54), NLSY97 and NLSY79. The form is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>Quits by floor</b></td><td>Entry to Executive: 0.93, 1.4, 1.0, 1.5, 1.83, 1.95 (relative); executives quit too</td><td>Fitted (v39) to median tenure by occupation (BLS, January 2024): service and production about 3 years, sales and office 3.5, professional 4.5, management 5.7. Until v38 executives never quit; no data supported that.</td><td><span class="st st-f">Fitted</span></td></tr>
         <tr><td><b>Layoffs by age</b></td><td>2, 1.3, 0.85, 0.7 (relative)</td><td>Fitted together with quits so jobs by age and tenure by age come close to the NLSY surveys and the BLS tenure survey. The split between quits and layoffs by age is ours.</td><td><span class="st st-f">Fitted</span></td></tr>
-        <tr><td><b>Movers and stayers</b></td><td>Lasting tendency to move, gamma-distributed (shape 0.42: most moves are made by a minority); layoffs concentrated on movers (power 2); the gap narrows with age to 20% of its size at 55</td><td>Fitted (v39) together with the settings above. The distribution's form is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>How a job ends</b></td><td>Decided before leaving. Quits: 60% straight to a job already lined up, 3% unemployment, 37% a break; layoffs without recall: 25%, 25%, 50%. A person's own tendency to take breaks scales their share (at most 60%), at any age</td><td>The share of breaks one person takes is capped at 60% of their job endings (v43; our assumption, so the time out is not piled on a few people). Fitted (v42) so that, of workers aged 25–55 who leave a job for non-employment, about 85% of quitters and 35% of laid-off workers leave the labour force rather than look for work (CPS, Ellieroth and Michaud, FRED EMSHRNQP and EMSHRNLP; the model gives about 87% and 26%, held back from 35% so time unemployed does not fall further below the NLSY79 figure). Direct moves: employer-to-employer flows (Fujita, Moscarini and Postel-Vinay). Until v41 breaks stopped at 40, our assumption; the spread of break-taking is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>Breaks out of the workforce</b></td><td>Average length by age when the break starts: 2.6 years under 24, 1.6 years at 24–38, 4 years from 39 (exponential). Two in three people come back straight into a job, one in three looks first; after a break of a year or more, about 1 in 4 come back one floor lower</td><td>Lengths fitted (v42) to time out of the workforce by age: 24.5% of weeks at 18–23 and 15.4% at 24–38 (NLSY97), 17% at 45–54 (NLSY79). Coming back: CPS flows 2001–2025, 4.1 million a month from out of the labour force into work against 2.1 million into unemployment. One floor lower: UK evidence (PwC 2016: 23% of professional women returners took a lower-skilled or lower-paid role; Government Equalities Office: high risk of downgrading after a break); no US figure found.</td><td><span class="st st-a">Data + assumption</span></td></tr><tr><td><b>Stepping up by changing employer</b></td><td>Only when moving straight from one job to another</td><td>A higher job elsewhere comes as an offer while still employed; after a break or a search people come back at their floor or lower. Our rule, following the evidence above.</td><td><span class="st st-a">Assumption</span></td></tr><tr><td><b>Personas</b></td><td>A visible "Regular employee" is the norm: their tendency to move is drawn from the middle of the population's spread (30th–70th percentile). A "Settler" sits at the bottom (below the 15th), a "Job hopper" near the top</td><td>Matches what each persona describes. The statistical sample has no personas.</td><td><span class="st st-a">Assumption</span></td></tr><tr><td><b>First jobs</b></td><td>Under 22: Entry 62.5%, Junior 27.3%, Professional 10.2%. From 22: Entry 53.9%, Junior 23.2%, Professional 23.0%. Never in management. If a seat is free</td><td>The jobs held by workers aged 16–19 and 20–24 (BLS CPS Table 11b, 2025), mapped to floors. The 4.2% of 20–24-year-olds in management are left out of first jobs: they mostly have some years of work behind them. Professional and lead are levels in that data; the split between entry (service, production) and junior (sales, office) is our mapping.</td><td><span class="st st-d">Data + mapping</span></td></tr><tr><td><b>Downturn layoffs are permanent</b></td><td>Layoffs above an industry's normal level for the month are never followed by a recall</td><td>In downturns temporary layoffs fall as a share of job loss: about 28% of unemployed job losers in 2006–07, 18% in 2009, 13% in 2010 (BLS CPS via FRED).</td><td><span class="st st-d">Data</span></td></tr>
+        <tr><td><b>Movers and stayers</b></td><td>Lasting tendency to move, gamma-distributed (shape 0.42: most moves are made by a minority); layoffs concentrated on movers (power 2); the gap narrows with age to 20% of its size at 55</td><td>Fitted (v39) together with the settings above. The distribution's form is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>How a job ends</b></td><td>Decided before leaving. Quits: 60% straight to a job already lined up, 3% unemployment, 37% a break; layoffs without recall: 25%, 25%, 50%. A person's own tendency to take breaks scales their share (at most 60%), at any age</td><td>The share of breaks one person takes is capped at 60% of their job endings (v43; our assumption, so the time out is not piled on a few people). Fitted (v42) so that, of workers aged 25–55 who leave a job for non-employment, about 85% of quitters and 35% of laid-off workers leave the labour force rather than look for work (CPS, Ellieroth and Michaud, FRED EMSHRNQP and EMSHRNLP; the model gives about 87% and 26%, held back from 35% so time unemployed does not fall further below the NLSY79 figure). Direct moves: employer-to-employer flows (Fujita, Moscarini and Postel-Vinay). Until v41 breaks stopped at 40, our assumption; the spread of break-taking is ours.</td><td><span class="st st-f">Fitted</span></td></tr><tr><td><b>Breaks out of the workforce</b></td><td>Average length by age when the break starts: 2.6 years under 24, 1.6 years at 24–38, 4 years from 39 (exponential). Two in three people come back straight into a job, one in three looks first; after a break of a year or more, about 1 in 4 come back one floor lower</td><td>Lengths fitted (v42) to time out of the workforce by age: 24.5% of weeks at 18–23 and 15.4% at 24–38 (NLSY97), 17% at 45–54 (NLSY79). Coming back: CPS flows 2001–2025, 4.1 million a month from out of the labour force into work against 2.1 million into unemployment. One floor lower: UK evidence (PwC 2016: 23% of professional women returners took a lower-skilled or lower-paid role; Government Equalities Office: high risk of downgrading after a break); no US figure found.</td><td><span class="st st-a">Data + assumption</span></td></tr><tr><td><b>Stepping up by changing employer</b></td><td>Only when moving straight from one job to another</td><td>A higher job elsewhere comes as an offer while still employed; after a break or a search people come back at their floor or lower. Our rule, following the evidence above.</td><td><span class="st st-a">Assumption</span></td></tr><tr><td><b>Personas</b></td><td>A visible "Regular employee" is the norm: their tendency to move is drawn from the middle of the population's spread (30th–70th percentile). A "Settler" sits at the bottom (below the 15th), a "Job hopper" near the top</td><td>Matches what each persona describes. The statistical sample has no personas.</td><td><span class="st st-a">Assumption</span></td></tr><tr><td><b>First jobs</b></td><td>Under 22: hands-on 62.5%, sales and office 27.3%, professional 10.2%. From 22: by degree (graduates 59% professional, the rest split by the graduate mix; others as all non-graduates). Hands-on and sales/office start at Entry; never in management. If a seat is free</td><td>The jobs held by 16–19-year-olds (BLS CPS Table 11b, 2025); BLS 2016 education by occupation; New York Fed recent-graduate underemployment (41%). Only degrees already finished count for a first job (NCES share of 25–29-year-olds).</td><td><span class="st st-d">Data</span></td></tr><tr><td><b>Downturn layoffs are permanent</b></td><td>Layoffs above an industry's normal level for the month are never followed by a recall</td><td>In downturns temporary layoffs fall as a share of job loss: about 28% of unemployed job losers in 2006–07, 18% in 2009, 13% in 2010 (BLS CPS via FRED).</td><td><span class="st st-d">Data</span></td></tr>
         <tr><td><b>Turnover by industry and month</b></td><td>Each industry's own quit and layoff rates for every month, January 2001 to August 2026</td><td>BLS JOLTS by industry, not seasonally adjusted (FRED). Construction includes mining, leisure includes other services, trade is wholesale plus retail, weighted by jobs (BLS CES). Layoffs above an industry's usual level for that month hit workers broadly.</td><td><span class="st st-d">Data</span></td></tr>
         <tr><td><b>Firm size and turnover</b></td><td>Quits ×1.05, 1.03, 1.00, 0.93, 0.93 and layoffs ×1.00, 1.03, 1.04, 0.96, 0.96 from the smallest to the largest firms</td><td>BLS JOLTS rates by establishment size (12 months to July 2026), shared out to firm sizes by which firms can own a site that big (our crosswalk); consistent with Census QWI firm-size separations.</td><td><span class="st st-f">Data + crosswalk</span></td></tr>
         <tr><td><b>Companies' own attrition</b></td><td>Washington state 4.5% resignations</td><td>Their own filings and reports, used instead of the industry rate.</td><td><span class="st st-d">Data</span></td></tr>
@@ -450,6 +456,10 @@ td a,.detail a{color:var(--ink)}
         <tr><td><b>Taking a lower job</b></td><td>Laid-off searchers above entry level take a job one floor down 25% of the time if one is free; 1 in 20 quitters choose a lower job</td><td>25%: about 1 in 4 long-tenured displaced workers back in full-time work earned 20% or more below the lost job (BLS Displaced Workers Survey, 2000); a floor down stands for that (v43; was our assumption of 40%). The 1 in 20 is our reading of Pew Research's 2022 survey of 2021 quitters.</td><td><span class="st st-a">Assumption</span></td></tr>
         <tr><td><b>Promotions by age</b></td><td>Under 30, 30s, 40s, 50+: 1.4, 1.1, 0.75, 0.45 (relative)</td><td>Direction from Pergamit and Veum (NLSY79: about 24% of young workers promoted by their employer in 1989–90) and the NLSY79 at midcareer (BLS Monthly Labor Review, 2014: about 20% every two years in the late 1990s, about 8% by 2010). Values fitted so the share of workers in management by age matches BLS CPS Table 11b (2025); checked again in v42.</td><td><span class="st st-f">Fitted</span></td></tr>
         <tr><td><b>Promotions by switching</b></td><td>About 1 in 5 promotions come with a new employer; 85% of those stay in the same industry</td><td>Fitted to DeVaro et al. and Bidwell and Mollick (2015). Same industry stands in for same job title. Since version 32 the chance moves with the openings rate of the industry being moved into (BLS JOLTS), as job-ladder moves rise and fall with vacancies (Haltiwanger, Hyatt and McEntarfer, 2018).</td><td><span class="st st-f">Fitted</span></td></tr>
+        <tr><td><b>Line of work</b></td><td>Hands-on, sales and office, or professional. Hands-on and sales/office: Entry → Junior → Lead → Director → Executive. Professional: Professional → Lead → Director → Executive</td><td>Where each line of work is found by industry: BLS CPS Table 17, 2025 (managers taken out using the OEWS management share). Treating Junior to Lead as one step follows first-line supervisors, who are drawn from the work they supervise. The structure is ours.</td><td><span class="st st-a">Data + assumption</span></td></tr>
+        <tr><td><b>Degrees</b></td><td>By birth cohort: the share of 25–29-year-olds with a bachelor's degree when the cohort was 27, ×1.5 for degrees finished later and graduates' higher participation. Degree holders: 72% professional or management work; others 21%. First jobs: 41% of graduates start in jobs that need no degree</td><td>NCES Digest Table 104.20; BLS educational attainment of the labor force, 2016 (38.9% with a degree, by occupation group); Federal Reserve Bank of New York, recent graduates' underemployment. The ×1.5 is fitted to the 2016 figure.</td><td><span class="st st-f">Data + fitted</span></td></tr>
+        <tr><td><b>Changing line of work</b></td><td>12% of changes of employer under 29, falling to about 3% from 47; graduates in other work move into professional work at 1 in 4 changes of employer</td><td>Direction and age profile from occupation switching in the PSID (13% of men a year at the one-digit level, 26% at 23–28, 7% at 47–61; Kambourov and Manovskii), which halved from the mid-1990s (CPS, St. Louis Fed). Our three lines of work are broader, so the levels are our assumption; the model gives about 5% a year at 25–54.</td><td><span class="st st-a">Assumption</span></td></tr>
+        <tr><td><b>Displaced professionals</b></td><td>Keep looking for professional work up to three rounds, 71% of the time, before taking other work</td><td>71% of displaced professional-specialty workers were re-employed in the same broad occupation (BLS Displaced Workers Survey, via The Economics Daily, 1999).</td><td><span class="st st-d">Data</span></td></tr>
         <tr><td><b>Time between promotions</b></td><td>At least 1 year up to Lead, 2 years from Lead to Director, 3 from Director to Executive</td><td>LinkedIn career histories at 20 large firms: 30.4 months between promotions on average, 10.4 at the fastest (Standout CV, 2024). The longer gaps at the top are our assumption (v44).</td><td><span class="st st-a">Assumption</span></td></tr>
         <tr><td><b>How promotions are filled</b></td><td>An open seat is usually filled from the floor below within about a year; climbers push 1.5×, nepo hires 2.6× at family firms and 1.4× elsewhere</td><td>Ours.</td><td><span class="st st-a">Assumption</span></td></tr>
         <tr><td><b>Ladder colour (prospects)</b></td><td>Average of three measures for the company's group of jobs, each scaled by its spread across industries and years 2001–2026: job openings rate and layoff rate over the last 12 months, and job growth over the last year</td><td>All three are data (BLS JOLTS by industry, BLS JOLTS by establishment size, BLS CES, company annual reports). Equal weights are our choice. The colour has no effect of its own: it shows the numbers that drive the workers there.</td><td><span class="st st-f">Data + assumption</span></td></tr>
@@ -464,7 +474,20 @@ td a,.detail a{color:var(--ink)}
     <h2>Release notes</h2>
     <div class="rel">
       <article class="relv cur">
-        <h3>Version 44 · Clearer floors, steadier climbs, and bugs from the reviews <span>21 Oct 2026 · current</span></h3>
+        <h3>Version 45 · Lines of work and degrees <span>22 Oct 2026 · current</span></h3>
+        <ul>
+          <li><b>Every worker has a line of work:</b> hands-on (service, trades, production, transport), sales and office, or professional. Floors are still levels. Hands-on and sales/office workers hold Entry and Junior jobs and are promoted from Junior straight to Lead, as first-line supervisors are; professionals start on the Professional floor. Management is open to all three.</li>
+          <li><b>Moves follow the line of work.</b> Outside their own industry, workers go where their kind of work is (BLS CPS Table 17, 2025): a cook mostly to restaurants, hotels and shops, an accountant almost anywhere. Changes of line of work come with changes of employer, more often when young.</li>
+          <li><b>Degrees.</b> Each worker has a bachelor's degree or not, by birth cohort (NCES), fitted to the 2016 workforce (38.9% with a degree, BLS). Degree holders mostly work in professional jobs or management (72%, against 21% of others). About 41% of new graduates start in jobs that need no degree (New York Fed) and move into professional work later.</li>
+          <li><b>Displaced professionals keep looking for professional work</b> (71% are re-employed in the same broad occupation, Displaced Workers Survey), and no longer drop to Junior after a short break or a small setback.</li>
+          <li><b>Layoffs by floor</b> are now weighted by who actually works at each company, so every industry's total stays at its JOLTS rate.</li>
+          <li><b>Every step in a journey shows its month and year</b>, so the timing of each job, break and search can be read directly. A search or notice period now ends on its date even while the figure is still walking on screen: notice periods had sometimes stretched to several months, and followed workers lost time that the statistical sample did not.</li>
+          <li><b>Copy all journeys.</b> A button under the journey (and on the end-of-run card) copies every followed worker's journey as plain text, one block per worker, each step dated by month and year.</li>
+          <li><b>New in the comparator:</b> the share of workers with a degree, and the share of degree holders and others in management or professional work (BLS, 2016).</li>
+        </ul>
+      </article>
+      <article class="relv">
+        <h3>Version 44 · Clearer floors, steadier climbs, and bugs from the reviews <span>21 Oct 2026</span></h3>
         <ul>
           <li><b>"Senior" is now "Professional".</b> The floor stands for professional and business-specialist jobs (teacher, nurse, accountant), which graduates hold from their first job. All four reviewers read "Senior" as seniority and marked down first jobs there. Nothing in the simulation changed.</li>
           <li><b>Promotions at the top take longer:</b> at least 2 years from Lead to Director and 3 from Director to Executive (one year below Lead, where young first-line managers are common). Reviewers flagged a climb from Junior to Director in three years. LinkedIn histories average 30 months between promotions.</li>
@@ -1442,7 +1465,7 @@ const TEN_L=t=>Math.pow(t+(+globalThis.TL0||.25),-(+globalThis.TL||.32)); // fit
 const TQY=+(globalThis.TQY||.87), TQO=+(globalThis.TQO||.48);
 const TEN_Q=(t,a)=>Math.pow(t+.25,-(a!=null&&a<25?TQY:TQO));
 // v39: quits by floor, fitted so median tenure on each floor matches the BLS tenure survey by occupation (January 2024, Table 6)
-const FQ=globalThis.FQ||[.93,1,1.2,1.5,1.83,1.95];
+const FQ=globalThis.FQ||[.93,1.4,1.0,1.5,1.83,1.95]; // v45: refitted after lines of work: Junior staff can no longer be promoted to Professional, Professionals no longer drop to Junior
 /* quitting also falls with age. People born 1980–84 started 5.1 jobs at ages 18–23, 3.3 at 24–29 and 2.9 at 30–38 (BLS NLSY97, 2024
    release), about 0.85, 0.55 and 0.32 a year; people born 1957–64 started 0.19 a year at 45–56 (NLSY79). The age factors below are
    fitted (v36) so the simulated workers start about that many jobs at each age, together with how unevenly job-hopping is spread
@@ -1543,7 +1566,7 @@ const PAUSE_AGE=+(globalThis.PAUSE_AGE||999);
 /* v40: breaks are not random per job ending. Each person has a lasting tendency to take breaks (study, children, care), so a minority
    take most of them, as with job moves; it scales the break share of their job endings (mean 1). */
 function routeOf(p,kind){const R=ROUTE[kind],old=p.born!=null&&year-p.born>=PAUSE_AGE;
-  const pb=old?0:Math.min(+(globalThis.BCAP||.6),(1-R[0]-R[1])*(p.brk==null?1:p.brk)),k=(1-pb)/(R[0]+R[1]),r=Math.random();
+  const pb=old?0:Math.min(+(globalThis.BCAP||.45),(1-R[0]-R[1])*(p.brk==null?1:p.brk)),k=(1-pb)/(R[0]+R[1]),r=Math.random();
   return r<R[0]*k?'direct':r<(R[0]+R[1])*k?'unemployed':'pause'}
 function cmpRoute(p,kind,route){if(!p.shadow||burning||typeof CMP==='undefined'||!CMP||year<2001||p.born==null)return;const a=year-p.born;if(a<25||a>55||route==='direct')return;const r=CMP.rt[kind==='quit'?'q':'l'];r[0]++;if(route==='pause')r[1]++}
 function jobEnds(p,kind,route){route=route||routeOf(p,kind);cmpRoute(p,kind,route);
@@ -1694,9 +1717,63 @@ function rungsFor(d){
 function seatCap(L,lv,extra){return Math.floor(shares(L)[lv]*(occOf(L)[6]+extra)+(L.dith?L.dith[lv]:.5))}
 // is there a free seat on floor lv at L for worker p? (entry level is never full)
 function hasSeat(L,lv,p){if(lv<=0)return L.top>=0;if(lv>L.top)return false;return occOf(L)[lv]<seatCap(L,lv,p&&p.comp===L?0:1)}
-function takeSeat(p,L,lv){if(p.comp!==L)p.since=year;if(p.comp){const o=occOf(p.comp);o[p.level]--;o[6]--}const o=occOf(L);o[lv]++;o[6]++}
+/* ---------- v45: line of work and degree ----------
+   Every worker has a line of work: hands-on (service, protective, construction, installation and repair, production, transport, farming),
+   sales and office, or professional (professional plus business and financial specialists). The floors stay levels: hands-on and
+   sales/office workers hold Entry and Junior jobs and are promoted from Junior straight to Lead (first-line supervisors and managers);
+   professionals hold Professional jobs and are promoted to Lead. Management floors are open to all three.
+   Where each line of work is found, by industry: BLS CPS Table 17, 2025 annual averages (thousands of workers who are not managers;
+   the management share of each industry, from the OEWS as in IND_MGR, is taken out of "management, business and financial"). */
+const TRACK_IND={constr:[8720,804,2142],manuf:[7831,1665,4639],trade:[5950,10568,1980],transport:[5936,2490,1385],info:[359,521,1562],fin:[687,4130,4848],prof:[5515,2880,11360],edhealth:[8884,3565,23607],leisure:[13647,2524,4433],gov:[2873,1329,3209]};
+const TRK=['h','s','p'], TRK_I={h:0,s:1,p:2}, TRK_NAME={h:'hands-on work',s:'sales and office work',p:'professional work'};
+const trkShare=(k,t)=>{const r=TRACK_IND[k];if(!r)return 1/3;return r[TRK_I[t]]/(r[0]+r[1]+r[2])};
+/* degree (bachelor's or higher): share of 25–29-year-olds with one, by the year they were 27 (NCES Digest, Table 104.20): 1970 16.4%,
+   1980 22.5%, 1990 23.2%, 1995 24.7%, 2000 29.1%, 2005 28.8%, 2010 31.7%, 2015 35.6%, 2020 39.2%; people with degrees take part in
+   the labour force more, so the share among workers is higher (DEG_UP, fitted: 38.9% of the labour force aged 25+ held a degree in
+   2016, BLS). */
+const DEG_YR=[[1960,11],[1970,16.4],[1980,22.5],[1990,23.2],[1995,24.7],[2000,29.1],[2005,28.8],[2010,31.7],[2015,35.6],[2020,39.2],[2030,40]];
+const DEG_UP=+(globalThis.DEG_UP||1.5); // degrees finished after 29 and the higher labour-force participation of graduates (fitted to the 2016 figure)
+function degShare(born){const y=born+27;if(y<=DEG_YR[0][0])return DEG_YR[0][1]/100;for(let i=1;i<DEG_YR.length;i++)if(y<=DEG_YR[i][0]){const [a,va]=DEG_YR[i-1],[b,vb]=DEG_YR[i];return (va+(vb-va)*(y-a)/(b-a))/100}return .4}
+/* line of work by degree, workers 25+, 2016 (BLS, educational attainment of the labor force): of degree holders 72.4% work in
+   management, professional and related jobs, 16.2% in sales and office, 11.5% in hands-on jobs; without a degree 20.6%, 24.8% and
+   54.5% (combined from the published shares by education level). */
+const TRK_BY_DEG={1:[.115,.162,.724],0:[.545,.248,.206]};
+const DEG_REF=+(globalThis.DEG_REF||.22);
+/* a graduate's first job: about 41% of recent college graduates (22–27) work in jobs that do not need a degree (Federal Reserve Bank
+   of New York, The Labor Market for Recent College Graduates, underemployment rate); the rest start in professional work. The
+   non-graduate jobs are split as for all graduates. Later moves into professional work come with changes of employer (GRAD). */
+const TRK_FIRST_DEG=[.41*.115/.277,.41*.162/.277,.59];
+// the same in reverse, for the workforce already in place in 2000: share with a degree in each line of work (2016, see above)
+const DEG_BY_TRK={h:.118,s:.29,p:.69};
+function drawFrom(w,excl){let t=0;for(let i=0;i<3;i++)if(TRK[i]!==excl)t+=w[i];let r=Math.random()*t;for(let i=0;i<3;i++){if(TRK[i]===excl)continue;r-=w[i];if(r<=0)return TRK[i]}return TRK[2]}
+// a non-manager's line of work follows the floor: Professional means professional work; Entry and Junior are hands-on or sales/office
+function hsFor(L){const k=L?sectorOf(L):null,h=k?trkShare(k,'h'):.66,sv=k?trkShare(k,'s'):.34;return Math.random()*(h+sv)<h?'h':'s'}
+function setTrackFor(p,L,lv){const old=p.trk;
+  if(lv===2)p.trk='p';
+  else if(lv<2&&(!p.trk||p.trk==='p'))p.trk=hsFor(L);
+  else if(!p.trk){const k=sectorOf(L),w=TRK.map(t=>trkShare(k,t));p.trk=drawFrom(w)}
+  // people already in work in 2000 (and in the warm-up before it): the 2016 shares by line of work, scaled by their birth cohort's degree
+  // share (DEG_REF: the average for the workforce of 2000, fitted to the 2016 figure), so earlier cohorts hold fewer degrees
+  if(p.deg==null){const ds=p.born!=null?degShare(p.born)*DEG_UP:.35;p.deg=Math.random()<Math.min(.95,DEG_BY_TRK[p.trk]*ds/DEG_REF)}
+  if(old&&old!==p.trk){if(!burning&&p.shadow&&typeof CMP!=='undefined'&&CMP&&year>=2001)CMP.ts[1]++;if(p.tracked)p.trkNote=old}}
+// the next floor up and down in a worker's own line of work
+const nextUp=(p,lv=p.level)=>lv>=3?lv+1:p.trk==='p'?(lv<2?2:3):(lv===0?1:3);
+const nextDown=(p,lv=p.level)=>lv>=4?lv-1:lv===3?(p.trk==='p'?2:1):lv===2?1:0;
+/* changing line of work. Occupation changes are common young and rare later: in the PSID about 13% of men changed one-digit
+   occupation each year (1968–93), 26% at ages 23–28 and 7% at 47–61 (Kambourov and Manovskii), and occupation switching roughly halved
+   from the mid-1990s to 2010 (CPS, St. Louis Fed). Our three lines of work are much broader than one-digit occupations, and moves into
+   management are promotions here, so a change of line of work is set at TS per change of employer, falling with age as in the PSID
+   (our assumption, checked against the yearly rate in the comparator). Graduates who started in other work move into professional
+   work when they change employer (GRAD), until 72% of degree holders are in professional work or management, as in the CPS. */
+const TS=+(globalThis.TS||.12), GRAD=+(globalThis.GRAD||.25);
+const TS_AGE=a=>a<29?1:a<35?.7:a<47?.45:.27;
+function applyGoal(p,lv){if(p.trkGoal&&p.trkGoal!=='p'&&lv<2&&p.trk!==p.trkGoal){const o=p.trk;p.trk=p.trkGoal;if(o){if(!burning&&p.shadow&&typeof CMP!=='undefined'&&CMP&&year>=2001)CMP.ts[1]++;if(p.tracked)p.trkNote=o}}p.trkGoal=null}
+function trackMove(p){if(p.level>=3||!p.trk||p.born==null)return;const a=year-p.born;
+  if(p.deg&&p.trk!=='p'&&a>=22&&Math.random()<GRAD){p.level=2;p.trkGoal='p';return}
+  if(Math.random()<TS*TS_AGE(a)){const t=drawFrom(TRK_BY_DEG[p.deg?1:0],p.trk);p.trkGoal=t;p.level=t==='p'?2:p.level===2?1:p.level}}
+function takeSeat(p,L,lv){setTrackFor(p,L,lv);if(p.comp!==L)p.since=year;if(p.comp){const o=occOf(p.comp);o[p.level]--;o[6]--}const o=occOf(L);o[lv]++;o[6]++}
 // the best job a worker can land: their own floor if some company has a free seat there, otherwise the highest floor below it that does
-function landing(p,opts,lv){for(let l=lv;l>=0;l--){const o=opts.filter(L=>hasSeat(L,l,p));if(o.length)return [fieldPick(p,o,null,l),l]}return null}
+function landing(p,opts,lv){for(let l=lv,g=0;g<7;g++){const o=opts.filter(L=>hasSeat(L,l,p));if(o.length)return [fieldPick(p,o,null,l),l];if(l===0)break;l=nextDown(p,l)}return null}
 /* staying in the same field: about 37–39% of US job-to-job moves stay in the same industry sector (Census Job-to-Job Flows,
    via the Richmond Fed, 2019–2022). Some industries are represented by a single company here (health care by HCA Healthcare,
    government by the US Postal Service), so many attempts to stay in the field find no other employer. Aiming 65% of moves at the
@@ -1723,6 +1800,8 @@ function fieldPick(p,opts,sec,lv){
     // some industries have a single company in the model (health care: HCA Healthcare; government: the US Postal Service).
     // That company stands for its whole industry, so staying in the field can mean being hired by it again.
     const B=p.left;if(lv!=null&&!p.comp&&B&&B.alive&&sectorOf(B)===f&&!alive().some(L=>L!==B&&sectorOf(L)===f)&&hasSeat(B,lv,p))return B}
+  // v45: outside their own industry, workers go where their line of work is: a cook to restaurants, hotels and shops, an accountant anywhere
+  if(p.trk&&lv!=null&&lv<3){let t=0;const w=opts.map(L=>{const k=sectorOf(L),c=mixNow&&mixNow[k]>0?Math.min(3,Math.max(.33,Math.pow(shareAt(k,year)/mixNow[k],1.5))):1,x=trkShare(k,lv===2?'p':p.trk)*c;t+=x;return x}); /* the same rebalancing as hiring keeps the industry mix at its real shares */let r=Math.random()*t;for(let i=0;i<opts.length;i++){r-=w[i];if(r<=0)return opts[i]}}
   return pick(opts)}
 // starting floor for the workforce already in place in 2000, drawn from the same proportions
 function startLevel(L,type){const lo=type==='nepo'?Math.min(L.top,isFamily(L)?2:1):0,sh=shares(L);let t=0;for(let i=lo;i<=L.top;i++)t+=sh[i];
@@ -1814,7 +1893,7 @@ function occAt(y){const a=OCC_YRS[0],b=OCC_YRS[OCC_YRS.length-1];if(y<=a)return 
 let relCache={};
 function layoffRel(y){const k=Math.round(y*4);if(relCache[k])return relCache[k];const [sv,pr,tr,sa,of,pf,mbf,mg]=occAt(k/4);
   return relCache[k]=[(sv+pr+tr)/3,(sa+of)/2,pf,mbf,mg,mg]}
-function layoffFactor(L,lv){const R=layoffRel(year),sh=shares(L);let m=0;for(let i=0;i<6;i++)m+=sh[i]*R[i];return R[lv]/m}
+function layoffFactor(L,lv){const R=layoffRel(year),o=occOf(L),sh=o[6]>=10?o.slice(0,6).map(x=>x/o[6]):shares(L);let m=0;for(let i=0;i<6;i++)m+=sh[i]*R[i];return R[lv]/m} // v45: weighted by who actually works there, so the company's total stays at its industry's JOLTS rate whatever its floor mix
 /* recalls: over 40% of unemployed people go back to their previous employer after a jobless spell, and those recalled are out of
    work at least a month less than others (Fujita and Moscarini, American Economic Review, 2017). So 40% of laid-off workers whose
    employer still exists are recalled to their old floor after a short spell of 2 to 12 weeks (the spell length is our estimate). */
@@ -1936,7 +2015,7 @@ function renderJourney(){
     document.getElementById('jlog').innerHTML=`<li><time>${Math.floor(year)}</time><span class="hiddenstep">The scenario is a surprise. ${n?n+' key moment'+(n>1?'s':'')+' so far, ':''}all revealed when the run ends in ${Math.floor(END)}.</span></li>`;return}
   const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],mo=t=>MON[Math.min(11,Math.floor((t-Math.floor(t))*12))]+' ';
   // v43: when two steps a few weeks apart fall either side of New Year, both show the month, so a notice in December and a start in January don't look a year apart
-  const lab=(j,i)=>{const a=journey[i-1],b=journey[i+1],near=x=>x&&x.t!=null&&j.t!=null&&x.y!==j.y&&Math.abs(x.t-j.t)<.25;return (near(a)||near(b)?mo(j.t):'')+j.y};
+  const lab=j=>(j.t!=null?mo(j.t):'')+j.y; // every step shows its month and year (the model dates each step exactly)
   document.getElementById('jlog').innerHTML=journey.map((j,i)=>`<li><time>${lab(j,i)}</time><span><span class="k" style="--kc:var(${KIND_COL[j.kind]||'--ink'})"></span>${j.text}</span></li>`).join('');
   const el=document.getElementById('jlog'); el.scrollTop=el.scrollHeight;
 }
@@ -1968,10 +2047,20 @@ function updateTrail(){
     if(p.markKind&&!p.q.length){(p.marks||(p.marks=[])).push([p.x,p.y,p.z,p.markKind]);if(p===tracked)dropMarker(p,p.markKind);p.markKind=null}}
 }
 function showFollowed(i){if(!followed.length)return;fIdx=(i+followed.length)%followed.length;tracked=followed[fIdx];
-  const nav=document.getElementById('jnav');nav.hidden=followed.length<2;document.getElementById('jpos').textContent=`Worker ${fIdx+1} of ${followed.length}`;
+  const nav=document.getElementById('jnav');nav.hidden=followed.length<2;{const c=document.getElementById('jcopy');c.hidden=!followed.length;c.textContent=followed.length>1?'Copy all journeys':'Copy journey';c.disabled=!!(follow&&follow.mystery&&!revealed)}document.getElementById('jpos').textContent=`Worker ${fIdx+1} of ${followed.length}`;
   const real=!!tracked.def,typeName=real?CASES.find(c=>c.key===follow.type).name:TYPES[tracked.type].name;
   document.getElementById('jhead').innerHTML=`<i style="--c:${tracked.fcol||'var(--p-'+tracked.type+')'}"></i>${followed.length>1?'Worker '+(fIdx+1)+': ':'Following: '}${typeName}${real?' · real career':follow.mystery&&!revealed?' · scenario hidden until the end':' · '+SCEN[tracked.scen||follow.scen].label}`;
   drawTrails();renderJourney();if(year>=END)journeySummary(tracked)}
+/* v45: copy every followed worker's journey as plain text, one block per worker, each step dated by month and year */
+function journeysText(){const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return followed.map((p,i)=>{const real=!!p.def,name=real?CASES.find(c=>c.key===follow.type).name:TYPES[p.type].name,sc=real?'real career':SCEN[p.scen||follow.scen].label;
+    const L=(p.journey||[]).map(j=>`${j.t!=null?MON[Math.min(11,Math.floor((j.t-Math.floor(j.t))*12))]+' ':''}${j.y}  ${j.text.replace(/<[^>]+>/g,'')}`);
+    return `WORKER ${i+1}: ${name} · ${sc}\n${L.join('\n')}`}).join('\n\n')}
+function copyJourneys(){const t=journeysText(),ok=document.getElementById('jcopied'),n=followed.length,msg=`Copied ${n} journey${n>1?'s':''}.`;
+  const fallback=()=>{const box=document.getElementById('jcopybox'),ta=document.getElementById('jcopytext');ta.value=t;box.hidden=false;ta.focus();ta.select();ok.textContent=''};
+  try{navigator.clipboard.writeText(t).then(()=>{ok.textContent=msg;setTimeout(()=>{if(ok.textContent===msg)ok.textContent=''},3000)}).catch(fallback)}catch(e){fallback()}}
+document.getElementById('jcopy').onclick=copyJourneys;
+document.getElementById('jcopyclose').onclick=()=>{document.getElementById('jcopybox').hidden=true};
 document.getElementById('jprev').onclick=()=>showFollowed(fIdx-1);
 document.getElementById('jnext').onclick=()=>showFollowed(fIdx+1);
 function dimOthers(on){
@@ -2003,7 +2092,7 @@ const SCEN_ODDS={typical:.9,ordinary:.1};
 function surpriseScen(){let r=Math.random();for(const k in SCEN_ODDS){if((r-=SCEN_ODDS[k])<0)return k}return 'typical'}
 function setupTracked(){
   revealed=false; {const rv=document.getElementById('reveal'); if(rv) rv.classList.remove('show');}
-  journey=[]; tracked=null; followed=[]; fIdx=0; resetTrail();
+  journey=[]; tracked=null; followed=[]; fIdx=0; resetTrail(); {const c=document.getElementById('jcopy');if(c)c.hidden=true;const b=document.getElementById('jcopybox');if(b)b.hidden=true;const o=document.getElementById('jcopied');if(o)o.textContent=''}
   const jb=document.getElementById('journey'); jb.hidden=!follow; document.getElementById('jsum').hidden=true;
   document.getElementById('fstop').hidden=!follow;
   dimOthers(!!follow);
@@ -2058,7 +2147,8 @@ function revealMany(){const rv=document.getElementById('reveal');if(!rv)return;
   rv.classList.add('wide');
   rv.innerHTML=`<div class="cap">The run reached ${Math.floor(END)} · ${followed.length} careers followed</div><h3>${TYPES[follow.type].name}s, 2000–${Math.floor(END)}</h3>
     <div class="tablewrap" style="border:0"><table class="rvt"><thead><tr><th>#</th><th>Scenario</th><th>Started as</th><th>In ${Math.floor(END)}</th><th class="num">Promoted</th><th class="num">Employers</th><th class="num">Quit</th><th class="num">Laid off</th><th class="num">Breaks</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <div class="row"><button id="revealJourney">See the full journeys</button><button id="revealClose">Close</button></div>`;
+    <div class="row"><button id="revealJourney">See the full journeys</button><button id="revealCopy">Copy all journeys</button><button id="revealClose">Close</button></div>`;
+  rv.querySelector('#revealCopy').onclick=()=>{copyJourneys();const b=rv.querySelector('#revealCopy');b.textContent='Copied';setTimeout(()=>{b.textContent='Copy all journeys'},2500)};
   rv.querySelector('#revealClose').onclick=()=>rv.classList.remove('show');
   rv.querySelector('#revealJourney').onclick=()=>{rv.classList.remove('show');document.getElementById('followBox').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})};
   rv.addEventListener('pointerdown',e=>e.stopPropagation());
@@ -2076,7 +2166,7 @@ function journeySummary(p){const st=p.st, real=!!p.def;
 }
 function revealOne(p,st,real){
   if(!real&&!revealed){
-    revealed=true; renderJourney();
+    revealed=true; renderJourney(); {const c=document.getElementById('jcopy');if(c)c.disabled=false}
     document.getElementById('jhead').innerHTML=`<i style="--c:var(--p-${follow.type})"></i>Following: ${TYPES[follow.type].name} · ${SCEN[follow.scen].label}`;
     const rv=document.getElementById('reveal');
     const tn=TYPES[follow.type].name, an=/^[aeiou]/i.test(tn)?'An':'A';
@@ -2112,14 +2202,14 @@ function crowdCollapse(p,L){
   const lvl=p.level; p.comp=null; p.left=L;
   const open=alive().filter(o=>hasSeat(o,lvl,p));
   if(lvl>0&&Math.random()<.5&&open.length){const N=fieldPick(p,open,sectorOf(L));takeSeat(p,N,lvl);p.comp=N;return}
-  p.level=Math.max(0,lvl-1); p.y=p.level*GAP;
+  p.level=nextDown(p,lvl); p.y=p.level*GAP;
   if(p.level===0){setLaidOff(p,true);bump('layoffs',true);cmpNote(p,'','laid');startSearch(p)}
   else{const o2=alive().filter(o=>hasSeat(o,p.level,p));if(o2.length){const N=fieldPick(p,o2,sectorOf(L));takeSeat(p,N,p.level);p.comp=N}}
 }
 function crowdMerge(p,M){
   const r=Math.random(); p.comp=M; if(p.level===0) return;
   if(r<.65) return;
-  if(r<.9&&p.level>1){p.level--;p.y=p.level*GAP;return}
+  if(r<.9&&p.level>1){const dn=nextDown(p);takeSeat(p,M,dn);p.level=dn;p.y=p.level*GAP;return}
   p.level=0;p.y=0;p.comp=null;setLaidOff(p,true);bump('layoffs',true);cmpNote(p,'','laid');startSearch(p);
 }
 /* the statistical sample is event-driven: each worker's decision is taken at the moment it is due, not at the next animation frame,
@@ -2267,7 +2357,9 @@ function setAge(p,lv,at,newcomer){p.past=null;p.place=null;if(newcomer)p.fresh=t
   if(pool){const ag=pool[Math.floor(Math.random()*pool.length)];if(p.retireAt<=ag)p.retireAt=Math.min(72,ag+.5+Math.random()*4);p.born=at-ag}
   else p.born=at-Math.min(p.retireAt-1,a+Math.random()*(b-a));
   // time already spent with the current employer for those in work at the start (our assumption: about 6 years on average, never before age 18)
-  p.since=at-Math.min(Math.max(0,at-p.born-18),-6*Math.log(1-Math.random()))}
+  p.since=at-Math.min(Math.max(0,at-p.born-18),-6*Math.log(1-Math.random()));
+  // v45: a newcomer's degree is drawn from their birth cohort; people already in work get theirs with their line of work
+  p.trk=null;p.deg=newcomer?Math.random()<Math.min(.95,degShare(p.born)*DEG_UP):null;if(p.comp)setTrackFor(p,p.comp,lv||0)}
 const ageOf=p=>Math.floor(year-p.born);
 function retireTracked(p){
   note(p,`Retires at ${ageOf(p)} as ${lvName(p.level)}${p.comp?' at '+p.comp.d[0]:', while out of work'}.`,'end');
@@ -2312,7 +2404,7 @@ function decide(p){
        our reading). Coming back after a break carries a high risk of taking a lower job (UK Government Equalities Office, employment pathways after
        childbirth); about 23% of professional women returning after a career break went into a lower-skilled or lower-paid role
        (PwC, 2016). No US figure was found, so the UK share is used: about 1 in 4 come back one floor lower. */
-    if(p.level>0&&year-(p.outFrom==null?year-1:p.outFrom)>=1&&Math.random()<.23){p.level--;if(p.tracked)note(p,`After the break, aims one floor lower: ${lvName(p.level)}.`,'drop')}
+    if(p.level>0&&!(p.trk==='p'&&p.level===2)&&year-(p.outFrom==null?year-1:p.outFrom)>=1&&Math.random()<.23){p.level=nextDown(p);if(p.tracked)note(p,`After the break, aims one floor lower: ${lvName(p.level)}.`,'drop')}
     // two in three people coming back from a break go straight into a job (CPS flows 2001-2025: 4.1 million a month from out of the
     // labour force into work against 2.1 million into unemployment); the rest look for one first
     const direct=Math.random()<.66;if(p.tracked)note(p,direct?'Comes back to work after the break.':'Comes back to the workforce and looks for a job.','move');startSearch(p,direct);return}
@@ -2320,35 +2412,43 @@ function decide(p){
   if(p.seeking){
     if(year<p.seekUntil){wander(p);p.next=Math.min(p.next,p.seekUntil);return}
     // search over: take an offer, often one floor higher than the job they left
-    const up=open.filter(L=>L!==p.left&&hasSeat(L,p.level+1,p)), same=open.filter(L=>L!==p.left&&L.top>=p.level);
     p.seeking=false; setSeeker(p,false);
+    const lvBefore=p.level; if(!p.recall&&!p.tries)trackMove(p); // v45: a change of employer can come with a change of line of work
+    const up=open.filter(L=>L!==p.left&&hasSeat(L,nextUp(p),p)), same=open.filter(L=>L!==p.left&&L.top>=p.level);
     if(p.recall){const R=p.recall;p.recall=null;
       if(R.alive&&R.top>=p.level){p.tries=0;p.recalling=true;join(p,R,p.level);p.recalling=false;p.since=R===p.left&&p.sinceBefore!=null?p.sinceBefore:p.since;tally.recalled=(tally.recalled||0)+1;note(p,`Recalled by ${R.d[0]} to the same job, ${lvName(p.level)}.`,'hired');return}
       startSearch(p);return} // the recall fell through: a normal search starts
     // people who quit chose to leave, so they rarely accept a lower job: about 1 in 20 of those above entry level do, by choice
     // (our estimate; Pew Research found 9–18% of 2021 quitters had fewer chances to advance in their new job, and a lower floor is a
     // bigger step down than that). Everyone else waits for their own floor, looking in short rounds until a seat opens.
-    if(!p.laidOff&&!p.notice&&p.level>0&&Math.random()<QUIT_DOWN){const low=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));
-      if(low.length){const lv0=p.level;p.tries=0;join(p,fieldPick(p,low,null,lv0-1),lv0-1);note(p,`Chooses a lower job: ${lvName(p.level)} at ${p.comp.d[0]}.`,'drop');return}}
+    if(!p.laidOff&&!p.notice&&p.level>0&&p.level===lvBefore&&!(p.trk==='p'&&p.level===2)&&Math.random()<QUIT_DOWN){const dn=nextDown(p),low=open.filter(L=>L!==p.left&&hasSeat(L,dn,p));
+      if(low.length){p.tries=0;join(p,fieldPick(p,low,null,dn),dn);note(p,`Chooses a lower job: ${lvName(p.level)} at ${p.comp.d[0]}.`,'drop');return}}
     // a step up by changing employer: most promotions happen inside the company, and most moves between companies are sideways.
     // In Finnish employer records, promotions into a job from another firm are 4.3% of job entries against 24.5% for internal
     // promotions (DeVaro et al.); among US MBA graduates, 77% of moves into bigger roles were internal (Bidwell & Mollick 2015).
     // UP_SWITCH is set so that about 1 in 5 promotions come from switching. Most of these stay in the same field: about 85% of
     // hires between firms keep the same job title (DeVaro et al.); the model has no occupations, so the industry stands in for it.
     const f0=fieldOf(p), upSame=up.filter(L=>sectorOf(L)===f0), upPool=Math.random()<UP_SAME?upSame:up;
-    const upTo=year-(p.lastUp||-99)>=PROMO_GAP(p.level)&&upPool.length&&pick(upPool);
-    if(!p.laidOff&&p.notice&&!p.back&&upTo&&Math.random()<Math.min(.9,UP_SWITCH*cm('upMult')*edgeOf(p,upTo)*PROMO_AGE(p)*TRAIL('o',sectorOf(upTo),year)/Math.exp(PROS_STATS.o[0]))){ /* stepping up by changing employer follows the openings in the industry being moved into (BLS JOLTS): job-ladder moves between employers rise and fall with vacancies (Haltiwanger, Hyatt and McEntarfer, AEJ: Macroeconomics, 2018) */bump('promos');join(p,upTo,p.level+1);p.lastUp=year;tally.upSwitch=(tally.upSwitch||0)+1;note(p,`Starts the new job one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
+    const upTo=p.level===lvBefore&&year-(p.lastUp||-99)>=PROMO_GAP(p.level)&&upPool.length&&pick(upPool);
+    if(!p.laidOff&&p.notice&&!p.back&&upTo&&Math.random()<Math.min(.9,UP_SWITCH*cm('upMult')*edgeOf(p,upTo)*PROMO_AGE(p)*TRAIL('o',sectorOf(upTo),year)/Math.exp(PROS_STATS.o[0]))){ /* stepping up by changing employer follows the openings in the industry being moved into (BLS JOLTS): job-ladder moves between employers rise and fall with vacancies (Haltiwanger, Hyatt and McEntarfer, AEJ: Macroeconomics, 2018) */bump('promos');join(p,upTo,nextUp(p));p.lastUp=year;tally.upSwitch=(tally.upSwitch||0)+1;note(p,`Starts the new job one floor higher: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'promo');if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive by switching to ${p.comp.d[0]}.`,'good')}return}
     /* v43: about 1 in 4 long-tenured displaced workers back in full-time work earned 20% or more below the lost job (BLS Displaced
        Workers Survey, February 2000: 396,000 of 1.6 million); a floor lower stands for that. Until v42 this was our assumption of 40%. */
-    if(p.laidOff&&p.level>0&&Math.random()<.25){const lower=open.filter(L=>L!==p.left&&hasSeat(L,p.level-1,p));if(lower.length){const lv=p.level;join(p,fieldPick(p,lower,null,lv-1),lv-1);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'drop');return}}
+    if(p.laidOff&&p.level>0&&p.level===lvBefore&&!(p.trk==='p'&&p.level===2)&&Math.random()<.25){ /* v45: a professional has no lower professional floor; the pay loss stays within professional work */const dn=nextDown(p),lower=open.filter(L=>L!==p.left&&hasSeat(L,dn,p));if(lower.length){join(p,fieldPick(p,lower,null,dn),dn);note(p,`Takes a step down to get back into work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`,'drop');return}}
     let land=same.length&&landing(p,same,p.level);
+    // v45: a change of line of work that finds no opening falls back to the old line of work and floor
+    if(p.level!==lvBefore&&(!land||land[1]<p.level)){p.level=lvBefore;p.trkGoal=null;land=same.length&&landing(p,open.filter(L=>L!==p.left&&L.top>=p.level),p.level)}
     /* v42: someone who gave notice already has the new job: they never end up "still looking". If the seats they aimed at filled up
        during the notice period, they take the same floor at any employer that has one */
     if(p.notice&&!p.laidOff&&(!land||land[1]<p.level)){const any=open.filter(L=>L!==p.left&&hasSeat(L,p.level,p)),ok=open.filter(L=>L!==p.left&&L.top>=p.level);if(any.length)land=[pick(any),p.level];else if(ok.length)land=[pick(ok),p.level]} // v44: if every seat filled during the notice, the offer still stands
     if(land&&land[1]<p.level&&!p.laidOff){if(!p.tries)note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');p.tries=1;startSearch(p,true);return}
+    /* v45: displaced professionals mostly find professional work again: 71% of displaced professional-specialty workers were re-employed
+       in the same broad occupation (BLS Displaced Workers Survey, via The Economics Daily, 1999), so they keep looking for a Professional
+       job (up to three rounds) before taking other work */
+    if(land&&land[1]<p.level&&p.level===2&&p.trk==='p'&&(p.tries||0)<3&&Math.random()<.71){p.tries=(p.tries||0)+1;startSearch(p,true);if(p.tries===1)note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');return}
     if(land&&land[1]<p.level&&p.laidOff&&!p.tries){p.tries=1;startSearch(p,true);note(p,`No ${lvName(p.level)} seat is free at the companies they want. Keeps looking.`,'move');return}
-    if(land){const wasLaid=p.laidOff,lv0=p.level;p.tries=0;join(p,land[0],land[1]);
-      note(p,p.level<lv0?`Still no ${lvName(lv0)} seat free anywhere; takes a step down to ${lvName(p.level)} at ${p.comp.d[0]}.`:wasLaid?`Back in work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`:`Moves to ${p.comp.d[0]}, same floor as before (${lvName(p.level)})${backIn(p)}.`,p.level<lv0?'drop':'hired');return}
+    if(land){const wasLaid=p.laidOff,lv0=p.level;p.tries=0;applyGoal(p,land[1]);join(p,land[0],land[1]);
+      if(p.tracked&&p.trkNote){note(p,p.trk==='p'&&p.deg&&p.degSaid?`Moves back into professional work.`:p.trk==='p'&&p.deg&&(p.degSaid=true)?`Having finished a degree, moves into professional work.`:p.trk==='p'?`After training, changes line of work: from ${TRK_NAME[p.trkNote]} to professional work.`:`Changes line of work: from ${TRK_NAME[p.trkNote]} to ${TRK_NAME[p.trk]}.`,'move');p.trkNote=null}
+      note(p,p.level!==lvBefore&&p.level===lv0&&lv0<2&&lvBefore<2?`Moves to ${p.comp.d[0]} as ${lvName(p.level)} in ${TRK_NAME[p.trk]}${backIn(p)}.`:p.level!==lvBefore&&p.level===lv0?`Moves to ${p.comp.d[0]} as ${lvName(p.level)}${backIn(p)}.`:p.level<lv0?`Still no ${lvName(lv0)} seat free anywhere; takes a step down to ${lvName(p.level)} at ${p.comp.d[0]}.`:wasLaid?`Back in work: ${lvName(p.level)} at ${p.comp.d[0]}${backIn(p)}.`:`Moves to ${p.comp.d[0]}, same floor as before (${lvName(p.level)})${backIn(p)}.`,p.level<lv0?'drop':'hired');return}
   }
   if(p.comp&&!p.f.g.parent) return;
   // quits and layoffs are drawn ahead for the time until the next check, using the real JOLTS rate of each month in that time, and
@@ -2394,7 +2494,9 @@ function decide(p){
        mix (CPS Table 11b, 2025: service, production and construction 62.5%, sales and office 27.3%, professional and business/financial
        10.2%). From 22: the 20–24 mix without its management share (4.2%), which is held by people who already have some years of work
        behind them: entry 53.9%, junior 23.2%, senior 23.0%. Until v42 the 20–24 mix, management included, applied to every first job. */
-    const first=!!p.fresh;if(p.fresh){p.fresh=false;const r=Math.random(),a0=p.born!=null?year-p.born:22;p.level=a0<22?(r<.625?0:r<.898?1:2):(r<.539?0:r<.771?1:2)}
+    /* v45: the line of work comes first. Under 22, the 16–19 mix (hands-on 62.5%, sales and office 27.3%, professional 10.2%); from 22, by
+       degree (see TRK_BY_DEG). Hands-on and sales/office workers start at Entry, professionals on the Professional floor. */
+    const first=!!p.fresh;if(p.fresh){p.fresh=false;const a0=p.born!=null?year-p.born:22,t=a0<22?drawFrom([.625,.273,.102]):drawFrom(p.deg&&Math.random()<1/DEG_UP?TRK_FIRST_DEG:TRK_BY_DEG[0]) /* by their first job, only the share of 25–29-year-olds with a degree (NCES) have finished one; the rest finish later */;p.trkGoal=t;p.level=t==='p'?2:0}
     if(p.type==='nepo'&&p.level===0){ // family connections open a door above entry level: two floors up where the family controls the company, one elsewhere
       const opts=open.filter(L=>hasSeat(L,isFamily(L)?2:1,p));
       if(opts.length){const L=pick(opts),fam=isFamily(L);join(p,L,fam?2:1);
@@ -2403,8 +2505,8 @@ function decide(p){
     }
     const land=landing(p,open,p.level);
     if(!land) return;
-    const lv0=p.level; join(p,land[0],land[1]);
-    note(p,p.level<lv0&&!first?`No ${lvName(lv0)} seat free; hired at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Hired at ${p.comp.d[0]} as ${lvName(p.level)}.`,p.level<lv0&&!first?'drop':'hired'); return;
+    const lv0=p.level; applyGoal(p,land[1]); join(p,land[0],land[1]); p.trkNote=null;
+    note(p,p.level<lv0&&!first?`No ${lvName(lv0)} seat free; hired at ${p.comp.d[0]} as ${lvName(p.level)}.`:`Hired at ${p.comp.d[0]} as ${lvName(p.level)}${p.level<2?', in '+TRK_NAME[p.trk]:''}.`,p.level<lv0&&!first?'drop':'hired'); return;
   }
   const L=p.comp;
   if(!lock&&p.type==='changer'&&!p.changed&&year>=p.changeYear&&p.level>=1&&(p.born==null||ageOf(p)<50)){ // restarting at entry level: under 50 only (our assumption)
@@ -2412,32 +2514,33 @@ function decide(p){
     walkTo(p,L.fx,L.fz); vert(p,0,'climb');
     const s=[L.fx+(Math.random()-.5)*3,L.fz+(Math.random()-.5)*3]; walkTo(p,s[0],s[1]);
     addLog(`A career changer left ${L.d[0]} at L${p.level} ${LEVELS[p.level-1]} to start over at entry level in a new field.`);
-    p.avoid=sectorOf(L); p.left=null; p.level=0; p.comp=null; p.next=year+.8; return;
+    p.avoid=sectorOf(L); p.left=null; {const t=drawFrom(TRK_BY_DEG[p.deg?1:0],p.trk);p.trkGoal=t;p.level=t==='p'?2:0;if(t!=='p')p.trk=t} p.comp=null; p.fresh=false; p.next=year+.8; return;
   }
   if(!lock&&p.type==='hopper'&&p.wantHop){
-    const opts=open.filter(o=>o!==L&&o.top>p.level&&hasSeat(o,p.level,p));
+    const opts=open.filter(o=>o!==L&&o.top>=nextUp(p)&&hasSeat(o,p.level,p));
     p.wantHop=false; if(opts.length){transfer(p,fieldPick(p,opts));note(p,`Hops to ${p.comp.d[0]} at the same level, ${lvName(p.level)}, chasing a better ladder.`,'move');return}
   }
-  if(p.type==='steady'&&p.level>=p.target) return;
-  if(L.top>p.level){
+  if(p.type==='steady'&&p.level>=(p.trk!=='p'&&p.target===2?1:p.target)) return;
+  const up1=nextUp(p);
+  if(L.top>=up1){
     const edge=edgeOf(p,L);
     // nobody is promoted twice within a year, or within their first year at a company (our rule; LinkedIn career histories at 20 large firms show 30.4 months between promotions
     // on average, and 10.4 months at the fastest, Tesla; Standout CV, 2024)
-    if(year-Math.max(p.lastUp||-99,p.since!=null?p.since:-99)>=PROMO_GAP(p.level)&&Math.random()<hz(BASE[p.level]*sf(L)*edge*cm('promoMult')*PROMO_AGE(p))&&hasSeat(L,p.level+1,p)){bump('promos');takeSeat(p,L,p.level+1);
+    if(year-Math.max(p.lastUp||-99,p.since!=null?p.since:-99)>=PROMO_GAP(p.level)&&Math.random()<hz(BASE[p.level]*sf(L)*edge*cm('promoMult')*PROMO_AGE(p))&&hasSeat(L,up1,p)){bump('promos');takeSeat(p,L,up1);
       const s=spot(p,L);
-      if(p.type==='nepo'){walkTo(p,s[0],s[1]);vert(p,(p.level+1)*GAP,'lift')}
-      else{walkTo(p,L.fx,L.fz); vert(p,(p.level+1)*GAP,'climb'); walkTo(p,s[0],s[1])}
-      p.level++; p.stuck=0; p.lastUp=year; if(p.type==='hopper') p.wantHop=true; note(p,`Promoted to ${lvName(p.level)} at ${L.d[0]}.`,'promo');
+      if(p.type==='nepo'){walkTo(p,s[0],s[1]);vert(p,up1*GAP,'lift')}
+      else{walkTo(p,L.fx,L.fz); vert(p,up1*GAP,'climb'); walkTo(p,s[0],s[1])}
+      p.level=up1; p.stuck=0; p.lastUp=year; if(p.type==='hopper') p.wantHop=true; note(p,`Promoted to ${lvName(p.level)} at ${L.d[0]}.`,'promo');
       if(p.level===5&&!p.reachedTop){p.reachedTop=true;tally.top++;addLog(`A ${TYPES[p.type].name.toLowerCase()} reached Executive at ${L.d[0]}.`,'good')}
     }else if(year-Math.max(p.lastUp||0,p.since||0)>=4&&Math.random()<hz(.15*jq*(p.born!=null?AGE_Q(year-p.born)/AGE_Q(40):1))&&!lock&&p.type!=='steady'&&p.type!=='regular'){
       // passed over: usually look for a better-rated company in the same industry, otherwise any company with a free seat
-      const cand=open.filter(o=>o!==L&&o.top>p.level&&hasSeat(o,p.level,p)), better=cand.filter(o=>sectorOf(o)===sectorOf(L)&&prospects(o).score>prospects(L).score+.1);
+      const cand=open.filter(o=>o!==L&&o.top>=up1&&hasSeat(o,p.level,p)), better=cand.filter(o=>sectorOf(o)===sectorOf(L)&&prospects(o).score>prospects(L).score+.1);
       p.stuck=0; if(cand.length){const nb=notPast(p,better),N=better.length&&Math.random()<.7?pick(nb):fieldPick(p,cand);transfer(p,N);
         const rated=prospects(N).score>prospects(L).score+.1;
         note(p,`Passed over for promotion at ${L.d[0]}; moves to ${N.d[0]}${rated?', where prospects are better':''}.`,'move')}
     }
   }else if(!lock&&p.type!=='steady'&&(p.type!=='regular'||Math.random()<hz(.34*jq))){
-    const opts=open.filter(o=>o.top>p.level&&hasSeat(o,p.level,p));
+    const opts=open.filter(o=>o.top>=up1&&hasSeat(o,p.level,p));
     if(opts.length){transfer(p,fieldPick(p,opts));note(p,`${L.d[0]} has no higher floor. Moves to ${p.comp.d[0]}, which does.`,'move')}
   }
 }
@@ -2496,7 +2599,7 @@ function collapse(L){
     p.q=[]; p.lockUntil=0; let lvl=Math.max(0,Math.round(p.y/GAP)); p.level=lvl; p.comp=null; p.next=year+.5+Math.random();
     const open=alive().filter(o=>hasSeat(o,lvl,p));
     if(lvl>0&&Math.random()<.5&&open.length){const N=fieldPick(p,open,sectorOf(L));takeSeat(p,N,lvl);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N;same++;note(p,`${L.d[0]} collapses. Finds work at ${N.d[0]} on the same floor, ${lvName(lvl)}.`,'move');continue}
-    const nl=Math.max(0,lvl-1); if(nl<lvl) vert(p,nl*GAP,'fall'); p.level=nl;
+    const nl=nextDown(p,lvl); if(nl<lvl) vert(p,nl*GAP,'fall'); p.level=nl;
     if(nl===0){ground++;setLaidOff(p,true);bump('layoffs',true);note(p,`${L.d[0]} collapses. Laid off and back to entry level.`,'laid');continue}
     const o2=alive().filter(o=>hasSeat(o,nl,p));
     if(o2.length){const N=fieldPick(p,o2,sectorOf(L));takeSeat(p,N,nl);const s=spot(p,N);walkTo(p,s[0],s[1]);p.comp=N}
@@ -2549,7 +2652,7 @@ function simulate(dt){
     // pace as the statistical sample instead of losing years to animation
     // v39: a figure that is behind its next decision walks faster to catch up (up to about 8 times, at a quarter of a year behind),
     // so moves stay visible; only a figure a whole simulated year behind finishes its move at once
-    if(year>=p.next&&(!p.q.length||year>=p.next+(+globalThis.LAG||1))){if(p.q.length)finishMoves(p);curP=p;decide(p);curP=null;p.hzTo=p.next}
+    if(year>=p.next&&(!p.q.length||year>=p.next+(p.seeking?0:(+globalThis.LAG||1)))){if(p.q.length)finishMoves(p); /* v45: a search or a notice period that is over ends on time, even if the figure is still walking, so the dates in the journey are exact */curP=p;decide(p);curP=null;p.hzTo=p.next}
     stepPerson(p,sdt*(p.q.length&&year>p.next?Math.min(12,1+(year-p.next)*28):1)) }
   stepCases(sdt);
   cmpSample(yPrev); if(CMP&&(year-(CMP.r||0)>=.5||year>=END)){CMP.r=year;renderCmp()} if(year>=END)cmpSaveRun();
@@ -2733,7 +2836,7 @@ const SHARE_CHECK={"years": ["2001", "2009", "2017", "2025"], "rows": [["Manufac
 function renderShare(){const el=document.getElementById('shareTable');if(!el)return;
   el.innerHTML='<thead><tr><th>Industry</th>'+SHARE_CHECK.years.map(y=>`<th>${y}<br><span>model / real</span></th>`).join('')+'</tr></thead><tbody>'+
   SHARE_CHECK.rows.map(r=>'<tr><td>'+r[0]+'</td>'+r.slice(1).map(c=>`<td>${c[0].toFixed(1)}% / ${c[1].toFixed(1)}%</td>`).join('')+'</tr>').join('')+'</tbody>'}
-const CMP_REF_L={"light": {"runs": 6, "overall": 86.9, "s": {"quitsY": 92.5, "laysY": 89.7, "sep11": 94.0, "gfcQ": 94.3, "gfcL": 96.3, "covidL": 82.1, "greatQ": 96.5, "indQ": 92.4, "indL": 87.6, "mix": 96.0, "size": 79.9, "mirror": 94.0, "floors": 98.6, "age": 93.5, "tenure": 90.2, "tenAge": 81.2, "tenInd": 81.3, "tenFloor": 65.2, "le1": 92.5, "ten10": 93.4, "jobsAge": 87.9, "shortJobs": 60.2, "mgmtAge": 72.3, "floorAge": 82.1, "outLF": 91.2, "toNILF": 80.8, "rehire": 92.4, "oow": 71.8, "jobLoss": 70.0, "swP": 98.2, "cross": 95.8}}, "std": {"runs": 6, "overall": 88.1, "s": {"quitsY": 93.8, "laysY": 90.9, "sep11": 96.9, "gfcQ": 96.4, "gfcL": 95.7, "covidL": 85.3, "greatQ": 97.2, "indQ": 94.4, "indL": 92.6, "mix": 96.2, "size": 92.1, "mirror": 92.8, "floors": 98.8, "age": 93.5, "tenure": 89.5, "tenAge": 84.8, "tenInd": 83.7, "tenFloor": 70.9, "le1": 93.6, "ten10": 93.1, "jobsAge": 88.0, "shortJobs": 60.2, "mgmtAge": 70.0, "floorAge": 80.4, "outLF": 91.5, "toNILF": 81.4, "rehire": 98.0, "oow": 71.7, "jobLoss": 69.8, "swP": 89.2, "cross": 100}}, "full": {"runs": 6, "overall": 87.7, "s": {"quitsY": 93.9, "laysY": 90.8, "sep11": 96.2, "gfcQ": 97.0, "gfcL": 97.6, "covidL": 83.6, "greatQ": 97.5, "indQ": 94.0, "indL": 92.5, "mix": 96.4, "size": 91.6, "mirror": 92.3, "floors": 98.8, "age": 93.9, "tenure": 90.3, "tenAge": 83.6, "tenInd": 85.8, "tenFloor": 71.1, "le1": 90.3, "ten10": 93.8, "jobsAge": 87.4, "shortJobs": 60.3, "mgmtAge": 68.2, "floorAge": 80.6, "outLF": 92.7, "toNILF": 80.3, "rehire": 93.5, "oow": 72.7, "jobLoss": 72.3, "swP": 78.3, "cross": 100}}}; let CMP_REF=CMP_REF_L[typeof DETAIL==='undefined'?'std':DETAIL]; // typical scores: average of 6 full runs at each detail level (version 44)
+const CMP_REF_L={"light": {"runs": 6, "overall": 87.0, "s": {"quitsY": 94.0, "laysY": 89.2, "sep11": 94.5, "gfcQ": 91.5, "gfcL": 96.0, "covidL": 84.3, "greatQ": 96.3, "indQ": 92.5, "indL": 85.3, "mix": 93.6, "size": 80.5, "mirror": 94.0, "floors": 96.4, "age": 94.6, "tenure": 90.7, "tenAge": 83.0, "tenInd": 82.3, "tenFloor": 62.3, "le1": 93.3, "ten10": 88.6, "jobsAge": 88.4, "shortJobs": 60.7, "mgmtAge": 75.1, "floorAge": 85.9, "degree": 84.6, "outLF": 93.9, "toNILF": 78.8, "rehire": 91.7, "oow": 71.8, "jobLoss": 71.2, "swP": 100, "cross": 100}}, "std": {"runs": 6, "overall": 88.3, "s": {"quitsY": 95.2, "laysY": 90.8, "sep11": 96.1, "gfcQ": 94.9, "gfcL": 97.1, "covidL": 83.5, "greatQ": 96.2, "indQ": 94.0, "indL": 90.7, "mix": 94.3, "size": 90.6, "mirror": 92.8, "floors": 96.4, "age": 94.5, "tenure": 90.5, "tenAge": 84.5, "tenInd": 85.0, "tenFloor": 69.8, "le1": 91.6, "ten10": 89.5, "jobsAge": 87.5, "shortJobs": 61.3, "mgmtAge": 77.4, "floorAge": 87.0, "degree": 85.5, "outLF": 92.0, "toNILF": 78.4, "rehire": 96.3, "oow": 71.2, "jobLoss": 71.3, "swP": 99.8, "cross": 100}}, "full": {"runs": 6, "overall": 87.8, "s": {"quitsY": 95.2, "laysY": 89.5, "sep11": 96.4, "gfcQ": 96.4, "gfcL": 94.2, "covidL": 84.5, "greatQ": 94.9, "indQ": 93.3, "indL": 89.6, "mix": 94.3, "size": 89.4, "mirror": 92.3, "floors": 96.9, "age": 93.5, "tenure": 90.4, "tenAge": 83.1, "tenInd": 84.1, "tenFloor": 65.6, "le1": 93.7, "ten10": 90.7, "jobsAge": 88.0, "shortJobs": 61.6, "mgmtAge": 79.3, "floorAge": 87.6, "degree": 84.7, "outLF": 92.8, "toNILF": 79.0, "rehire": 93.3, "oow": 72.6, "jobLoss": 70.4, "swP": 93.6, "cross": 100}}}; let CMP_REF=CMP_REF_L[typeof DETAIL==='undefined'?'std':DETAIL]; // typical scores: average of 6 full runs at each detail level (version 45)
 /* ---------- model vs real world: the comparator ----------
    Every metric the model can be checked on, measured live in this run from the statistical sample and set against the real US
    figure for the same years. Each gets a match score from 0 to 100; the overall score is their plain average. Metrics that need
@@ -2768,6 +2871,7 @@ const CMP_REAL={
   /* v42: of prime-age workers (25-55) who leave a job for non-employment, the share who leave the labour force rather than look for
      work: about 85% after a quit and 35% after a layoff (CPS, Ellieroth and Michaud, FRED EMSHRNQP and EMSHRNLP, 1978-2026 averages) */
   toNILF:[85,35],
+  degree:[38.9,72.4,20.6],                 // v45: % of labour force 25+ with a degree; % of degree holders / of others in management or professional work (BLS, 2016)
   rehire:4.5,                               // % of new hires who are former employees, not recalls (LinkedIn, 2021; 3.9% in 2019)
   switchPromo:[15,23],                      // % of promotions that come with a change of employer (DeVaro et al.; Bidwell & Mollick 2015)
   crossInd:[35,50]                          // % of employer changes that cross industry (supersector) lines
@@ -2802,12 +2906,14 @@ const CMP_INFO={
   swP:['Promotions that come with a new employer','DeVaro et al.; Bidwell & Mollick 2015'],
   cross:['Employer changes that cross industries','Job-to-job flow studies (supersector)'],
   floorAge:['Floor mix by age (entry or junior / senior / lead+)','BLS CPS Table 11b, 2025, occupations mapped to floors'],
+  degree:['Degrees and the work people do, 2016','BLS: share of the labour force aged 25+ with a bachelor\'s degree, and share of degree holders and of others in management or professional jobs'],
+  trkMove:['Changing line of work (hands-on, sales and office, professional)','Not scored: our assumption, informed by occupation switching in the PSID (Kambourov and Manovskii) and the CPS'],
   rehire:['Hires who go back to a former employer','LinkedIn, 2021: 4.5% of new hires (recalls after temporary layoffs not included)'],
   toNILF:['Leaving the workforce after a quit or a layoff','CPS, ages 25–55 (Ellieroth and Michaud, FRED EMSHRNQP and EMSHRNLP)']
 };
 const CMP_GROUPS=[['Turnover over time',['quitsY','laysY','sep11','gfcQ','gfcL','covidL','greatQ']],
   ['Industries and companies',['indQ','indL','mix','size','mirror']],
-  ['Workers and careers',['floors','age','tenure','tenAge','tenInd','tenFloor','le1','ten10','jobsAge','shortJobs','mgmtAge','floorAge','outLF','toNILF','rehire','oow','jobLoss','swP','cross']]];
+  ['Workers and careers',['floors','age','tenure','tenAge','tenInd','tenFloor','le1','ten10','jobsAge','shortJobs','mgmtAge','floorAge','degree','trkMove','outLF','toNILF','rehire','oow','jobLoss','swP','cross']]];
 // what we know about the gaps that remain, and what would fix them
 const CMP_NOTES={
   shortJobs:'Too few jobs started young end within a year (about 50% against 61%) and too many started at 25–38 (about 48% against 32%). The model\'s frequent movers settle down with age, but not as much as real ones.',
@@ -2816,7 +2922,8 @@ const CMP_NOTES={
   mgmtAge:'Workers aged 25–34 reach management a little less often than in the CPS (about 6–10% against 10%).',
   outLF:'Close at 18–23; a little high at 24–38 and 45–54 (about 19% against 15–17%).',
   toNILF:'After a quit the share matches. After a layoff about 26% leave the workforce against 35%: more breaks there would push time unemployed further below the NLSY79 figure, so the two are balanced.',
-  floorAge:'Workers aged 20–24 are less often at entry or junior level than in the CPS; from 25 senior jobs are a little over-represented.',
+  floorAge:'Close at most ages. Professional jobs are a little over-represented at 35–44: the model keeps the 2025 job pyramid for every year, while professional jobs in fact grew as a share of all jobs since 2000.',
+  degree:'The degree share and the work degree holders do are close. Workers without a degree are in professional or management work a little more often than in 2016 (about 28% against 21%), for the same reason: the job pyramid is the 2025 one.',
   rehire:'Close to the LinkedIn figure.',
   jobLoss:'In the survey, job loss in 2007–09 was 1.9 times its 2005–07 level; in the model it rises less. Most normal-times layoffs in the model are spread across all workers over 30, so a downturn adds proportionally less. The survey\'s own levels are lower than the model\'s, but they are known to undercount (people forget job losses), so the levels are shown, not scored.',
   jobsAge:'Young workers start about 1.06 new jobs a year at 18–23 against 0.85 in the survey, and 0.41 at 30–38 against 0.32. Total quits are fixed by JOLTS, so moving quits away from the young raises them at other ages; the current setting is the best balance found.',
@@ -2830,7 +2937,7 @@ const CMP_NOTES={
 };
 let CMP=null, CMP_LAST=null;
 function cmpReset(){CMP={t:0,e:{},q:{},l:{},ay:[0,0,0,0],aj:[0,0,0,0],U:0,T:0,pro:0,swp:0,chg:0,cross:0,
-  mixD:[],sizeD:[],flD:[],ageS:{},tenS:{},t24:null,jw:{},jl:{},sj:[],N:[0,0,0],NT:[0,0,0],rt:{q:[0,0],l:[0,0]},rh:[0,0],done:false}}
+  mixD:[],sizeD:[],flD:[],ageS:{},tenS:{},t24:null,jw:{},jl:{},sj:[],N:[0,0,0],NT:[0,0,0],rt:{q:[0,0],l:[0,0]},rh:[0,0],ts:[0,0],done:false}}
 const cmpBand=a=>a<18?-1:a<24?0:a<30?1:a<39?2:a<45?-1:a<57?3:-1;
 function cmpNote(p,text,kind){if(!CMP||burning)return;
   if(kind==='promo'){CMP.pro++;if(text&&text.startsWith('Starts the new job one floor higher'))CMP.swp++}
@@ -2853,6 +2960,7 @@ function cmpSample(y0){if(!CMP)return;const dy=year-y0;if(dy<=0)return;const yr=
     else if(year>=2002&&!(p.notice&&p.seeking)&&a!=null&&a>=18&&a<57)CMP.U+=dy;
     if(year>=2002&&a!=null&&(a>=18&&a<39||a>=45&&a<55))CMP.NT[a<24?0:a<39?1:2]+=dy; // from 2002, after the start-up months when many newcomers look for a first job at once
     if(year>=2001&&a!=null&&a>=18&&a<57){if(year>=2002)CMP.T+=dy;if(b>=0)CMP.ay[b]+=dy}
+    if(year>=2001&&p.comp&&a!=null&&a>=25&&a<55&&p.level<3)CMP.ts[0]+=dy;
   }
   // snapshots at fixed moments: tenure surveys in January, ages mid-year, the job-loss windows
   for(const y in CMP_REAL.tenure){const t=+y+.05;if(!CMP.tenS[y]&&year>=t&&y0<t+.5)CMP.tenS[y]=cmpMedian(people.filter(p=>p.shadow&&p.comp&&p.since!=null).map(p=>year-p.since))}
@@ -2865,6 +2973,10 @@ function cmpSample(y0){if(!CMP)return;const dy=year-y0;if(dy<=0)return;const yr=
     CMP.t24.fl=[0,1,2,3,4,5].map(l=>cmpMedian(e.filter(p=>p.level===l).map(p=>year-p.since)));
     CMP.t24.mg=[[20,25],[25,35],[35,45],[45,55],[55,65]].map(([lo,hi])=>{const g=e.filter(p=>p.born!=null&&year-p.born>=lo&&year-p.born<hi);return g.length>=30?100*g.filter(p=>p.level>=3).length/g.length:null});
     CMP.t24.fa=[[20,25],[25,35],[35,45],[45,55],[55,65]].map(([lo,hi])=>{const g=e.filter(p=>p.born!=null&&year-p.born>=lo&&year-p.born<hi);return g.length>=30?[0,1,2].map(l=>100*g.filter(p=>l===0?p.level<=1:l===1?p.level===2:p.level>=3).length/g.length):null})}
+  // v45: degree and line of work, 2016 (BLS: 38.9% of the labour force aged 25+ held a bachelor's degree or more; of them 72.4% worked in
+  // management or professional jobs, against 20.6% of those without)
+  if(!CMP.d16&&year>=2016.5){const w=people.filter(p=>p.shadow&&(p.comp||p.seeking)&&p.born!=null&&year-p.born>=25),e=w.filter(p=>p.comp),dg=e.filter(p=>p.deg),nd=e.filter(p=>!p.deg),pm=g=>g.length?100*g.filter(p=>p.trk==='p'||p.level>=3).length/g.length:null;
+    CMP.d16={deg:w.length?100*w.filter(p=>p.deg).length/w.length:null,pd:pm(dg),pn:pm(nd)}}
   for(const [nm,[w0,w1]] of Object.entries(CMP_REAL.jobLoss)){
     if(!CMP.jw[nm]&&year>=w0){CMP.jw[nm]=new Map();for(const p of people)if(p.shadow&&p.born!=null&&year-p.born>=20&&year-p.born<=64)CMP.jw[nm].set(p,p._gen)}
     if(CMP.jw[nm]&&CMP.jl[nm]==null&&year>=w1){let n=0,h=0;for(const [p,g] of CMP.jw[nm]){if(p._gen!==g)continue;n++;if(p._nr&&p._nr.some(t=>t>=w0&&t<w1))h++}CMP.jl[nm]=n?100*h/n:null}
@@ -2916,6 +3028,8 @@ function cmpCompute(){if(!CMP)return null;const R={},yNow=Math.floor(year);
   R.floorAge=t&&t.fa?(()=>{const sc=[],dt=[];t.fa.forEach((r,i)=>{if(!r)return;r.forEach((v,j)=>sc.push(mRel(v,CMP_REAL.floorAge[i][j])));dt.push(['20–24','25–34','35–44','45–54','55–64'][i]+': '+r.map(v=>v.toFixed(0)).join('/')+' vs '+CMP_REAL.floorAge[i].map(v=>v.toFixed(0)).join('/'))});
     return {m:t.fa[3]?t.fa[3][0]:null,r:CMP_REAL.floorAge[3][0],fmt:v=>v.toFixed(0)+'% entry or junior at 45–54',s:mAvg(sc),det:dt.join('; ')}})():null;
   R.toNILF=CMP.rt&&CMP.rt.q[0]>=30&&CMP.rt.l[0]>=30?(()=>{const q=100*CMP.rt.q[1]/CMP.rt.q[0],l=100*CMP.rt.l[1]/CMP.rt.l[0];return {m:q,r:85,fmt:v=>v.toFixed(0)+'% after quits',s:mAvg([mRel(q,85),mRel(l,35)]),det:'after a quit / a layoff: '+q.toFixed(0)+'% / '+l.toFixed(0)+'% vs 85% / 35%'}})():null;
+  R.degree=CMP.d16&&CMP.d16.deg!=null?{m:CMP.d16.deg,r:38.9,fmt:v=>v.toFixed(1)+'% with a degree',s:mAvg([mRel(CMP.d16.deg,38.9),mRel(CMP.d16.pd,72.4),mRel(CMP.d16.pn,20.6)]),det:`in management or professional work: degree ${CMP.d16.pd==null?'–':CMP.d16.pd.toFixed(0)}% vs 72%, no degree ${CMP.d16.pn==null?'–':CMP.d16.pn.toFixed(0)}% vs 21%`}:null;
+  R.trkMove=CMP.ts&&CMP.ts[0]>100?{m:100*CMP.ts[1]/CMP.ts[0],r:null,rt:'–',fmt:v=>v.toFixed(1)+'% a year',s:null,det:'non-managers aged 25–54'}:null;
   R.rehire=CMP.rh&&CMP.rh[0]>=200?{m:100*CMP.rh[1]/CMP.rh[0],r:4.5,fmt:v=>v.toFixed(1)+'%',s:mRel(100*CMP.rh[1]/CMP.rh[0],4.5)}:null;
   R.mgmtAge=t&&t.mg?{m:mAvg(t.mg),r:mAvg(CMP_REAL.mgmtAge),fmt:v=>v.toFixed(1)+'% avg',s:mAvg(t.mg.map((v,i)=>v==null?null:mRel(v,CMP_REAL.mgmtAge[i]))),det:'20–24 / 25–34 / 35–44 / 45–54 / 55–64: '+t.mg.map(v=>v==null?'–':v.toFixed(1)).join(' / ')+' vs '+CMP_REAL.mgmtAge.join(' / ')}:null;
   R.outLF=CMP.NT[1]>50?{m:100*(CMP.N[0]+CMP.N[1])/(CMP.NT[0]+CMP.NT[1]),r:18,fmt:v=>v.toFixed(1)+'% at 18–38',s:mAvg([0,1,2].map(i=>CMP.NT[i]>50?mRel(100*CMP.N[i]/CMP.NT[i],CMP_REAL.outLF[i]):null)),det:'18–23 / 24–38 / 45–54: '+[0,1,2].map(i=>CMP.NT[i]>50?(100*CMP.N[i]/CMP.NT[i]).toFixed(1)+'%':'–').join(' / ')+' vs '+CMP_REAL.outLF.join('% / ')+'%'}:null;
@@ -2957,7 +3071,7 @@ function renderCmp(force){const el=document.getElementById('cmp');if(!el)return;
 }
 // a short record of finished runs, kept in this browser only
 function cmpSaveRun(){if(!CMP||CMP.done||!CMP_LAST||CMP_LAST.overall==null)return;CMP.done=true;
-  try{const h=JSON.parse(localStorage.getItem('lf-cmp')||'[]');h.unshift({d:new Date().toISOString().slice(0,10),v:'44',det:DETAIL,o:Math.round(CMP_LAST.overall),n:CMP_LAST.got.length});localStorage.setItem('lf-cmp',JSON.stringify(h.slice(0,8)))}catch(e){}}
+  try{const h=JSON.parse(localStorage.getItem('lf-cmp')||'[]');h.unshift({d:new Date().toISOString().slice(0,10),v:'45',det:DETAIL,o:Math.round(CMP_LAST.overall),n:CMP_LAST.got.length});localStorage.setItem('lf-cmp',JSON.stringify(h.slice(0,8)))}catch(e){}}
 function cmpHistory(){const el=document.getElementById('cmpHist');if(!el)return;let h=[];try{h=JSON.parse(localStorage.getItem('lf-cmp')||'[]')}catch(e){}
   el.innerHTML=h.length?`<p class="small"><b>Your finished runs in this browser:</b> ${h.map(x=>`${x.o}% (${x.d}, ${({light:'Light',std:'Standard',full:'Full'})[x.det]||x.det})`).join(' · ')}</p>`:''}
 
